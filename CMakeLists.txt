@@ -167,4 +167,6 @@ if(WITH_ROS_SUPPORT)
   )
 endif()
 
+add_subdirectory(robots)
+
 install(CODE "message(\"Installation done\")")
