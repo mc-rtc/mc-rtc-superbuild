@@ -133,21 +133,16 @@ AddProject(mc_rbdyn_urdf
   DEPENDS RBDyn
 )
 
+AddCatkinProject(mc_rtc_data
+  GITHUB jrl-umi3218/mc_rtc_data
+  GIT_TAG master
+  WORKSPACE "${CATKIN_DATA_WORKSPACE}"
+)
 if(WITH_ROS_SUPPORT)
-  AddCatkinProject(mc_rtc_data
-    GITHUB jrl-umi3218/mc_rtc_data
-    GIT_TAG master
-    WORKSPACE "${CATKIN_DATA_WORKSPACE}"
-  )
   AddCatkinProject(mc_rtc_msgs
     GITHUB jrl-umi3218/mc_rtc_msgs
     GIT_TAG master
     WORKSPACE "${CATKIN_DATA_WORKSPACE}"
-  )
-else()
-  AddProject(mc_rtc_data
-    GITHUB jrl-umi3218/mc_rtc_data
-    GIT_TAG master
   )
 endif()
 

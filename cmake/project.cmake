@@ -189,12 +189,18 @@ function(AddCatkinProject NAME)
     message(FATAL_ERROR "WORKSPACE must be provided when calling AddCatkinProject")
   endif()
   set(WORKSPACE "${ADD_CATKIN_PROJECT_ARGS_WORKSPACE}")
-  AddProject(${NAME}
-    SOURCE_DIR "${WORKSPACE}/src/${NAME}"
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND catkin_make -C "${WORKSPACE}" -DCMAKE_BUILD_TYPE=$<CONFIG>
-    INSTALL_COMMAND ""
-    SKIP_TEST
-    ${ARGV}
-  )
+  if(WITH_ROS_SUPPORT)
+    AddProject(${NAME}
+      SOURCE_DIR "${WORKSPACE}/src/${NAME}"
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND catkin_make -C "${WORKSPACE}" -DCMAKE_BUILD_TYPE=$<CONFIG>
+      INSTALL_COMMAND ""
+      SKIP_TEST
+      ${ARGV}
+    )
+  else()
+    AddProject(${NAME}
+      ${ARGV}
+    )
+  endif()
 endfunction()
