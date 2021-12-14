@@ -6,7 +6,7 @@
 option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 option(INSTALL_SYSTEM_DEPENDENCIES "Install system dependencies" ON)
 option(WITH_LSSOL "Enable LSSOL support" OFF)
-if(UNIX)
+if(UNIX AND NOT APPLE)
   set(WITH_ROS_SUPPORT_DEFAULT ON)
 else()
   set(WITH_ROS_SUPPORT_DEFAULT OFF)
