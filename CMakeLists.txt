@@ -164,6 +164,7 @@ if(WITH_ROS_SUPPORT)
     GITHUB jrl-umi3218/mc_rtc_ros
     GIT_TAG master
     WORKSPACE "${CATKIN_WORKSPACE}"
+    DEPENDS mc_rtc
   )
 endif()
 
