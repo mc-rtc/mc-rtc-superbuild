@@ -20,6 +20,7 @@ set(BREW_DEPENDENCIES
   gcc
   spdlog
   ninja
+  git
 )
 if(BUILD_BENCHMARKS)
   list(APPEND BREW_DEPENDENCIES google-benchmark)
