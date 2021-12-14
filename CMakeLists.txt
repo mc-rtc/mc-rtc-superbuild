@@ -21,7 +21,7 @@ if(WIN32)
   include(cmake/win32-dependencies.cmake)
 endif()
 
-if(UNIX)
+if(UNIX AND NOT APPLE)
   include(cmake/linux-dependencies.cmake)
 endif()
 
