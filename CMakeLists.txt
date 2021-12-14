@@ -83,7 +83,7 @@ if(PYTHON_BINDING)
   AddProject(sch-core-python
     GITHUB jrl-umi3218/sch-core-python
     GIT_TAG master
-    DEPENDS sch-core
+    DEPENDS sch-core SpaceVecAlg
   )
 endif()
 
