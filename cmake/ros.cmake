@@ -1,6 +1,6 @@
 # A function to mimic source $WORKSPACE/devel/setup.bash in CMake
 function(AppendROSWorkspace DEV_DIR SRC_DIR)
-  if(ENV{CMAKE_PREFIX_PATH} MATCHES "${DEV_DIR}")
+  if("$ENV{CMAKE_PREFIX_PATH}" MATCHES "${DEV_DIR}")
     return()
   endif()
   set(ENV{CMAKE_PREFIX_PATH} "${DEV_DIR}:$ENV{CMAKE_PREFIX_PATH}")
