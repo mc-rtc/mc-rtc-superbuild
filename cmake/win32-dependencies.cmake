@@ -1,0 +1,40 @@
+if(NOT DEFINED MSVC_TOOLSET_VERSION)
+  message(FATAL_ERROR "This tool assumes you are using MSVC to build under Windows, please revise win32-dependencies.cmake to handle your toolset")
+endif()
+
+if(NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "AMD64")
+  message(FATAL_ERROR "Only 64 bits builds are currently supported by this tool")
+endif()
+
+set(BOOST_VERSION "1.78.0")
+string(REPLACE "." "_" BOOST_VERSION_ "${BOOST_VERSION}")
+if(${MSVC_TOOLSET_VERSION} EQUAL 141) # VS 2017
+  set(MSVC_TOOLSET_VERSION_DOT "14.1")
+  set(BOOST_BINARIES_SHA256 0b52fe1b7bc93aadcfec5d0a94fb2bf3f881e6995601188355343b951e26175b)
+elseif(${MSVC_TOOLSET_VERSION} EQUAL 142) # VS 2019
+  set(MSVC_TOOLSET_VERSION_DOT "14.2")
+  set(BOOST_BINARIES_SHA256 719817954ab82aba4458f55ccaee02df9ad15dc3e082f882eed626ba0c38b5cf)
+elseif(${MSVC_TOOLSET_VERSION} EQUAL 143) # VS 2019
+  set(MSVC_TOOLSET_VERSION_DOT "14.3")
+  set(BOOST_BINARIES_SHA256 b8911c98c2a95faa516aca354872b0ea63962a437382822aaf7bca95f528db65)
+else()
+  if(${MSVC_TOOLSET_VERSION} LESS 141)
+    message(FATAL_ERROR "Your version of Visual Studio is too old. Upgrade to VS 2017 or later.")
+  else()
+    message(FATAL_ERROR "It seems your version of Visual Studio is recent. Please contact mc_rtc maintainers.")
+  endif()
+endif()
+
+set(BOOST_BINARIES "https://sourceforge.net/projects/boost/files/boost-binaries/${BOOST_VERSION}/boost_${BOOST_VERSION_}-msvc-${MSVC_TOOLSET_VERSION_DOT}.exe")
+
+message(STATUS "Downloading Boost binaries: ${BOOST_BINARIES}")
+set(BOOST_EXE_OUT "${CMAKE_CURRENT_BINARY_DIR}/boost_${BOOST_VERSION_}.exe")
+file(DOWNLOAD "${BOOST_BINARIES}" "${BOOST_EXE_OUT}" EXPECTED_HASH SHA256=${BOOST_BINARIES_SHA256} SHOW_PROGRESS)
+set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/Boost/${BOOST_VERSION}/x86_64")
+if(NOT EXISTS "${BOOST_ROOT}")
+  execute_process(COMMAND "${BOOST_EXE_OUT}" /SILENT /SP- /SUPPRESSMSGBOXES "/DIR=${BOOST_ROOT}")
+endif()
+set(ENV{BOOST_ROOT} "${BOOST_ROOT}")
+if(NOT "$ENV{PATH}" MATCHES "${BOOST_ROOT}/lib64-msvc-${MSVC_TOOLSET_VERSION_DOT}")
+  set(ENV{PATH} "${BOOST_ROOT}/lib64-msvc-${MSVC_TOOLSET_VERSION_DOT};$ENV{PATH}")
+endif()
