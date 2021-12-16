@@ -27,3 +27,4 @@ jobs:
       with:
         compiler: gcc
         build-type: RelWithDebInfo
+        options: -DUPDATE_ALL=OFF
