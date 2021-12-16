@@ -51,3 +51,5 @@ endif()
 if(NOT "$ENV{PATH}" MATCHES "${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin")
   set(ENV{PATH} "${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin;$ENV{PATH}")
 endif()
+
+include(projects/spdlog.cmake)

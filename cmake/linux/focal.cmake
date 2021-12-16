@@ -1,6 +1,5 @@
 set(MC_LOG_UI_PYTHON_EXECUTABLE python3)
 set(ROS_DISTRO noetic)
-set(SYSTEM_HAS_SPDLOG TRUE)
 set(APT_DEPENDENCIES
   curl
   wget

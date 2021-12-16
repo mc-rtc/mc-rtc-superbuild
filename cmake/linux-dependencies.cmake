@@ -9,7 +9,6 @@ execute_process(COMMAND lsb_release -sc OUTPUT_VARIABLE DISTRO OUTPUT_STRIP_TRAI
 if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/linux/${DISTRO}.cmake)
   include(${PROJECT_SOURCE_DIR}/cmake/linux/${DISTRO}.cmake)
 else()
-  set(SYSTEM_HAS_SPDLOG TRUE)
   message(WARNING "Unknown distribution ${DISTRO}. This script will continue assuming you have all system dependencies available already")
   message(AUTHOR_WARNING "You can add a file: ${PROJECT_SOURCE_DIR}/cmake/linux/${DISTRO}.cmake to inform this script about the distribution.")
 endif()

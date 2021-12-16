@@ -35,3 +35,6 @@ set(APT_DEPENDENCIES
 if(BUILD_BENCHMARKS)
   list(APPEND APT_DEPENDENCIES libbenchmark-dev)
 endif()
+
+# We need spdlog >= 1.5.0 and it is not available in Bionic
+include(projects/spdlog.cmake)

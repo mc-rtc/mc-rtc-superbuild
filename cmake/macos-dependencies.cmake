@@ -1,4 +1,3 @@
-set(SYSTEM_HAS_SPDLOG TRUE)
 set(BREW_DEPENDENCIES
   coreutils
   pkg-config

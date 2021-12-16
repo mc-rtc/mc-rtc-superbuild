@@ -11,8 +11,6 @@ endif()
 include(cmake/project.cmake)
 include(cmake/ros.cmake)
 
-set(SYSTEM_HAS_SPDLOG FALSE)
-
 if(APPLE)
   include(cmake/macos-dependencies.cmake)
 endif()
@@ -38,15 +36,6 @@ if(WITH_ROS_SUPPORT)
 else()
   set(CATKIN_DATA_WORKSPACE "${CATKIN_WORKSPACE_BASEDIR}")
   set(CATKIN_WORKSPACE "${CATKIN_WORKSPACE_BASEDIR}")
-endif()
-
-if(NOT SYSTEM_HAS_SPDLOG)
-  AddProject(spdlog
-    GITHUB gabime/spdlog
-    GIT_TAG v1.6.1
-    CMAKE_ARGS -DSPDLOG_BUILD_EXAMPLE:BOOL=OFF -DSPDLOG_BUILD_SHARED:BOOL=ON
-    SKIP_TEST
-  )
 endif()
 
 AddProject(hpp-spline
@@ -150,7 +139,7 @@ if(WITH_ROS_SUPPORT)
 endif()
 
 set(mc_rtc_DEPENDS Tasks mc_rbdyn_urdf mc_rtc_data hpp-spline state-observation)
-if(NOT SYSTEM_HAS_SPDLOG)
+if(TARGET spdlog)
   list(APPEND mc_rtc_DEPENDS spdlog)
 endif()
 if(WITH_ROS_SUPPORT)
