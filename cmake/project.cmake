@@ -17,6 +17,9 @@ include(ExternalProject)
 # - GITE <org/project> Use https://gite.lirmm.fr/org/project as GIT_REPOSITORY
 # - GIT_TAG <tag> Use this argument as GIT_TAG, defaults to main
 function(AddProject NAME)
+  if(TARGET ${NAME})
+    return()
+  endif()
   set(options NO_NINJA GIT_USE_SSH SKIP_TEST)
   set(oneValueArgs GITHUB GITE GIT_REPOSITORY GIT_TAG SOURCE_DIR)
   set(multiValueArgs CMAKE_ARGS BUILD_COMMAND CONFIGURE_COMMAND INSTALL_COMMAND)
