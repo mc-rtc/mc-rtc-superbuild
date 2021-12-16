@@ -22,9 +22,11 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
-    - name: Build and test
-      uses: jrl-umi3218/github-actions/build-cmake-project@master
-      with:
-        compiler: gcc
-        build-type: RelWithDebInfo
-        options: -DUPDATE_ALL=OFF
+    - name: Install system dependencies
+      shell: bash
+      run: |
+        cmake -S ${GITHUB_WORKSPACE} -B /build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUPDATE_ALL=OFF
+    - name: Install mc_rtc and related projects
+      shell: bash
+      run: |
+        cmake --build /build --config RelWithDebInfo
