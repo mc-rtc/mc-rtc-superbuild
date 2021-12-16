@@ -145,9 +145,13 @@ endif()
 if(TARGET mc_rtc_msgs)
   list(APPEND mc_rtc_DEPENDS mc_rtc_msgs)
 endif()
+if(NOT DEFINED MC_LOG_UI_PYTHON_EXECUTABLE)
+  set(MC_LOG_UI_PYTHON_EXECUTABLE python)
+endif()
 AddProject(mc_rtc
   GITHUB jrl-umi3218/mc_rtc
   GIT_TAG master
+  CMAKE_ARGS -DMC_LOG_UI_PYTHON_EXECUTABLE=${MC_LOG_UI_PYTHON_EXECUTABLE}
   DEPENDS ${mc_rtc_DEPENDS}
 )
 
