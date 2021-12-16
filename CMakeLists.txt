@@ -56,13 +56,13 @@ if(PYTHON_BINDING)
     GITHUB jrl-umi3218/Eigen3ToPython
     GIT_TAG master
   )
-  set(SVA_DEPENDS DEPENDS Eigen3ToPython)
+  list(APPEND SpaceVecAlg_DEPENDS Eigen3ToPython)
 endif()
 
 AddProject(SpaceVecAlg
   GITHUB jrl-umi3218/SpaceVecAlg
   GIT_TAG master
-  ${SVA_DEPENDS}
+  DEPENDS ${SpaceVecAlg_DEPENDS}
 )
 
 AddProject(sch-core
@@ -142,7 +142,7 @@ set(mc_rtc_DEPENDS Tasks mc_rbdyn_urdf mc_rtc_data hpp-spline state-observation)
 if(TARGET spdlog)
   list(APPEND mc_rtc_DEPENDS spdlog)
 endif()
-if(WITH_ROS_SUPPORT)
+if(TARGET mc_rtc_msgs)
   list(APPEND mc_rtc_DEPENDS mc_rtc_msgs)
 endif()
 AddProject(mc_rtc
