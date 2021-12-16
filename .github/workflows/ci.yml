@@ -25,6 +25,8 @@ jobs:
     - name: Install system dependencies
       shell: bash
       run: |
+        sudo mkdir -p /build
+        sudo chown -R `whoami` /build
         cmake -S ${GITHUB_WORKSPACE} -B /build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUPDATE_ALL=OFF
     - name: Install mc_rtc and related projects
       shell: bash
