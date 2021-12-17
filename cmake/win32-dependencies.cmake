@@ -27,7 +27,7 @@ endif()
 
 set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/Boost/${BOOST_VERSION}/x86_64")
 if(NOT EXISTS "${BOOST_ROOT}")
-  set(BOOST_BINARIES "https://sourceforge.net/projects/boost/files/boost-binaries/${BOOST_VERSION}/boost_${BOOST_VERSION_}-msvc-${MSVC_TOOLSET_VERSION_DOT}.exe")
+  set(BOOST_BINARIES "https://sourceforge.net/projects/boost/files/boost-binaries/${BOOST_VERSION}/boost_${BOOST_VERSION_}-msvc-${MSVC_TOOLSET_VERSION_DOT}-64.exe")
   message(STATUS "Downloading Boost binaries: ${BOOST_BINARIES}")
   set(BOOST_EXE_OUT "${CMAKE_CURRENT_BINARY_DIR}/boost_${BOOST_VERSION_}.exe")
   file(DOWNLOAD "${BOOST_BINARIES}" "${BOOST_EXE_OUT}" EXPECTED_HASH SHA256=${BOOST_BINARIES_SHA256} SHOW_PROGRESS)
