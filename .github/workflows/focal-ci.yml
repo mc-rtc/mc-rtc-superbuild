@@ -1,4 +1,4 @@
-name: CI of mc-rtc-superbuild
+name: CI Ubuntu Focal
 
 on:
   push:
@@ -13,11 +13,7 @@ on:
 
 jobs:
   run:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-18.04, ubuntu-20.04, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
       with:

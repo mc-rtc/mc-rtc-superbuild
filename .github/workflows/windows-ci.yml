@@ -1,0 +1,29 @@
+name: CI Windows
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+  schedule:
+    # Run on Sunday, Tuesday and Thursday nights
+    - cron: '0 22 * * 0,1,4'
+
+jobs:
+  run:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Install system dependencies
+      shell: bash
+      run: |
+        mkdir -p /c/build-mc-rtc
+        cmake -S ${GITHUB_WORKSPACE} -B /c/build-mc-rtc -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUPDATE_ALL=OFF
+    - name: Install mc_rtc and related projects
+      shell: bash
+      run: |
+        cmake --build /c/build-mc-rtc --config RelWithDebInfo
