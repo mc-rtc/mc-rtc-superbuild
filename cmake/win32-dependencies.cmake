@@ -80,7 +80,7 @@ list(APPEND GLOBAL_DEPENDS tinyxml2)
 
 AddProject(geos
   GITHUB libgeos/geos
-  GIT_TAG 3.8.1
+  GIT_TAG 3.10.1
   SKIP_TEST
 )
 list(APPEND GLOBAL_DEPENDS geos)
