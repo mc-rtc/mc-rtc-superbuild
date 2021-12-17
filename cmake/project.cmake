@@ -15,14 +15,20 @@ include(ExternalProject)
 # - GIT_USE_SSH Use SSH for cloning/updating git repository for GITHUB/GITE repos
 # - GITHUB <org/project> Use https://github.com/org/project as GIT_REPOSITORY
 # - GITE <org/project> Use https://gite.lirmm.fr/org/project as GIT_REPOSITORY
-# - GIT_TAG <tag> Use this argument as GIT_TAG, defaults to main
+#
+# Variables
+# =========
+#
+# - GLOBAL_DEPENDS those projects are added to every project dependencies
+#
+
 function(AddProject NAME)
   if(TARGET ${NAME})
     return()
   endif()
   set(options NO_NINJA GIT_USE_SSH SKIP_TEST)
   set(oneValueArgs GITHUB GITE GIT_REPOSITORY GIT_TAG SOURCE_DIR)
-  set(multiValueArgs CMAKE_ARGS BUILD_COMMAND CONFIGURE_COMMAND INSTALL_COMMAND)
+  set(multiValueArgs CMAKE_ARGS BUILD_COMMAND CONFIGURE_COMMAND INSTALL_COMMAND DEPENDS)
   cmake_parse_arguments(ADD_PROJECT_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
   # Handle NO_NINJA
   if(NOT WIN32)
@@ -164,6 +170,10 @@ function(AddProject NAME)
   if(NOT ADD_PROJECT_ARGS_SKIP_TEST)
     set(TEST_STEP_OPTIONS TEST_AFTER_INSTALL TRUE TEST_COMMAND ${COMMAND_PREFIX} ctest -C $<CONFIG>)
   endif()
+  # -- Depends option
+  list(APPEND ADD_PROJECT_ARGS_DEPENDS ${GLOBAL_DEPENDS})
+  set(DEPENDS DEPENDS ${ADD_PROJECT_ARGS_DEPENDS})
+  # -- CLONE_ONLY option
   if(CLONE_ONLY)
     set(CONFIGURE_COMMAND "${CMAKE_COMMAND}" -E true)
     set(BUILD_COMMAND "${CMAKE_COMMAND}" -E true)
@@ -183,6 +193,7 @@ function(AddProject NAME)
     ${EXTRA_INSTALL_COMMAND}
     USES_TERMINAL_INSTALL TRUE
     ${TEST_STEP_OPTIONS}
+    ${DEPENDS}
     ${ADD_PROJECT_ARGS_UNPARSED_ARGUMENTS}
   )
   # This step forces CMake to re-run configure/build/install when the source content changes
