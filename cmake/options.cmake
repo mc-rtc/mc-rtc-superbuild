@@ -14,6 +14,7 @@ endif()
 option(WITH_ROS_SUPPORT "Enable ROS support" ${WITH_ROS_SUPPORT_DEFAULT})
 option(UPDATE_ALL "Update all packages" ON)
 option(INSTALL_DOCUMENTATION "Install documentation of the projects" OFF)
+option(CLONE_ONLY "Clone (or update) the packages only" OFF)
 
 #########################
 # -- Python bindings -- #
