@@ -227,11 +227,11 @@ function(AddCatkinProject NAME)
       BUILD_COMMAND catkin_make -C "${WORKSPACE}" -DCMAKE_BUILD_TYPE=$<CONFIG>
       INSTALL_COMMAND ""
       SKIP_TEST
-      ${ARGV}
+      ${ADD_CATKIN_PROJECT_ARGS_UNPARSED_ARGUMENTS}
     )
   else()
     AddProject(${NAME}
-      ${ARGV}
+      ${ADD_CATKIN_PROJECT_ARGS_UNPARSED_ARGUMENTS}
     )
   endif()
 endfunction()
