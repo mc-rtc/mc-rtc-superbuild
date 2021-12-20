@@ -19,11 +19,8 @@ jobs:
       with:
         submodules: recursive
     - name: Install system dependencies
-      shell: bash
       run: |
-        mkdir -p /c/build-mc-rtc
-        cmake -S ${GITHUB_WORKSPACE} -B /c/build-mc-rtc -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUPDATE_ALL=OFF -DCMAKE_INSTALL_PREFIX=C:/devel/install
+        cmake -S ${GITHUB_WORKSPACE} -B C:/build-mc-rtc -DCMAKE_INSTALL_PREFIX=C:/devel/install
     - name: Install mc_rtc and related projects
-      shell: bash
       run: |
-        cmake --build /c/build-mc-rtc --config RelWithDebInfo
+        cmake --build C:/build-mc-rtc --config RelWithDebInfo
