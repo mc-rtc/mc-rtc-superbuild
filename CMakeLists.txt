@@ -136,22 +136,25 @@ if(WITH_ROS_SUPPORT)
     GIT_TAG master
     WORKSPACE "${CATKIN_DATA_WORKSPACE}"
   )
+  list(APPEND mc_rtc_DEPENDS mc_rtc_msgs)
 endif()
 
-set(mc_rtc_DEPENDS Tasks mc_rbdyn_urdf mc_rtc_data hpp-spline state-observation)
+list(APPEND mc_rtc_DEPENDS Tasks mc_rbdyn_urdf mc_rtc_data hpp-spline state-observation)
 if(TARGET spdlog)
   list(APPEND mc_rtc_DEPENDS spdlog)
-endif()
-if(TARGET mc_rtc_msgs)
-  list(APPEND mc_rtc_DEPENDS mc_rtc_msgs)
 endif()
 if(NOT DEFINED MC_LOG_UI_PYTHON_EXECUTABLE)
   set(MC_LOG_UI_PYTHON_EXECUTABLE python)
 endif()
+if(WITH_ROS_SUPPORT)
+  set(MC_RTC_ROS_OPTION "-DDISABLE_ROS=OFF")
+else()
+  set(MC_RTC_ROS_OPTION "-DDISABLE_ROS=ON")
+endif()
 AddProject(mc_rtc
   GITHUB jrl-umi3218/mc_rtc
   GIT_TAG master
-  CMAKE_ARGS -DMC_LOG_UI_PYTHON_EXECUTABLE=${MC_LOG_UI_PYTHON_EXECUTABLE}
+  CMAKE_ARGS -DMC_LOG_UI_PYTHON_EXECUTABLE=${MC_LOG_UI_PYTHON_EXECUTABLE} ${MC_RTC_ROS_OPTION}
   DEPENDS ${mc_rtc_DEPENDS}
 )
 
