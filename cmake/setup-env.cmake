@@ -1,10 +1,9 @@
 if(NOT "$ENV{PATH}" MATCHES "${CMAKE_INSTALL_PREFIX}/bin")
   if(WIN32)
-    set(PATH_SEP ";")
+    set(EXTRA_PATH "${CMAKE_INSTALL_PREFIX}/bin;${EXTRA_PATH}")
   else()
-    set(PATH_SEP ":")
+    set(ENV{PATH} "${CMAKE_INSTALL_PREFIX}/bin:$ENV{PATH}")
   endif()
-  set(ENV{PATH} "${CMAKE_INSTALL_PREFIX}/bin${PATH_SEP}$ENV{PATH}")
 endif()
 
 if(APPLE)

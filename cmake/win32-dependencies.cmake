@@ -36,7 +36,7 @@ endif()
 
 set(ENV{BOOST_ROOT} "${BOOST_ROOT}")
 if(NOT "$ENV{PATH}" MATCHES "${BOOST_ROOT}/lib64-msvc-${MSVC_TOOLSET_VERSION_DOT}")
-  set(ENV{PATH} "${BOOST_ROOT}/lib64-msvc-${MSVC_TOOLSET_VERSION_DOT};$ENV{PATH}")
+  set(EXTRA_PATH "${BOOST_ROOT}/lib64-msvc-${MSVC_TOOLSET_VERSION_DOT};${EXTRA_PATH}")
 endif()
 
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin/gfortran.exe")
@@ -49,7 +49,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin/gfortran.exe")
 endif()
 
 if(NOT "$ENV{PATH}" MATCHES "${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin")
-  set(ENV{PATH} "${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin;$ENV{PATH}")
+  set(EXTRA_PATH "${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin;${EXTRA_PATH}")
 endif()
 
 include(projects/spdlog.cmake)
