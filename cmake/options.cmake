@@ -17,6 +17,10 @@ option(INSTALL_DOCUMENTATION "Install documentation of the projects" OFF)
 option(CLONE_ONLY "Clone (or update) the packages only" OFF)
 option(MC_RTC_SUPERBUILD_VERBOSE "Output more information at configuration time" OFF)
 
+if(WIN32)
+  option(MC_RTC_SUPERBUILD_SET_ENVIRONMENT "Allow mc-rtc-superbuild to manipulate the PATH variable" ON)
+endif()
+
 #########################
 # -- Python bindings -- #
 #########################

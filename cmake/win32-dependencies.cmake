@@ -35,9 +35,7 @@ if(NOT EXISTS "${BOOST_ROOT}")
 endif()
 
 set(ENV{BOOST_ROOT} "${BOOST_ROOT}")
-if(NOT "$ENV{PATH}" MATCHES "${BOOST_ROOT}/lib64-msvc-${MSVC_TOOLSET_VERSION_DOT}")
-  set(EXTRA_PATH "${BOOST_ROOT}/lib64-msvc-${MSVC_TOOLSET_VERSION_DOT};${EXTRA_PATH}")
-endif()
+add_to_path("${BOOST_ROOT}/lib64-msvc-${MSVC_TOOLSET_VERSION_DOT}")
 
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin/gfortran.exe")
   set(MINGW_URL "https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-win32/seh/x86_64-8.1.0-release-win32-seh-rt_v6-rev0.7z")
@@ -48,9 +46,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin/gfortran.exe")
   file(ARCHIVE_EXTRACT INPUT "${CMAKE_CURRENT_BINARY_DIR}/mingw.7z" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 endif()
 
-if(NOT "$ENV{PATH}" MATCHES "${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin")
-  set(EXTRA_PATH "${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin;${EXTRA_PATH}")
-endif()
+add_to_path("${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin")
 
 include(projects/spdlog.cmake)
 
