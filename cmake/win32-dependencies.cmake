@@ -35,6 +35,9 @@ if(NOT EXISTS "${BOOST_ROOT}")
 endif()
 
 set(ENV{BOOST_ROOT} "${BOOST_ROOT}")
+if(MC_RTC_SUPERBUILD_SET_ENVIRONMENT)
+  execute_process(COMMAND powershell -c "[System.Environment]::SetEnvironmentVariable('BOOST_ROOT', '${BOOST_ROOT}', 'User')" COMMAND_ERROR_IS_FATAL ANY)
+endif()
 add_to_path("${BOOST_ROOT}/lib64-msvc-${MSVC_TOOLSET_VERSION_DOT}")
 
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin/gfortran.exe")
