@@ -38,9 +38,9 @@ else()
   set(CATKIN_WORKSPACE "${CATKIN_WORKSPACE_BASEDIR}")
 endif()
 
-AddProject(hpp-spline
-  GITHUB gergondet/hpp-spline
-  GIT_TAG master
+AddProject(ndcurves
+  GITHUB loco-3d/ndcurves
+  GIT_TAG v1.1.1
   CMAKE_ARGS -DBUILD_PYTHON_INTERFACE:BOOL=OFF
   SKIP_TEST
 )
@@ -139,7 +139,7 @@ if(WITH_ROS_SUPPORT)
   list(APPEND mc_rtc_DEPENDS mc_rtc_msgs)
 endif()
 
-list(APPEND mc_rtc_DEPENDS Tasks mc_rbdyn_urdf mc_rtc_data hpp-spline state-observation)
+list(APPEND mc_rtc_DEPENDS Tasks mc_rbdyn_urdf mc_rtc_data ndcurves state-observation)
 if(TARGET spdlog)
   list(APPEND mc_rtc_DEPENDS spdlog)
 endif()
