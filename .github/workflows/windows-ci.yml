@@ -20,7 +20,7 @@ jobs:
         submodules: recursive
     - name: Install system dependencies
       run: |
-        cmake -S $Env:GITHUB_WORKSPACE -B C:/build-mc-rtc -DCMAKE_INSTALL_PREFIX=C:/devel/install -DMC_RTC_SUPERBUILD_VERBOSE=ON
+        cmake -S $Env:GITHUB_WORKSPACE -B C:/build-mc-rtc -DCMAKE_INSTALL_PREFIX=C:/devel/install -DMC_RTC_SUPERBUILD_VERBOSE=ON -DPYTHON_BINDING=OFF
     - name: Install mc_rtc and related projects
       run: |
         cmake --build C:/build-mc-rtc --config RelWithDebInfo
