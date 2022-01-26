@@ -45,3 +45,10 @@ endif()
 if(NOT DEFINED SOURCE_DESTINATION)
   set(SOURCE_DESTINATION "${PROJECT_BINARY_DIR}/src")
 endif()
+
+###########################
+# -- Location of build -- #
+###########################
+if(NOT DEFINED BUILD_DESTINATION)
+  set(BUILD_DESTINATION "${PROJECT_BINARY_DIR}/build")
+endif()
