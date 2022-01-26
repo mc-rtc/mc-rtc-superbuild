@@ -164,7 +164,7 @@ endif()
 
 add_subdirectory(robots)
 
-file(GLOB extension_dirs "*" CONFIGURE_DEPENDS)
+file(GLOB extension_dirs CONFIGURE_DEPENDS "*")
 foreach(extension_dir ${extension_dirs})
   if(EXISTS "${extension_dir}/CMakeLists.txt")
     add_subdirectory(${extension_dir})
