@@ -42,4 +42,6 @@ endif()
 ###########################
 # -- Clone destination -- #
 ###########################
-option(GET_SOURCE_IN_SOURCE "Get all sources in ${PROJECT_SOURCE_DIR} instead of ${PROJECT_BINARY_DIR}" OFF)
+if(NOT DEFINED SOURCE_DESTINATION)
+  set(SOURCE_DESTINATION "${PROJECT_BINARY_DIR}/src")
+endif()
