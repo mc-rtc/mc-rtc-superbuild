@@ -54,7 +54,7 @@ The following CMake options can be passed:
 
 | Options | Default | Description |
 | :---    | :-----: | :---        |
-| `WITH_ROS_SUPPORT` | `ON` (Linux)\n`OFF` (others) | Build mc_rtc with the ROS plugin, install ROS if necessary |
+| `WITH_ROS_SUPPORT` | `ON` (Linux)<br/>`OFF` (others) | Build mc_rtc with the ROS plugin, install ROS if necessary |
 | `WITH_LSSOL` | `OFF` | Enable the LSSOL QP solver, you must have access to the eigen-lssol package |
 | `UPDATE_ALL` | `ON` | Update all packages when the super-project is built. If this is off you can select a subset of packages to update anyway |
 | `INSTALL_DOCUMENTATION` | `OFF` | Generate and install projects documentation on your local machine |
@@ -64,7 +64,7 @@ The following CMake options can be passed:
 | `BUILD_BENCHMARKS` | `OFF` | Build mc_rtc benchmarks |
 | `INSTALL_SYSTEM_DEPENDENCIES` | `ON` | Install system-level dependencies, do not disable unless you known these requirements are fullfilled |
 | `PYTHON_BINDING` | `ON` | Build mc_rtc Python bindings |
-| `PYTHON_BINDING_USER_INSTALL` | `ON`(Windows)\n `OFF` (others) | Install the Python bindings in user space |
+| `PYTHON_BINDING_USER_INSTALL` | `ON`(Windows)<br/> `OFF` (others) | Install the Python bindings in user space |
 | `PYTHON_BINDING_FORCE_PYTHON2` | `OFF` | Force usage of  python2 instead of python |
 | `PYTHON_BINDING_FORCE_PYTHON3` | `OFF` | Force usage of  python3 instead of python |
 | `PYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3` | `OFF` | Build Python 2 and Python 3 bindings |
