@@ -1,6 +1,6 @@
 option(WITH_HRP5 "Build HRP5 support, requires access to mc-hrp5 group on gite.lirmm.fr" OFF)
 
-if(NOT WITH_HRP4)
+if(NOT WITH_HRP5)
   return()
 endif()
 
