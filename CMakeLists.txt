@@ -35,7 +35,7 @@ endif()
 
 AddProject(ndcurves
   GITHUB loco-3d/ndcurves
-  GIT_TAG v1.1.1
+  GIT_TAG v1.1.2
   CMAKE_ARGS -DBUILD_PYTHON_INTERFACE:BOOL=OFF
   SKIP_TEST
 )
