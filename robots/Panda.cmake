@@ -13,13 +13,13 @@ endif()
 if(Panda_DEPENDENCIES_FROM_SOURCE)
   AddProject(libfranka
     GITHUB frankaemika/libfranka
-    GIT_TAG 0.8.0
+    GIT_TAG origin/0.8.0
   )
   set(mc_panda_DEPENDS libfranka)
   if(WITH_ROS_SUPPORT)
     AddCatkinProject(franka_ros
       GITHUB frankaemika/franka_ros
-      GIT_TAG 0.8.1
+      GIT_TAG origin/0.8.1
       WORKSPACE "${CATKIN_WORKSPACE}"
       DEPENDS libfranka
     )
@@ -34,6 +34,6 @@ endif()
 
 AddProject(mc_panda
   GITHUB jrl-umi3218/mc_panda
-  GIT_TAG master
+  GIT_TAG origin/master
   DEPENDS mc_rtc ${mc_panda_DEPENDS}
 )

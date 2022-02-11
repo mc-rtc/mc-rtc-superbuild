@@ -6,12 +6,12 @@ endif()
 
 AddCatkinProject(sawyer_description
   GITHUB jrl-umi3218/sawyer_description
-  GIT_TAG master
+  GIT_TAG origin/master
   WORKSPACE "${CATKIN_DATA_WORKSPACE}"
 )
 
 AddProject(mc-sawyer
   GITHUB jrl-umi3218/mc-sawyer
-  GIT_TAG master
+  GIT_TAG origin/master
   DEPENDS sawyer_description mc_rtc
 )

@@ -6,13 +6,13 @@ endif()
 
 AddCatkinProject(pepper_description
   GITHUB jrl-umi3218/pepper_description
-  GIT_TAG master
+  GIT_TAG origin/master
   WORKSPACE "${CATKIN_DATA_WORKSPACE}"
 )
 
 AddProject(mc_pepper
   GITHUB jrl-umi3218/mc_pepper
-  GIT_TAG master
+  GIT_TAG origin/master
   DEPENDS pepper_description mc_rtc
 )
 

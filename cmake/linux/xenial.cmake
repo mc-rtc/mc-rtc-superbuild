@@ -37,7 +37,6 @@ function(mc_rtc_extra_steps)
   if(BUILD_BENCHMARKS)
     AddProject(google-benchmark
       GITHUB google/benchmark
-      GIT_TAG main
       CMAKE_ARGS -DBENCHMARK_ENABLE_GTEST_TESTS:BOOL=OFF
       SKIP_TEST
     )

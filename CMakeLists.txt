@@ -42,60 +42,60 @@ AddProject(ndcurves
 
 AddProject(state-observation
   GITHUB jrl-umi3218/state-observation
-  GIT_TAG master
+  GIT_TAG origin/master
   CMAKE_ARGS -DBUILD_STATE_OBSERVATION_TOOLS:BOOL=OFF
 )
 
 if(PYTHON_BINDING)
   AddProject(Eigen3ToPython
     GITHUB jrl-umi3218/Eigen3ToPython
-    GIT_TAG master
+    GIT_TAG origin/master
   )
   list(APPEND SpaceVecAlg_DEPENDS Eigen3ToPython)
 endif()
 
 AddProject(SpaceVecAlg
   GITHUB jrl-umi3218/SpaceVecAlg
-  GIT_TAG master
+  GIT_TAG origin/master
   DEPENDS ${SpaceVecAlg_DEPENDS}
 )
 
 AddProject(sch-core
   GITHUB jrl-umi3218/sch-core
-  GIT_TAG master
+  GIT_TAG origin/master
   CMAKE_ARGS -DCMAKE_CXX_STANDARD=11
 )
 
 if(PYTHON_BINDING)
   AddProject(sch-core-python
     GITHUB jrl-umi3218/sch-core-python
-    GIT_TAG master
+    GIT_TAG origin/master
     DEPENDS sch-core SpaceVecAlg
   )
 endif()
 
 AddProject(RBDyn
   GITHUB jrl-umi3218/RBDyn
-  GIT_TAG master
+  GIT_TAG origin/master
   DEPENDS SpaceVecAlg
 )
 
 AddProject(eigen-qld
   GITHUB jrl-umi3218/eigen-qld
-  GIT_TAG master
+  GIT_TAG origin/master
   NO_NINJA
 )
 
 AddProject(eigen-quadprog
   GITHUB jrl-umi3218/eigen-quadprog
-  GIT_TAG master
+  GIT_TAG origin/master
   NO_NINJA
 )
 
 if(WITH_LSSOL)
   AddProject(eigen-lssol
     GITE multi-contact/eigen-lssol
-    GIT_TAG master
+    GIT_TAG origin/master
     GIT_USE_SSH
     NO_NINJA
   )
@@ -110,25 +110,25 @@ if(PYTHON_BINDING)
 endif()
 AddProject(Tasks
   GITHUB jrl-umi3218/Tasks
-  GIT_TAG master
+  GIT_TAG origin/master
   DEPENDS ${Tasks_DEPENDS}
 )
 
 AddProject(mc_rbdyn_urdf
   GITHUB jrl-umi3218/mc_rbdyn_urdf
-  GIT_TAG master
+  GIT_TAG origin/master
   DEPENDS RBDyn
 )
 
 AddCatkinProject(mc_rtc_data
   GITHUB jrl-umi3218/mc_rtc_data
-  GIT_TAG master
+  GIT_TAG origin/master
   WORKSPACE "${CATKIN_DATA_WORKSPACE}"
 )
 if(WITH_ROS_SUPPORT)
   AddCatkinProject(mc_rtc_msgs
     GITHUB jrl-umi3218/mc_rtc_msgs
-    GIT_TAG master
+    GIT_TAG origin/master
     WORKSPACE "${CATKIN_DATA_WORKSPACE}"
   )
   list(APPEND mc_rtc_DEPENDS mc_rtc_msgs)
@@ -148,7 +148,7 @@ else()
 endif()
 AddProject(mc_rtc
   GITHUB jrl-umi3218/mc_rtc
-  GIT_TAG master
+  GIT_TAG origin/master
   CMAKE_ARGS -DMC_LOG_UI_PYTHON_EXECUTABLE=${MC_LOG_UI_PYTHON_EXECUTABLE} ${MC_RTC_ROS_OPTION}
   DEPENDS ${mc_rtc_DEPENDS}
 )
@@ -156,7 +156,7 @@ AddProject(mc_rtc
 if(WITH_ROS_SUPPORT)
   AddCatkinProject(mc_rtc_ros
     GITHUB jrl-umi3218/mc_rtc_ros
-    GIT_TAG master
+    GIT_TAG origin/master
     WORKSPACE "${CATKIN_WORKSPACE}"
     DEPENDS mc_rtc
   )
