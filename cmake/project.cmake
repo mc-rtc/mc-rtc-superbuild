@@ -214,8 +214,25 @@ function(AddProject NAME)
     ${DEPENDS}
     ${ADD_PROJECT_ARGS_UNPARSED_ARGUMENTS}
   )
-  # This step forces CMake to re-run configure/build/install when the source content changes
+  # This glob expression forces CMake to re-run if the source directory content changes
   file(GLOB_RECURSE ${NAME}_SOURCES CONFIGURE_DEPENDS "${SOURCE_DIR}/*")
+  # But we don't care about all the files
+  execute_process(COMMAND git ls-files --recurse-submodules
+                  WORKING_DIRECTORY "${SOURCE_DIR}"
+                  OUTPUT_VARIABLE ${NAME}_SOURCES
+                  ERROR_QUIET
+                  OUTPUT_STRIP_TRAILING_WHITESPACE)
+  string(REPLACE "\n" ";" ${NAME}_SOURCES "${${NAME}_SOURCES}")
+  execute_process(COMMAND git ls-files -o
+                  WORKING_DIRECTORY "${SOURCE_DIR}"
+                  OUTPUT_VARIABLE ${NAME}_SOURCES_OTHERS
+                  ERROR_QUIET
+                  OUTPUT_STRIP_TRAILING_WHITESPACE)
+  string(REPLACE "\n" ";" ${NAME}_SOURCES_OTHERS "${${NAME}_SOURCES_OTHERS}")
+  foreach(F ${${NAME}_SOURCES_OTHERS})
+    list(APPEND ${NAME}_SOURCES "${F}")
+  endforeach()
+  list(TRANSFORM ${NAME}_SOURCES PREPEND "${SOURCE_DIR}/")
   ExternalProject_Add_Step(${NAME} check-sources
     DEPENDEES patch
     DEPENDERS configure
