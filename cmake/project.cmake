@@ -238,6 +238,16 @@ function(AddProject NAME)
     DEPENDERS configure
     DEPENDS ${${NAME}_SOURCES}
   )
+  if(GIT_TAG MATCHES "^origin/(.*)")
+    set(LOCAL_BRANCH "${CMAKE_MATCH_1}")
+    ExternalProject_Add_Step(${NAME} checkout-${LOCAL_BRANCH}
+      COMMAND git checkout ${LOCAL_BRANCH}
+      WORKING_DIRECTORY <SOURCE_DIR>
+      DEPENDEES download
+      DEPENDERS update
+      INDEPENDENT ON
+    )
+  endif()
 endfunction()
 
 # Wrapper around AddProject
