@@ -223,15 +223,6 @@ function(AddProject NAME)
                   ERROR_QUIET
                   OUTPUT_STRIP_TRAILING_WHITESPACE)
   string(REPLACE "\n" ";" ${NAME}_SOURCES "${${NAME}_SOURCES}")
-  execute_process(COMMAND git ls-files -o
-                  WORKING_DIRECTORY "${SOURCE_DIR}"
-                  OUTPUT_VARIABLE ${NAME}_SOURCES_OTHERS
-                  ERROR_QUIET
-                  OUTPUT_STRIP_TRAILING_WHITESPACE)
-  string(REPLACE "\n" ";" ${NAME}_SOURCES_OTHERS "${${NAME}_SOURCES_OTHERS}")
-  foreach(F ${${NAME}_SOURCES_OTHERS})
-    list(APPEND ${NAME}_SOURCES "${F}")
-  endforeach()
   list(TRANSFORM ${NAME}_SOURCES PREPEND "${SOURCE_DIR}/")
   ExternalProject_Add_Step(${NAME} check-sources
     DEPENDEES patch
