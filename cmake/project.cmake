@@ -229,6 +229,14 @@ function(AddProject NAME)
     DEPENDERS configure
     DEPENDS ${${NAME}_SOURCES}
   )
+  # This makes sure the output of git ls-files is usable
+  ExternalProject_Add_Step(${NAME} set-git-config
+    COMMAND  git config core.quotepath off
+    WORKING_DIRECTORY <SOURCE_DIR>
+    DEPENDEES download
+    DEPENDERS update
+    INDEPENDENT ON
+  )
   if(GIT_TAG MATCHES "^origin/(.*)")
     set(LOCAL_BRANCH "${CMAKE_MATCH_1}")
     ExternalProject_Add_Step(${NAME} checkout-${LOCAL_BRANCH}
