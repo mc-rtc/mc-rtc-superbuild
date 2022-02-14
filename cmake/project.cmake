@@ -11,10 +11,12 @@ include(ExternalProject)
 # =======
 #
 # - SKIP_TEST Do not run tests
+# - NO_SOURCE_MONITOR Do not monitor source for changes
 # - NO_NINJA Indicate that the project is not compatible with the Ninja generator
 # - GIT_USE_SSH Use SSH for cloning/updating git repository for GITHUB/GITE repos
 # - GITHUB <org/project> Use https://github.com/org/project as GIT_REPOSITORY
 # - GITE <org/project> Use https://gite.lirmm.fr/org/project as GIT_REPOSITORY
+# - SUBFOLDER <folder> sub-folder of SOURCE_DESTINATION where to clone the project (also used as a sub-folder of BUILD_DESTINATION)
 #
 # Variables
 # =========
@@ -26,7 +28,7 @@ function(AddProject NAME)
   if(TARGET ${NAME})
     return()
   endif()
-  set(options NO_NINJA GIT_USE_SSH SKIP_TEST)
+  set(options NO_NINJA NO_SOURCE_MONITOR GIT_USE_SSH SKIP_TEST)
   set(oneValueArgs GITHUB GITE GIT_REPOSITORY GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER)
   set(multiValueArgs CMAKE_ARGS BUILD_COMMAND CONFIGURE_COMMAND INSTALL_COMMAND DEPENDS)
   cmake_parse_arguments(ADD_PROJECT_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -226,29 +228,31 @@ function(AddProject NAME)
     ${DEPENDS}
     ${ADD_PROJECT_ARGS_UNPARSED_ARGUMENTS}
   )
-  # This glob expression forces CMake to re-run if the source directory content changes
-  file(GLOB_RECURSE ${NAME}_SOURCES CONFIGURE_DEPENDS "${SOURCE_DIR}/*")
-  # But we don't care about all the files
-  execute_process(COMMAND git ls-files --recurse-submodules
-                  WORKING_DIRECTORY "${SOURCE_DIR}"
-                  OUTPUT_VARIABLE ${NAME}_SOURCES
-                  ERROR_QUIET
-                  OUTPUT_STRIP_TRAILING_WHITESPACE)
-  string(REPLACE "\n" ";" ${NAME}_SOURCES "${${NAME}_SOURCES}")
-  list(TRANSFORM ${NAME}_SOURCES PREPEND "${SOURCE_DIR}/")
-  ExternalProject_Add_Step(${NAME} check-sources
-    DEPENDEES patch
-    DEPENDERS configure
-    DEPENDS ${${NAME}_SOURCES}
-  )
-  # This makes sure the output of git ls-files is usable
-  ExternalProject_Add_Step(${NAME} set-git-config
-    COMMAND  git config core.quotepath off
-    WORKING_DIRECTORY <SOURCE_DIR>
-    DEPENDEES download
-    DEPENDERS update
-    INDEPENDENT ON
-  )
+  if(NOT ADD_PROJECT_ARGS_NO_SOURCE_MONITOR)
+    # This glob expression forces CMake to re-run if the source directory content changes
+    file(GLOB_RECURSE ${NAME}_SOURCES CONFIGURE_DEPENDS "${SOURCE_DIR}/*")
+    # But we don't care about all the files
+    execute_process(COMMAND git ls-files --recurse-submodules
+                    WORKING_DIRECTORY "${SOURCE_DIR}"
+                    OUTPUT_VARIABLE ${NAME}_SOURCES
+                    ERROR_QUIET
+                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    string(REPLACE "\n" ";" ${NAME}_SOURCES "${${NAME}_SOURCES}")
+    list(TRANSFORM ${NAME}_SOURCES PREPEND "${SOURCE_DIR}/")
+    ExternalProject_Add_Step(${NAME} check-sources
+      DEPENDEES patch
+      DEPENDERS configure
+      DEPENDS ${${NAME}_SOURCES}
+    )
+    # This makes sure the output of git ls-files is usable
+    ExternalProject_Add_Step(${NAME} set-git-config
+      COMMAND  git config core.quotepath off
+      WORKING_DIRECTORY <SOURCE_DIR>
+      DEPENDEES download
+      DEPENDERS update
+      INDEPENDENT ON
+    )
+  endif()
   if(GIT_TAG MATCHES "^origin/(.*)")
     set(LOCAL_BRANCH "${CMAKE_MATCH_1}")
     ExternalProject_Add_Step(${NAME} checkout-${LOCAL_BRANCH}
