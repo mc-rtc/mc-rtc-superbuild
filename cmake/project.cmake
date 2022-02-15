@@ -10,6 +10,7 @@ include(ExternalProject)
 # Options
 # =======
 #
+# - CLONE_ONLY Always act as if the CLONE_ONLY option was on
 # - SKIP_TEST Do not run tests
 # - NO_SOURCE_MONITOR Do not monitor source for changes
 # - NO_NINJA Indicate that the project is not compatible with the Ninja generator
@@ -28,7 +29,7 @@ function(AddProject NAME)
   if(TARGET ${NAME})
     return()
   endif()
-  set(options NO_NINJA NO_SOURCE_MONITOR GIT_USE_SSH SKIP_TEST)
+  set(options NO_NINJA NO_SOURCE_MONITOR CLONE_ONLY GIT_USE_SSH SKIP_TEST)
   set(oneValueArgs GITHUB GITE GIT_REPOSITORY GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER)
   set(multiValueArgs CMAKE_ARGS BUILD_COMMAND CONFIGURE_COMMAND INSTALL_COMMAND DEPENDS)
   cmake_parse_arguments(ADD_PROJECT_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -190,7 +191,7 @@ function(AddProject NAME)
   list(APPEND ADD_PROJECT_ARGS_DEPENDS ${GLOBAL_DEPENDS})
   set(DEPENDS DEPENDS ${ADD_PROJECT_ARGS_DEPENDS})
   # -- CLONE_ONLY option
-  if(CLONE_ONLY)
+  if(CLONE_ONLY OR ADD_PROJECT_ARGS_CLONE_ONLY)
     set(CONFIGURE_COMMAND ${CMAKE_COMMAND} -E true)
     set(BUILD_COMMAND ${CMAKE_COMMAND} -E true)
     set(INSTALL_COMMAND ${CMAKE_COMMAND} -E true)
