@@ -10,7 +10,7 @@ AddCatkinProject(hrp4cr_description
   GIT_USE_SSH
 )
 
-AddProject(mc-hrp4
+AddProject(mc-hrp4cr
   GITHUB isri-aist/mc_hrp4cr
   GIT_USE_SSH
   DEPENDS hrp4cr_description mc_rtc
