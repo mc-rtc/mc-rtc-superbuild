@@ -256,7 +256,8 @@ function(AddProject NAME)
   endif()
   if(GIT_TAG MATCHES "^origin/(.*)")
     set(LOCAL_BRANCH "${CMAKE_MATCH_1}")
-    ExternalProject_Add_Step(${NAME} checkout-${LOCAL_BRANCH}
+    string(REPLACE "/" "_" LOCAL_BRANCH_ "${LOCAL_BRANCH}")
+    ExternalProject_Add_Step(${NAME} checkout-${LOCAL_BRANCH_}
       COMMAND git checkout ${LOCAL_BRANCH}
       WORKING_DIRECTORY <SOURCE_DIR>
       DEPENDEES download
