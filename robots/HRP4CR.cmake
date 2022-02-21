@@ -6,7 +6,7 @@ endif()
 
 AddCatkinProject(hrp4cr_description
   GITHUB isri-aist/hrp4cr_description
-  WORKSPACE "${CATKIN_DATA_WORKSPACE}"
+  WORKSPACE data_ws
   GIT_USE_SSH
 )
 

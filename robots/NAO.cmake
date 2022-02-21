@@ -7,7 +7,7 @@ endif()
 AddCatkinProject(nao_description
   GITHUB jrl-umi3218/nao_description
   GIT_TAG origin/master
-  WORKSPACE "${CATKIN_DATA_WORKSPACE}"
+  WORKSPACE data_ws
 )
 
 AddProject(mc_nao

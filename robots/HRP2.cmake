@@ -6,7 +6,7 @@ endif()
 
 AddCatkinProject(hrp2_drc_description
   GITE mc-hrp2/hrp2_drc_description
-  WORKSPACE "${CATKIN_DATA_WORKSPACE}"
+  WORKSPACE data_ws
   GIT_USE_SSH
 )
 

@@ -7,7 +7,7 @@ endif()
 AddCatkinProject(hrp4j_description
   GITE mc-hrp4/hrp4j_description
   GIT_TAG origin/master
-  WORKSPACE "${CATKIN_DATA_WORKSPACE}"
+  WORKSPACE data_ws
   GIT_USE_SSH
 )
 

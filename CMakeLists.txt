@@ -9,7 +9,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 include(cmake/project.cmake)
-include(cmake/ros.cmake)
 
 if(APPLE)
   include(cmake/macos-dependencies.cmake)
@@ -24,13 +23,8 @@ if(UNIX AND NOT APPLE)
 endif()
 
 if(WITH_ROS_SUPPORT)
-  set(CATKIN_DATA_WORKSPACE "${SOURCE_DESTINATION}/catkin_data_ws")
-  CreateCatkinWorkspace("${CATKIN_DATA_WORKSPACE}")
-  set(CATKIN_WORKSPACE "${SOURCE_DESTINATION}/catkin_ws")
-  CreateCatkinWorkspace("${CATKIN_WORKSPACE}")
-else()
-  set(CATKIN_DATA_WORKSPACE "${SOURCE_DESTINATION}")
-  set(CATKIN_WORKSPACE "${SOURCE_DESTINATION}")
+  CreateCatkinWorkspace(ID data_ws DIR "${SOURCE_DESTINATION}/catkin_data_ws" CATKIN_MAKE)
+  CreateCatkinWorkspace(ID mc_rtc_ws DIR "${SOURCE_DESTINATION}/catkin_ws" CATKIN_MAKE)
 endif()
 
 AddProject(ndcurves
@@ -123,13 +117,13 @@ AddProject(mc_rbdyn_urdf
 AddCatkinProject(mc_rtc_data
   GITHUB jrl-umi3218/mc_rtc_data
   GIT_TAG origin/master
-  WORKSPACE "${CATKIN_DATA_WORKSPACE}"
+  WORKSPACE data_ws
 )
 if(WITH_ROS_SUPPORT)
   AddCatkinProject(mc_rtc_msgs
     GITHUB jrl-umi3218/mc_rtc_msgs
     GIT_TAG origin/master
-    WORKSPACE "${CATKIN_DATA_WORKSPACE}"
+    WORKSPACE data_ws
   )
   list(APPEND mc_rtc_DEPENDS mc_rtc_msgs)
 endif()
@@ -157,7 +151,7 @@ if(WITH_ROS_SUPPORT)
   AddCatkinProject(mc_rtc_ros
     GITHUB jrl-umi3218/mc_rtc_ros
     GIT_TAG origin/master
-    WORKSPACE "${CATKIN_WORKSPACE}"
+    WORKSPACE mc_rtc_ws
     DEPENDS mc_rtc
   )
 endif()
@@ -170,5 +164,7 @@ foreach(extension_dir ${extension_dirs})
     add_subdirectory(${extension_dir})
   endif()
 endforeach()
+
+finalize_catkin_workspaces()
 
 install(CODE "message(\"Installation done\")")
