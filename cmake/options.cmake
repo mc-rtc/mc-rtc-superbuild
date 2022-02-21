@@ -21,6 +21,9 @@ if(WIN32)
   option(MC_RTC_SUPERBUILD_SET_ENVIRONMENT "Allow mc-rtc-superbuild to manipulate the PATH variable" ON)
 endif()
 
+option(LINK_BUILD_AND_SRC "Create symbolic links to/from build and src folders" ON)
+option(LINK_COMPILE_COMMANDS "Create a symbolic to compile_commands.json in the source folder" ON)
+
 #########################
 # -- Python bindings -- #
 #########################

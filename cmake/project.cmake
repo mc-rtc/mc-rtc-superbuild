@@ -12,6 +12,7 @@ include(ExternalProject)
 #
 # - CLONE_ONLY Always act as if the CLONE_ONLY option was on
 # - SKIP_TEST Do not run tests
+# - SKIP_SYMBOLIC_LINKS Skip symbolic links creation mandated by LINK_BUILD_AND_SRC and LINK_COMPILE_COMMANDS
 # - NO_SOURCE_MONITOR Do not monitor source for changes
 # - NO_NINJA Indicate that the project is not compatible with the Ninja generator
 # - GIT_USE_SSH Use SSH for cloning/updating git repository for GITHUB/GITE repos
@@ -29,7 +30,7 @@ function(AddProject NAME)
   if(TARGET ${NAME})
     return()
   endif()
-  set(options NO_NINJA NO_SOURCE_MONITOR CLONE_ONLY GIT_USE_SSH SKIP_TEST)
+  set(options NO_NINJA NO_SOURCE_MONITOR CLONE_ONLY GIT_USE_SSH SKIP_TEST SKIP_SYMBOLIC_LINKS)
   set(oneValueArgs GITHUB GITE GIT_REPOSITORY GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER SOURCE_SUBDIR)
   set(multiValueArgs CMAKE_ARGS BUILD_COMMAND CONFIGURE_COMMAND INSTALL_COMMAND DEPENDS)
   cmake_parse_arguments(ADD_PROJECT_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -265,6 +266,22 @@ function(AddProject NAME)
       INDEPENDENT ON
     )
   endif()
+  if(NOT CLONE_ONLY AND NOT ADD_PROJECT_ARGS_SKIP_SYMBOLIC_LINKS)
+    if(LINK_BUILD_AND_SRC)
+      ExternalProject_Add_Step(${NAME} link-build-and-src
+        COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${SOURCE_DIR} -DBINARY_DIR=${BINARY_DIR} -DBUILD_LINK_SUFFIX=${BUILD_LINK_SUFFIX} -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-source-and-build.cmake
+        DEPENDEES configure
+        DEPENDS ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-source-and-build.cmake
+      )
+    endif()
+    if(LINK_COMPILE_COMMANDS)
+      ExternalProject_Add_Step(${NAME} link-compile-commands
+        COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${SOURCE_DIR} -DBINARY_DIR=${BINARY_DIR} -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-compile-commands.cmake
+        DEPENDEES configure
+        DEPENDS ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-compile-commands.cmake
+      )
+    endif()
+  endif()
 endfunction()
 
 # Wrapper around AddProject
@@ -290,6 +307,7 @@ function(AddCatkinProject NAME)
       BUILD_COMMAND catkin_make -C "${WORKSPACE}" -DCMAKE_BUILD_TYPE=$<CONFIG>
       INSTALL_COMMAND ""
       SKIP_TEST
+      SKIP_SYMBOLIC_LINKS
       ${ADD_CATKIN_PROJECT_ARGS_UNPARSED_ARGUMENTS}
     )
   else()
