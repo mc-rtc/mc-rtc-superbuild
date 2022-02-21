@@ -97,7 +97,17 @@ function(CreateCatkinWorkspace)
   else()
     set(BUILD_COMMAND ${COMMAND_PREFIX} "${CMAKE_COMMAND}" -E chdir "${DIR}" catkin build ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS})
   endif()
-  add_custom_target(catkin-build-${ID} COMMAND ${BUILD_COMMAND} COMMENT "Build catkin workspace at ${DIR}")
+  set(STAMP_DIR "${PROJECT_BINARY_DIR}/catkin-stamps/")
+  set(STAMP_FILE "${STAMP_DIR}/${ID}.stamp")
+  set_property(GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_STAMP "${STAMP_FILE}")
+  file(MAKE_DIRECTORY "${STAMP_DIR}")
+  add_custom_command(
+    OUTPUT "${STAMP_FILE}"
+    COMMAND ${BUILD_COMMAND}
+    COMMAND "${CMAKE_COMMAND}" -E touch "${STAMP_FILE}"
+    COMMENT "Build catkin workspace ${ID} at ${DIR}"
+  )
+  add_custom_target(catkin-build-${ID} DEPENDS "${STAMP_FILE}")
 endfunction()
 
 function(ensure_valid_workspace ID)
