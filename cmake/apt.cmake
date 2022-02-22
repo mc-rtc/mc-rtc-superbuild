@@ -1,4 +1,4 @@
-function(install_apt_dependencies)
+function(AptInstall)
   execute_process(COMMAND dpkg-query -W ${ARGV} OUTPUT_QUIET ERROR_QUIET RESULT_VARIABLE MISSING_DEPS)
   if(MISSING_DEPS)
     message(STATUS "Install missing dependencies")

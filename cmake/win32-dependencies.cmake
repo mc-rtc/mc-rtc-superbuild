@@ -39,7 +39,7 @@ if(MC_RTC_SUPERBUILD_SET_ENVIRONMENT)
     file(APPEND "$ENV{GITHUB_ENV}" "BOOST_ROOT=$ENV{BOOST_ROOT}\n")
   endif()
 endif()
-add_to_path("${BOOST_ROOT}/lib64-msvc-${MSVC_TOOLSET_VERSION_DOT}")
+AddToPath("${BOOST_ROOT}/lib64-msvc-${MSVC_TOOLSET_VERSION_DOT}")
 
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin/gfortran.exe")
   set(MINGW_URL "https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-win32/seh/x86_64-8.1.0-release-win32-seh-rt_v6-rev0.7z")
@@ -50,7 +50,7 @@ if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin/gfortran.exe")
   file(ARCHIVE_EXTRACT INPUT "${CMAKE_CURRENT_BINARY_DIR}/mingw.7z" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 endif()
 
-add_to_path("${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin")
+AddToPath("${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin")
 
 include(projects/spdlog.cmake)
 

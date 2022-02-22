@@ -38,7 +38,7 @@ if(BUILD_BENCHMARKS)
 endif()
 
 function(mc_rtc_extra_steps)
-  install_apt_dependencies(curl)
+  AptInstall(curl)
   find_program(PIP2 pip2)
   if(NOT PIP2)
     message(STATUS "Installing pip2 for python2")

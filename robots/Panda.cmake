@@ -29,7 +29,7 @@ else()
   if(NOT DPKG OR NOT WITH_ROS_SUPPORT)
     message(FATAL_ERROR "Panda dependencies binaries are only available from ROS APT mirrors, set Panda_DEPENDENCIES_FROM_SOURCE to OFF")
   endif()
-  install_apt_dependencies(ros-${ROS_DISTRO}-libfranka ros-${ROS_DISTRO}-franka-description)
+  AptInstall(ros-${ROS_DISTRO}-libfranka ros-${ROS_DISTRO}-franka-description)
 endif()
 
 AddProject(mc_panda

@@ -130,7 +130,7 @@ function(AddProject NAME)
       set(BINARY_DIR "${BUILD_DESTINATION}/${NAME}")
     endif()
   endif()
-  get_command_prefix(COMMAND_PREFIX)
+  GetCommandPrefix(COMMAND_PREFIX)
   # -- Configure command
   if(NOT ADD_PROJECT_ARGS_CONFIGURE_COMMAND AND NOT CONFIGURE_COMMAND IN_LIST ADD_PROJECT_ARGS_KEYWORDS_MISSING_VALUES)
     set(CONFIGURE_COMMAND ${COMMAND_PREFIX} ${CMAKE_COMMAND} -G "${GENERATOR}" -B "${BINARY_DIR}" -S "${SOURCE_DIR}/${ADD_PROJECT_ARGS_SOURCE_SUBDIR}" ${CMAKE_ARGS})
@@ -225,7 +225,7 @@ function(AddProject NAME)
     ${DEPENDS}
     ${ADD_PROJECT_ARGS_UNPARSED_ARGUMENTS}
   )
-  set_catkin_dependencies(${NAME} "${ADD_PROJECT_ARGS_DEPENDS}" "${ADD_PROJECT_ARGS_WORKSPACE}")
+  SetCatkinDependencies(${NAME} "${ADD_PROJECT_ARGS_DEPENDS}" "${ADD_PROJECT_ARGS_WORKSPACE}")
   if(NOT ADD_PROJECT_ARGS_NO_SOURCE_MONITOR)
     # This glob expression forces CMake to re-run if the source directory content changes
     file(GLOB_RECURSE ${NAME}_SOURCES CONFIGURE_DEPENDS "${SOURCE_DIR}/*")
@@ -296,7 +296,7 @@ function(AddCatkinProject NAME)
   endif()
   set(WORKSPACE "${ADD_CATKIN_PROJECT_ARGS_WORKSPACE}")
   if(WITH_ROS_SUPPORT)
-    ensure_valid_workspace(${WORKSPACE})
+    EnsureValidCatkinWorkspace(${WORKSPACE})
     get_property(WORKSPACE_DIR GLOBAL PROPERTY CATKIN_WORKSPACE_${WORKSPACE}_DIR)
     get_property(WORKSPACE_STAMP GLOBAL PROPERTY CATKIN_WORKSPACE_${WORKSPACE}_STAMP)
     AddProject(${NAME}

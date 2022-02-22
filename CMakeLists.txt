@@ -165,6 +165,6 @@ foreach(extension_dir ${extension_dirs})
   endif()
 endforeach()
 
-finalize_catkin_workspaces()
+FinalizeCatkinWorkspaces()
 
 install(CODE "message(\"Installation done\")")

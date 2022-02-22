@@ -1,4 +1,4 @@
-function(add_to_path DIR)
+function(AddToPath DIR)
   if("$ENV{PATH}" MATCHES "${DIR}")
     return()
   endif()
@@ -15,7 +15,7 @@ function(add_to_path DIR)
   endif()
 endfunction()
 
-add_to_path("${CMAKE_INSTALL_PREFIX}/bin")
+AddToPath("${CMAKE_INSTALL_PREFIX}/bin")
 
 if(APPLE)
   if(NOT "$ENV{DYLD_LIBRARY_PATH}" MATCHES "${CMAKE_INSTALL_PREFIX}/lib")

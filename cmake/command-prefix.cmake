@@ -1,4 +1,4 @@
-function(get_command_prefix VAR)
+function(GetCommandPrefix VAR)
   if(NOT WIN32 OR NOT MC_RTC_SUPERBUILD_SET_ENVIRONMENT)
     set(${VAR} ${CMAKE_COMMAND} -E env PATH=$ENV{PATH} CMAKE_PREFIX_PATH=$ENV{CMAKE_PREFIX_PATH} PKG_CONFIG_PATH=$ENV{PKG_CONFIG_PATH})
   endif()
