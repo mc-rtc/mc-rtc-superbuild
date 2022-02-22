@@ -89,12 +89,6 @@ function(AddProject NAME)
       "-DBUILD_TESTING:BOOL=OFF"
     )
   endif()
-  cmake_dependent_option(UPDATE_${NAME} "Update ${NAME}" ON "UPDATE_ALL" OFF)
-  if(UPDATE_${NAME})
-    set(UPDATE_DISCONNECTED OFF)
-  else()
-    set(UPDATE_DISCONNECTED ON)
-  endif()
   if(ADD_PROJECT_ARGS_SOURCE_DIR)
     set(SOURCE_DIR "${ADD_PROJECT_ARGS_SOURCE_DIR}")
   else()
@@ -183,7 +177,6 @@ function(AddProject NAME)
     message("BINARY_DIR: ${BINARY_DIR}")
     message("GIT_REPOSITORY: ${GIT_REPOSITORY}")
     message("GIT_TAG: ${GIT_TAG}")
-    message("UPDATE_DISCONNECTED: ${UPDATE_DISCONNECTED}")
     message("CONFIGURE_COMMAND IS: ${CONFIGURE_COMMAND}")
     message("BUILD_COMMAND IS: ${BUILD_COMMAND}")
     message("INSTALL_COMMAND IS: ${INSTALL_COMMAND}")
@@ -198,7 +191,7 @@ function(AddProject NAME)
     BINARY_DIR ${BINARY_DIR}
     GIT_REPOSITORY ${GIT_REPOSITORY}
     GIT_TAG ${GIT_TAG}
-    UPDATE_DISCONNECTED ${UPDATE_DISCONNECTED}
+    UPDATE_DISCONNECTED ON # We handle updates ourselves with an explicit target
     CONFIGURE_COMMAND ${CONFIGURE_COMMAND}
     BUILD_COMMAND ${BUILD_COMMAND}
     INSTALL_COMMAND ${INSTALL_COMMAND}
