@@ -32,7 +32,7 @@ function(AddProject NAME)
     return()
   endif()
   set(options NO_NINJA NO_SOURCE_MONITOR CLONE_ONLY GIT_USE_SSH SKIP_TEST SKIP_SYMBOLIC_LINKS)
-  set(oneValueArgs GITHUB GITE GIT_REPOSITORY GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER SOURCE_SUBDIR)
+  set(oneValueArgs GITHUB GITE GIT_REPOSITORY GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER SOURCE_SUBDIR WORKSPACE)
   set(multiValueArgs CMAKE_ARGS BUILD_COMMAND CONFIGURE_COMMAND INSTALL_COMMAND DEPENDS)
   cmake_parse_arguments(ADD_PROJECT_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
   # Handle NO_NINJA
@@ -225,7 +225,7 @@ function(AddProject NAME)
     ${DEPENDS}
     ${ADD_PROJECT_ARGS_UNPARSED_ARGUMENTS}
   )
-  set_catkin_dependencies(${NAME} "${ADD_PROJECT_ARGS_DEPENDS}")
+  set_catkin_dependencies(${NAME} "${ADD_PROJECT_ARGS_DEPENDS}" "${ADD_PROJECT_ARGS_WORKSPACE}")
   if(NOT ADD_PROJECT_ARGS_NO_SOURCE_MONITOR)
     # This glob expression forces CMake to re-run if the source directory content changes
     file(GLOB_RECURSE ${NAME}_SOURCES CONFIGURE_DEPENDS "${SOURCE_DIR}/*")
@@ -305,6 +305,7 @@ function(AddCatkinProject NAME)
       CONFIGURE_COMMAND ${CMAKE_COMMAND} -E rm -f "${WORKSPACE_STAMP}"
       BUILD_COMMAND ""
       INSTALL_COMMAND ""
+      WORKSPACE ${WORKSPACE}
       SKIP_TEST
       SKIP_SYMBOLIC_LINKS
       ${ADD_CATKIN_PROJECT_ARGS_UNPARSED_ARGUMENTS}
