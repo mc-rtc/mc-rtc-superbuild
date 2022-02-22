@@ -8,12 +8,10 @@ AddCatkinProject(hrp5_p_description
   GITE mc-hrp5/hrp5_p_description
   GIT_TAG origin/master
   WORKSPACE data_ws
-  GIT_USE_SSH
 )
 
 AddProject(mc_hrp5_p
   GITE mc-hrp5/mc_hrp5_p
   GIT_TAG origin/master
-  GIT_USE_SSH
   DEPENDS hrp5_p_description mc_rtc
 )

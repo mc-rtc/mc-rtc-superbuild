@@ -7,12 +7,10 @@ endif()
 AddCatkinProject(hrp2_drc_description
   GITE mc-hrp2/hrp2_drc_description
   WORKSPACE data_ws
-  GIT_USE_SSH
 )
 
 AddProject(mc-hrp2
   GITE mc-hrp2/mc-hrp2
   GIT_TAG origin/master
-  GIT_USE_SSH
   DEPENDS hrp2_drc_description mc_rtc
 )

@@ -1,6 +1,7 @@
 include(cmake/options.cmake)
 include(cmake/ros.cmake)
 include(cmake/setup-env.cmake)
+include(cmake/sources.cmake)
 include(cmake/sudo.cmake)
 
 include(CMakeDependentOption)
@@ -16,9 +17,6 @@ include(ExternalProject)
 # - SKIP_SYMBOLIC_LINKS Skip symbolic links creation mandated by LINK_BUILD_AND_SRC and LINK_COMPILE_COMMANDS
 # - NO_SOURCE_MONITOR Do not monitor source for changes
 # - NO_NINJA Indicate that the project is not compatible with the Ninja generator
-# - GIT_USE_SSH Use SSH for cloning/updating git repository for GITHUB/GITE repos
-# - GITHUB <org/project> Use https://github.com/org/project as GIT_REPOSITORY
-# - GITE <org/project> Use https://gite.lirmm.fr/org/project as GIT_REPOSITORY
 # - SUBFOLDER <folder> sub-folder of SOURCE_DESTINATION where to clone the project (also used as a sub-folder of BUILD_DESTINATION)
 #
 # Variables
@@ -31,8 +29,9 @@ function(AddProject NAME)
   if(TARGET ${NAME})
     return()
   endif()
-  set(options NO_NINJA NO_SOURCE_MONITOR CLONE_ONLY GIT_USE_SSH SKIP_TEST SKIP_SYMBOLIC_LINKS)
-  set(oneValueArgs GITHUB GITE GIT_REPOSITORY GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER SOURCE_SUBDIR WORKSPACE)
+  get_property(MC_RTC_SUPERBUILD_SOURCES GLOBAL PROPERTY MC_RTC_SUPERBUILD_SOURCES)
+  set(options NO_NINJA NO_SOURCE_MONITOR CLONE_ONLY SKIP_TEST SKIP_SYMBOLIC_LINKS)
+  set(oneValueArgs ${MC_RTC_SUPERBUILD_SOURCES} GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER SOURCE_SUBDIR WORKSPACE)
   set(multiValueArgs CMAKE_ARGS BUILD_COMMAND CONFIGURE_COMMAND INSTALL_COMMAND DEPENDS)
   cmake_parse_arguments(ADD_PROJECT_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
   # Handle NO_NINJA
@@ -45,34 +44,16 @@ function(AddProject NAME)
   else()
     set(GENERATOR "${CMAKE_GENERATOR}")
   endif()
-  # Handle GITHUB
-  if(ADD_PROJECT_ARGS_GITHUB)
-    set(GIT_REPOSITORY "${ADD_PROJECT_ARGS_GITHUB}")
-    if(ADD_PROJECT_ARGS_GIT_USE_SSH)
-      set(GIT_REPOSITORY "git@github.com:${GIT_REPOSITORY}")
-    else()
-      set(GIT_REPOSITORY "https://github.com/${GIT_REPOSITORY}")
+  set(GIT_REPOSITORY "")
+  foreach(SOURCE ${MC_RTC_SUPERBUILD_SOURCES})
+    if(ADD_PROJECT_ARGS_${SOURCE})
+      if(NOT "${GIT_REPOSITORY}" STREQUAL "")
+        message(FATAL_ERROR "Multiple sources have been specified for ${NAME}")
+      endif()
+      get_property(GIT_REPOSITORY GLOBAL PROPERTY MC_RTC_SUPERBUILD_SOURCES_${SOURCE})
+      set(GIT_REPOSITORY "${GIT_REPOSITORY}${ADD_PROJECT_ARGS_${SOURCE}}")
     endif()
-  endif()
-  # Handle GITE
-  if(ADD_PROJECT_ARGS_GITE)
-    if(DEFINED GIT_REPOSITORY)
-      message(FATAL_ERROR "Only one of GITHUB/GITE/GIT_REPOSITORY must be provided")
-    endif()
-    set(GIT_REPOSITORY "${ADD_PROJECT_ARGS_GITE}")
-    if(ADD_PROJECT_ARGS_GIT_USE_SSH)
-      set(GIT_REPOSITORY "git@gite.lirmm.fr:${GIT_REPOSITORY}")
-    else()
-      set(GIT_REPOSITORY "https://gite.lirmm.fr/${GIT_REPOSITORY}")
-    endif()
-  endif()
-  # Handle GIT_REPOSITORY
-  if(ADD_PROJECT_ARGS_GIT_REPOSITORY)
-    if(DEFINED GIT_REPOSITORY)
-      message(FATAL_ERROR "Only one of GITHUB/GITE/GIT_REPOSITORY must be provided")
-    endif()
-    set(GIT_REPOSITORY "${ADD_PROJECT_ARGS_GIT_REPOSITORY}")
-  endif()
+  endforeach()
   # Handle GIT_TAG
   if(ADD_PROJECT_ARGS_GIT_TAG)
     set(GIT_TAG "${ADD_PROJECT_ARGS_GIT_TAG}")

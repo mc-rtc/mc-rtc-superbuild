@@ -90,7 +90,6 @@ if(WITH_LSSOL)
   AddProject(eigen-lssol
     GITE multi-contact/eigen-lssol
     GIT_TAG origin/master
-    GIT_USE_SSH
     NO_NINJA
   )
 endif()
