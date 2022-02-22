@@ -7,6 +7,8 @@ include(cmake/sudo.cmake)
 include(CMakeDependentOption)
 include(ExternalProject)
 
+add_custom_target(uninstall)
+
 # Wrapper around the ExternalProject_Add function to allow simplified usage
 #
 # Options
@@ -207,6 +209,23 @@ function(AddProject NAME)
     ${ADD_PROJECT_ARGS_UNPARSED_ARGUMENTS}
   )
   SetCatkinDependencies(${NAME} "${ADD_PROJECT_ARGS_DEPENDS}" "${ADD_PROJECT_ARGS_WORKSPACE}")
+  if(NOT ADD_PROJECT_ARGS_CLONE_ONLY AND NOT ADD_PROJECT_ARGS_WORKSPACE)
+    add_custom_target(uninstall-${NAME}
+      COMMAND ${CMAKE_COMMAND}
+                -DBINARY_DIR=${BINARY_DIR}
+                -DUSE_SUDO=${USE_SUDO}
+                -DSUDO_CMD=${SUDO_CMD}
+                -DINSTALL_STAMP="${PROJECT_BINARY_DIR}/prefix/${NAME}/src/${NAME}-stamp/${NAME}-install"
+                -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/uninstall-project.cmake
+      COMMENT "Uninstall ${NAME}"
+    )
+    add_dependencies(uninstall uninstall-${NAME})
+    foreach(DEP ${ADD_PROJECT_ARGS_DEPENDS})
+      if(TARGET uninstall-${DEP})
+        add_dependencies(uninstall-${DEP} uninstall-${NAME})
+      endif()
+    endforeach()
+  endif()
   if(NOT ADD_PROJECT_ARGS_NO_SOURCE_MONITOR)
     # This glob expression forces CMake to re-run if the source directory content changes
     file(GLOB_RECURSE ${NAME}_SOURCES CONFIGURE_DEPENDS "${SOURCE_DIR}/*")
