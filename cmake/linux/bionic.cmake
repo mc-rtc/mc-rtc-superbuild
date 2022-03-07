@@ -37,4 +37,10 @@ if(BUILD_BENCHMARKS)
 endif()
 
 # We need spdlog >= 1.5.0 and it is not available in Bionic
-include(projects/spdlog.cmake)
+AddProject(spdlog
+  GITHUB gabime/spdlog
+  GIT_TAG v1.6.1
+  CMAKE_ARGS -DSPDLOG_BUILD_EXAMPLE:BOOL=OFF -DSPDLOG_BUILD_SHARED:BOOL=ON
+  SKIP_TEST
+)
+list(APPEND GLOBAL_DEPENDS spdlog)

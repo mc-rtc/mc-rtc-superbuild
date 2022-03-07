@@ -52,8 +52,6 @@ endif()
 
 AddToPath("${CMAKE_CURRENT_BINARY_DIR}/mingw64/bin")
 
-include(projects/spdlog.cmake)
-
 set(PIP_DEPENDENCIES
   Cython
   coverage
@@ -99,6 +97,14 @@ AddProject(yaml-cpp
   SKIP_TEST
 )
 list(APPEND GLOBAL_DEPENDS yaml-cpp)
+
+AddProject(spdlog
+  GITHUB gabime/spdlog
+  GIT_TAG v1.6.1
+  CMAKE_ARGS -DSPDLOG_BUILD_EXAMPLE:BOOL=OFF -DSPDLOG_BUILD_SHARED:BOOL=ON
+  SKIP_TEST
+)
+list(APPEND GLOBAL_DEPENDS spdlog)
 
 if(BUILD_BENCHMARKS)
   AddProject(benchmark

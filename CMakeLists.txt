@@ -8,6 +8,14 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose the type of a build" FORCE)
 endif()
 
+if(EMSCRIPTEN)
+  if(NOT DEFINED ENV{EMSDK})
+    message(FATAL_ERROR "EMSDK not present in environment")
+  endif()
+
+  set(CMAKE_INSTALL_PREFIX "$ENV{EMSDK}/upstream/emscripten/system" CACHE PATH "" FORCE)
+endif()
+
 include(cmake/project.cmake)
 
 if(APPLE)
@@ -18,7 +26,11 @@ if(WIN32)
   include(cmake/win32-dependencies.cmake)
 endif()
 
-if(UNIX AND NOT APPLE)
+if(EMSCRIPTEN)
+  include(cmake/emscripten-dependencies.cmake)
+endif()
+
+if(UNIX AND NOT APPLE AND NOT EMSCRIPTEN)
   include(cmake/linux-dependencies.cmake)
 endif()
 
@@ -74,16 +86,24 @@ AddProject(RBDyn
   DEPENDS SpaceVecAlg
 )
 
+if(EMSCRIPTEN)
+  set(USE_F2C_ARGS CMAKE_ARGS "-DUSE_F2C:BOOL=ON" "-DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=${CMAKE_INSTALL_PREFIX}/include")
+else()
+  set(USE_F2C_ARGS "")
+endif()
+
 AddProject(eigen-qld
   GITHUB jrl-umi3218/eigen-qld
   GIT_TAG origin/master
   NO_NINJA
+  ${USE_F2C_ARGS}
 )
 
 AddProject(eigen-quadprog
   GITHUB jrl-umi3218/eigen-quadprog
   GIT_TAG origin/master
   NO_NINJA
+  ${USE_F2C_ARGS}
 )
 
 if(WITH_LSSOL)
@@ -91,6 +111,7 @@ if(WITH_LSSOL)
     GITE multi-contact/eigen-lssol
     GIT_TAG origin/master
     NO_NINJA
+    ${USE_F2C_ARGS}
   )
 endif()
 
@@ -139,10 +160,15 @@ if(WITH_ROS_SUPPORT)
 else()
   set(MC_RTC_ROS_OPTION "-DDISABLE_ROS=ON")
 endif()
+if(EMSCRIPTEN)
+  set(MC_RTC_EXTRA_OPTIONS -DMC_RTC_BUILD_STATIC=ON -DMC_RTC_DISABLE_NETWORK=ON -DMC_RTC_DISABLE_STACKTRACE=ON -DJVRC_DESCRIPTION_PATH=/assets/jvrc_description -DMC_ENV_DESCRIPTION_PATH=/assets/mc_env_description -DMC_INT_OBJ_DESCRIPTION_PATH=/assets/mc_int_obj_description)
+else()
+  set(MC_RTC_EXTRA_OPTIONS)
+endif()
 AddProject(mc_rtc
   GITHUB jrl-umi3218/mc_rtc
   GIT_TAG origin/master
-  CMAKE_ARGS -DMC_LOG_UI_PYTHON_EXECUTABLE=${MC_LOG_UI_PYTHON_EXECUTABLE} ${MC_RTC_ROS_OPTION}
+  CMAKE_ARGS -DMC_LOG_UI_PYTHON_EXECUTABLE=${MC_LOG_UI_PYTHON_EXECUTABLE} ${MC_RTC_ROS_OPTION} ${MC_RTC_EXTRA_OPTIONS}
   DEPENDS ${mc_rtc_DEPENDS}
 )
 
