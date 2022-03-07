@@ -185,12 +185,16 @@ function(AddProject NAME)
     message("DEPENDS: ${DEPENDS}")
     message("UNPARSED_ARGUMENTS: ${ADD_PROJECT_ARGS_UNPARSED_ARGUMENTS}")
   endif()
+  if(NOT "${GIT_REPOSITORY}" STREQUAL "")
+    set(GIT_OPTIONS GIT_REPOSITORY ${GIT_REPOSITORY} GIT_TAG ${GIT_TAG})
+  else()
+    set(GIT_OPTIONS "")
+  endif()
   ExternalProject_Add(${NAME}
     PREFIX "${PROJECT_BINARY_DIR}/prefix/${NAME}"
     SOURCE_DIR ${SOURCE_DIR}
     BINARY_DIR ${BINARY_DIR}
-    GIT_REPOSITORY ${GIT_REPOSITORY}
-    GIT_TAG ${GIT_TAG}
+    ${GIT_OPTIONS}
     UPDATE_DISCONNECTED ON # We handle updates ourselves with an explicit target
     CONFIGURE_COMMAND ${CONFIGURE_COMMAND}
     BUILD_COMMAND ${BUILD_COMMAND}
@@ -219,7 +223,7 @@ function(AddProject NAME)
       endif()
     endforeach()
   endif()
-  if(NOT ADD_PROJECT_ARGS_NO_SOURCE_MONITOR)
+  if(NOT "${GIT_REPOSITORY}" STREQUAL "" AND NOT ADD_PROJECT_ARGS_NO_SOURCE_MONITOR)
     # This glob expression forces CMake to re-run if the source directory content changes
     file(GLOB_RECURSE ${NAME}_SOURCES CONFIGURE_DEPENDS "${SOURCE_DIR}/*")
     # But we don't care about all the files
@@ -244,7 +248,7 @@ function(AddProject NAME)
       INDEPENDENT ON
     )
   endif()
-  if(GIT_TAG MATCHES "^origin/(.*)")
+  if(NOT "${GIT_REPOSITORY}" STREQUAL "" AND GIT_TAG MATCHES "^origin/(.*)")
     set(LOCAL_BRANCH "${CMAKE_MATCH_1}")
     string(REPLACE "/" "_" LOCAL_BRANCH_ "${LOCAL_BRANCH}")
     ExternalProject_Add_Step(${NAME} checkout-${LOCAL_BRANCH_}
