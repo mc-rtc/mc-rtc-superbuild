@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(mc_rtc_superbuild)
+include(CTest)
 enable_testing()
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
