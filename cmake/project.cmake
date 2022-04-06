@@ -28,24 +28,12 @@ add_custom_target(uninstall)
 #
 
 function(AddProject NAME)
-  if(TARGET ${NAME})
-    return()
-  endif()
   get_property(MC_RTC_SUPERBUILD_SOURCES GLOBAL PROPERTY MC_RTC_SUPERBUILD_SOURCES)
   set(options NO_NINJA NO_SOURCE_MONITOR CLONE_ONLY SKIP_TEST SKIP_SYMBOLIC_LINKS)
   set(oneValueArgs ${MC_RTC_SUPERBUILD_SOURCES} GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER SOURCE_SUBDIR WORKSPACE)
   set(multiValueArgs CMAKE_ARGS BUILD_COMMAND CONFIGURE_COMMAND INSTALL_COMMAND DEPENDS)
   cmake_parse_arguments(ADD_PROJECT_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-  # Handle NO_NINJA
-  if(NOT WIN32)
-    if(ADD_PROJECT_ARGS_NO_NINJA)
-      set(GENERATOR "Unix Makefiles")
-    else()
-      set(GENERATOR "Ninja")
-    endif()
-  else()
-    set(GENERATOR "${CMAKE_GENERATOR}")
-  endif()
+  # Handle GIT_REPOSITORY
   set(GIT_REPOSITORY "")
   foreach(SOURCE ${MC_RTC_SUPERBUILD_SOURCES})
     if(ADD_PROJECT_ARGS_${SOURCE})
@@ -61,6 +49,43 @@ function(AddProject NAME)
     set(GIT_TAG "${ADD_PROJECT_ARGS_GIT_TAG}")
   else()
     set(GIT_TAG "origin/main")
+  endif()
+  # Handle SOURCE_DIR
+  if(ADD_PROJECT_ARGS_SOURCE_DIR)
+    set(SOURCE_DIR "${ADD_PROJECT_ARGS_SOURCE_DIR}")
+  else()
+    if(ADD_PROJECT_ARGS_SUBFOLDER)
+      set(SOURCE_DIR "${SOURCE_DESTINATION}/${ADD_PROJECT_ARGS_SUBFOLDER}/${NAME}")
+    else()
+      set(SOURCE_DIR "${SOURCE_DESTINATION}/${NAME}")
+    endif()
+  endif()
+  # Handle multiple definition of the same project
+  # This could happen if the same project is included in multiple extensions for example
+  # We check if the same remote/branch has been defined and error out if not
+  if(TARGET ${NAME})
+    set(PREVIOUS_GIT_REPOSITORY "${MC_RTC_SUPERBUILD_${NAME}_GIT_REPOSITORY}")
+    set(PREVIOUS_GIT_TAG "${MC_RTC_SUPERBUILD_${NAME}_GIT_TAG}")
+    if("${PREVIOUS_GIT_REPOSITORY}" STREQUAL "${GIT_REPOSITORY}" AND
+        "${PREVIOUS_GIT_TAG}" STREQUAL "${GIT_TAG}")
+      return()
+    endif()
+    message(FATAL_ERROR "${NAME} was already defined in ${MC_RTC_SUPERBUILD_${NAME}_DEFINITION_SOURCE} with a different source.
+This is trying to use:
+  ${GIT_REPOSITORY}#${GIT_TAG}
+But the previous call used:
+  ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG}
+This is likely a conflict between different extensions.")
+  endif()
+  # Handle NO_NINJA
+  if(NOT WIN32)
+    if(ADD_PROJECT_ARGS_NO_NINJA)
+      set(GENERATOR "Unix Makefiles")
+    else()
+      set(GENERATOR "Ninja")
+    endif()
+  else()
+    set(GENERATOR "${CMAKE_GENERATOR}")
   endif()
   set(CMAKE_ARGS)
   if(ADD_PROJECT_ARGS_CMAKE_ARGS)
@@ -88,15 +113,6 @@ function(AddProject NAME)
     list(PREPEND CMAKE_ARGS "-DBUILD_TESTING:BOOL=OFF")
   else()
     list(PREPEND CMAKE_ARGS "-DBUILD_TESTING:BOOL=${BUILD_TESTING}")
-  endif()
-  if(ADD_PROJECT_ARGS_SOURCE_DIR)
-    set(SOURCE_DIR "${ADD_PROJECT_ARGS_SOURCE_DIR}")
-  else()
-    if(ADD_PROJECT_ARGS_SUBFOLDER)
-      set(SOURCE_DIR "${SOURCE_DESTINATION}/${ADD_PROJECT_ARGS_SUBFOLDER}/${NAME}")
-    else()
-      set(SOURCE_DIR "${SOURCE_DESTINATION}/${NAME}")
-    endif()
   endif()
   if(ADD_PROJECT_ARGS_BINARY_DIR)
     set(BINARY_DIR "${ADD_PROJECT_ARGS_BINARY_DIR}")
@@ -285,6 +301,12 @@ function(AddProject NAME)
       )
     endif()
   endif()
+  # Save some of the project properties in the cache so we can:
+  # - Check that multiple projects are added with the same properties or error out
+  # - Warn the user about unsaved data if the scripts change branch
+  set(MC_RTC_SUPERBUILD_${NAME}_GIT_REPOSITORY "${GIT_REPOSITORY}" CACHE INTERNAL "")
+  set(MC_RTC_SUPERBUILD_${NAME}_GIT_TAG "${GIT_TAG}" CACHE INTERNAL "")
+  set(MC_RTC_SUPERBUILD_${NAME}_DEFINITION_SOURCE "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "")
 endfunction()
 
 # Wrapper around AddProject
