@@ -77,6 +77,36 @@ But the previous call used:
   ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG}
 This is likely a conflict between different extensions.")
   endif()
+  # This is true if the project was added in a previous run
+  # If the repository has already been cloned the operation might lose local work if it hasn't been saved,
+  # therefore we check for this and error if there is local changes
+  if(DEFINED MC_RTC_SUPERBUILD_${NAME}_GIT_REPOSITORY)
+    set(PREVIOUS_GIT_REPOSITORY "${MC_RTC_SUPERBUILD_${NAME}_GIT_REPOSITORY}")
+    set(PREVIOUS_GIT_TAG "${MC_RTC_SUPERBUILD_${NAME}_GIT_TAG}")
+    if(NOT "${PREVIOUS_GIT_REPOSITORY}" STREQUAL "${GIT_REPOSITORY}" OR
+        NOT "${PREVIOUS_GIT_TAG}" STREQUAL "${GIT_TAG}")
+      # GIT_REPOSITORY and/or GIT_TAG have changed, we check if there was any local changes
+      if(EXISTS "${SOURCE_DIR}/.git")
+        execute_process(COMMAND git diff-index --quiet ${PREVIOUS_GIT_TAG} --
+          WORKING_DIRECTORY "${SOURCE_DIR}"
+          RESULT_VARIABLE GIT_HAS_ANY_CHANGES)
+        if(GIT_HAS_ANY_CHANGES)
+          message(FATAL_ERROR "The repository for ${NAME} changed.
+From
+  ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG}
+To
+  ${GIT_REPOSITORY}#${GIT_TAG}
+
+You have local changes in ${SOURCE_DIR} that would be overwritten by this change. Save your work before continuing")
+        endif()
+      endif()
+      # Changing only GIT_TAG does not trigger a change so we force the download step to re-run in that case
+      if("${PREVIOUS_GIT_REPOSITORY}" STREQUAL "${GIT_REPOSITORY}")
+        set(STAMP_DIR "${PROJECT_BINARY_DIR}/prefix/${NAME}/src/${NAME}-stamp/")
+        file(REMOVE "${STAMP_DIR}/${NAME}-download" "${STAMP_DIR}/${NAME}-gitclone-lastrun.txt")
+      endif()
+    endif()
+  endif()
   # Handle NO_NINJA
   if(NOT WIN32)
     if(ADD_PROJECT_ARGS_NO_NINJA)
