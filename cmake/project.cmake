@@ -8,6 +8,7 @@ include(CMakeDependentOption)
 include(ExternalProject)
 
 add_custom_target(uninstall)
+add_custom_target(update)
 
 # Wrapper around the ExternalProject_Add function to allow simplified usage
 #
@@ -279,6 +280,14 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
       endif()
     endforeach()
   endif()
+  add_custom_target(update-${NAME}
+    COMMAND ${CMAKE_COMMAND}
+              -DNAME=${NAME}
+              -DSOURCE_DIR=${SOURCE_DIR}
+              -DGIT_TAG=${GIT_TAG}
+              -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/update-project.cmake
+  )
+  add_dependencies(update update-${NAME})
   if(NOT "${GIT_REPOSITORY}" STREQUAL "" AND NOT ADD_PROJECT_ARGS_NO_SOURCE_MONITOR)
     # This glob expression forces CMake to re-run if the source directory content changes
     file(GLOB_RECURSE ${NAME}_SOURCES CONFIGURE_DEPENDS "${SOURCE_DIR}/*")
