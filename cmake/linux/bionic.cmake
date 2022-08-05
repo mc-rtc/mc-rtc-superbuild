@@ -8,6 +8,7 @@ set(APT_DEPENDENCIES
   cython
   cython3
   python-pip
+  python3-pip
   python-nose
   python3-nose
   python-numpy

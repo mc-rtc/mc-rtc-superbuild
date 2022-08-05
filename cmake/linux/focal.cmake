@@ -17,6 +17,7 @@ set(APT_DEPENDENCIES
   python3-coverage
   python-setuptools
   python3-setuptools
+  python3-pip
   libeigen3-dev
   doxygen
   doxygen-latex
