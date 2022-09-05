@@ -11,6 +11,8 @@ set(APT_DEPENDENCIES
   python3-pip
   python-nose
   python3-nose
+  python-pytest
+  python3-pytest
   python-numpy
   python3-numpy
   python-coverage

@@ -56,6 +56,7 @@ set(PIP_DEPENDENCIES
   Cython
   coverage
   nose
+  pytest
   numpy
   matplotlib
   pyqt5
