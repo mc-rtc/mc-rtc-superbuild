@@ -324,20 +324,22 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
       INDEPENDENT ON
     )
   endif()
-  if(NOT CLONE_ONLY AND NOT ADD_PROJECT_ARGS_SKIP_SYMBOLIC_LINKS)
-    if(LINK_BUILD_AND_SRC)
-      ExternalProject_Add_Step(${NAME} link-build-and-src
-        COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${SOURCE_DIR} -DBINARY_DIR=${BINARY_DIR} -DBUILD_LINK_SUFFIX=${BUILD_LINK_SUFFIX} -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-source-and-build.cmake
-        DEPENDEES configure
-        DEPENDS ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-source-and-build.cmake
-      )
-    endif()
-    if(LINK_COMPILE_COMMANDS)
-      ExternalProject_Add_Step(${NAME} link-compile-commands
-        COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${SOURCE_DIR} -DBINARY_DIR=${BINARY_DIR} -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-compile-commands.cmake
-        DEPENDEES configure
-        DEPENDS ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-compile-commands.cmake
-      )
+  if(NOT WIN32)
+    if(NOT CLONE_ONLY AND NOT ADD_PROJECT_ARGS_SKIP_SYMBOLIC_LINKS)
+      if(LINK_BUILD_AND_SRC)
+        ExternalProject_Add_Step(${NAME} link-build-and-src
+          COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${SOURCE_DIR} -DBINARY_DIR=${BINARY_DIR} -DBUILD_LINK_SUFFIX=${BUILD_LINK_SUFFIX} -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-source-and-build.cmake
+          DEPENDEES configure
+          DEPENDS ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-source-and-build.cmake
+        )
+      endif()
+      if(LINK_COMPILE_COMMANDS)
+        ExternalProject_Add_Step(${NAME} link-compile-commands
+          COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${SOURCE_DIR} -DBINARY_DIR=${BINARY_DIR} -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-compile-commands.cmake
+          DEPENDEES configure
+          DEPENDS ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-compile-commands.cmake
+        )
+      endif()
     endif()
   endif()
   # Save some of the project properties in the cache so we can:
