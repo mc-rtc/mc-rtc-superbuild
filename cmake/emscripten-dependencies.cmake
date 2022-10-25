@@ -23,7 +23,7 @@ set(BOOST_HASH "fc9f85fc030e233142908241af7a846e60630aa7388de9a5fafb1f3a26840854
 
 string(REPLACE "." "_" BOOST_VERSION_ "${BOOST_VERSION}")
 set(BOOST_OUT "${CMAKE_CURRENT_BINARY_DIR}/boost_${BOOST_VERSION_}.tar.bz2")
-file(DOWNLOAD "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" "${BOOST_OUT}" EXPECTED_HASH SHA256=${BOOST_HASH} SHOW_PROGRESS)
+DownloadFile("https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" "${BOOST_OUT}" ${BOOST_HASH})
 set(BOOST_SOURCE_DIR "${SOURCE_DESTINATION}/boost_${BOOST_VERSION_}")
 if(NOT EXISTS "${BOOST_SOURCE_DIR}/boost.png")
   message(STATUS "Extracting Boost ${BOOST_VERSION} to ${SOURCE_DESTINATION}")

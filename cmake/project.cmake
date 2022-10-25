@@ -1,3 +1,4 @@
+include(cmake/download.cmake)
 include(cmake/options.cmake)
 include(cmake/ros.cmake)
 include(cmake/setup-env.cmake)
