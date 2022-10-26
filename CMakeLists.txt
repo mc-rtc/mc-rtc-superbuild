@@ -193,4 +193,62 @@ endforeach()
 
 FinalizeCatkinWorkspaces()
 
+message("
+mc-rtc-superbuild is now ready, the following special targets are available:
+- clone: clone all projects into their location
+- update: update all the projects at once
+- uninstall: uninstall all the project at once
+
+You can also use the [COMMAND]-[NAME] form to update particular projects
+
+Or use your regular build command to build all projects
+")
+
+set(FINAL_MESSAGE
+"
+Source will be cloned in ${SOURCE_DESTINATION}
+
+Please add the following lines to your .bashrc/.zshrc file:
+
+export PATH=${CMAKE_INSTALL_PREFIX}/bin:$PATH
+export PKG_CONFIG_PATH=${CMAKE_INSTALL_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH"
+)
+
+if(APPLE)
+  set(FINAL_MESSAGE "${FINAL_MESSAGE}
+export DYLD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:$DYLD_LIBRARY_PATH")
+elseif(UNIX)
+  set(FINAL_MESSAGE "${FINAL_MESSAGE}
+export LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:$LD_LIBRARY_PATH")
+endif()
+
+if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON AND NOT PYTHON_BINDING_USER_INSTALL)
+  execute_process(COMMAND ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON} -c "from distutils import sysconfig; print(sysconfig.get_python_lib(prefix = '${CMAKE_INSTALL_PREFIX}', plat_specific = True))" RESULT_VARIABLE PYTHON_INSTALL_DIR_FOUND OUTPUT_VARIABLE PYTHON_INSTALL_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+  execute_process(COMMAND ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON} -c "from distutils import sysconfig; print(sysconfig.get_python_lib(standard_lib = True, prefix = '${CMAKE_INSTALL_PREFIX}', plat_specific = True))" RESULT_VARIABLE PYTHON_INSTALL_DIR_FOUND OUTPUT_VARIABLE PYTHON_INSTALL_STANDARD_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+  set(FINAL_MESSAGE "${FINAL_MESSAGE}
+export PYTHONPATH=${PYTHON_INSTALL_DIR}:${PYTHON_INSTALL_STANDARD_DIR}/dist-packages:$PYTHONPATH")
+endif()
+
+if(WITH_ROS_SUPPORT)
+  get_property(ID GLOBAL PROPERTY PREVIOUS_CATKIN_WORKSPACE)
+  if(NOT "${ID}" STREQUAL "")
+    get_property(DIR GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_DIR)
+    set(FINAL_MESSAGE "${FINAL_MESSAGE}
+source ${DIR}/devel/setup.bash
+
+Please replace setup.bash with setup.zsh in that last line if you are using zsh")
+  endif()
+endif()
+
+if(WIN32)
+  if(MC_RTC_SUPERBUILD_SET_ENVIRONMENT)
+    set(FINAL_MESSAGE "${FINAL_MESSAGE}
+
+This has already been set in your environment. Please open a new shell for the change to take effect.")
+  endif()
+endif()
+
+message("${FINAL_MESSAGE}")
+
 install(CODE "message(\"Installation done\")")
+install(CODE "message(\"${FINAL_MESSAGE}\")")

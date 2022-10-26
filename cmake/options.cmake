@@ -44,6 +44,10 @@ if(NOT MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
   endif()
 endif()
 
+if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
+  message("-- Use Python for install: ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON}")
+endif()
+
 option(PYTHON_BINDING "Generate Python binding" ${PYTHON_BINDING_DEFAULT})
 if(WIN32)
   set(PYTHON_BINDING_USER_INSTALL_DEFAULT ON)
