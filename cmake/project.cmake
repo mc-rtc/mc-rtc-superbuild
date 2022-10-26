@@ -2,6 +2,7 @@ include(cmake/download.cmake)
 include(cmake/options.cmake)
 include(cmake/ros.cmake)
 include(cmake/setup-env.cmake)
+include(cmake/setup-source-monitor.cmake)
 include(cmake/sources.cmake)
 include(cmake/sudo.cmake)
 
@@ -263,6 +264,8 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
     ${DEPENDS}
     ${ADD_PROJECT_ARGS_UNPARSED_ARGUMENTS}
   )
+  ExternalProject_Add_StepTargets(${NAME} configure)
+  add_dependencies(${NAME} init-superbuild)
   SetCatkinDependencies(${NAME} "${ADD_PROJECT_ARGS_DEPENDS}" "${ADD_PROJECT_ARGS_WORKSPACE}")
   if(NOT ADD_PROJECT_ARGS_CLONE_ONLY AND NOT ADD_PROJECT_ARGS_WORKSPACE)
     add_custom_target(uninstall-${NAME}
@@ -290,21 +293,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
   )
   add_dependencies(update update-${NAME})
   if(NOT "${GIT_REPOSITORY}" STREQUAL "" AND NOT ADD_PROJECT_ARGS_NO_SOURCE_MONITOR)
-    # This glob expression forces CMake to re-run if the source directory content changes
-    file(GLOB_RECURSE ${NAME}_SOURCES CONFIGURE_DEPENDS "${SOURCE_DIR}/*")
-    # But we don't care about all the files
-    execute_process(COMMAND git ls-files --recurse-submodules
-                    WORKING_DIRECTORY "${SOURCE_DIR}"
-                    OUTPUT_VARIABLE ${NAME}_SOURCES
-                    ERROR_QUIET
-                    OUTPUT_STRIP_TRAILING_WHITESPACE)
-    string(REPLACE "\n" ";" ${NAME}_SOURCES "${${NAME}_SOURCES}")
-    list(TRANSFORM ${NAME}_SOURCES PREPEND "${SOURCE_DIR}/")
-    ExternalProject_Add_Step(${NAME} check-sources
-      DEPENDEES patch
-      DEPENDERS configure
-      DEPENDS ${${NAME}_SOURCES}
-    )
+    SetupSourceMonitor(${NAME} "${SOURCE_DIR}")
     # This makes sure the output of git ls-files is usable
     ExternalProject_Add_Step(${NAME} set-git-config
       COMMAND  git config core.quotepath off
@@ -413,8 +402,5 @@ function(AddProjectPlugin NAME PROJECT)
     CLONE_ONLY
     ${ADD_PROJECT_PLUGIN_ARGS_UNPARSED_ARGUMENTS}
   )
-  if(NOT TARGET ${PROJECT}-configure)
-    ExternalProject_Add_StepTargets(${PROJECT} configure)
-  endif()
   add_dependencies(${PROJECT}-configure ${NAME})
 endfunction()

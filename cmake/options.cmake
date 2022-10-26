@@ -76,8 +76,9 @@ if(NOT EXISTS "${SOURCE_DESTINATION}/.git")
   add_custom_command(
     OUTPUT "${PROJECT_BINARY_DIR}/init-superbuild"
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${SOURCE_DESTINATION}"
+    COMMAND "${CMAKE_COMMAND}" -E touch "${SOURCE_DESTINATION}/.mc-rtc-superbuild"
     COMMAND git init
-    COMMAND "${CMAKE_COMMAND}" -E "${PROJECT_BINARY_DIR}/init-superbuild"
+    COMMAND "${CMAKE_COMMAND}" -E touch "${PROJECT_BINARY_DIR}/init-superbuild"
     WORKING_DIRECTORY "${SOURCE_DESTINATION}")
   add_custom_target(init-superbuild DEPENDS "${PROJECT_BINARY_DIR}/init-superbuild")
 else()
