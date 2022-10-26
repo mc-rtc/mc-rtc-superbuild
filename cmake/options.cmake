@@ -47,6 +47,20 @@ endif()
 if(NOT DEFINED SOURCE_DESTINATION)
   set(SOURCE_DESTINATION "${PROJECT_BINARY_DIR}/src")
 endif()
+if(EXISTS "${SOURCE_DESTINATION}" AND NOT EXISTS "${SOURCE_DESTINATION}/.mc-rtc-superbuild")
+  message(FATAL_ERROR "Cannot use ${SOURCE_DESTINATION} as SOURCE_DESTINATION. SOURCE_DESTINATION must be an empty folder or an existing superbuild folder")
+endif()
+if(NOT EXISTS "${SOURCE_DESTINATION}/.git")
+  add_custom_command(
+    OUTPUT "${PROJECT_BINARY_DIR}/init-superbuild"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${SOURCE_DESTINATION}"
+    COMMAND git init
+    COMMAND "${CMAKE_COMMAND}" -E "${PROJECT_BINARY_DIR}/init-superbuild"
+    WORKING_DIRECTORY "${SOURCE_DESTINATION}")
+  add_custom_target(init-superbuild DEPENDS "${PROJECT_BINARY_DIR}/init-superbuild")
+else()
+  add_custom_target(init-superbuild)
+endif()
 
 ###########################
 # -- Location of build -- #
