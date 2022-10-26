@@ -33,11 +33,23 @@ else()
 endif()
 
 if(NOT EXISTS "${CATKIN_DIR}/devel/setup.bash")
-  execute_process(
-    COMMAND ${INIT_COMMAND}
-    WORKING_DIRECTORY "${CATKIN_DIR}"
-    COMMAND_ERROR_IS_FATAL ANY
-  )
+  file(GLOB SRC_FILES "${CATKIN_DIR}/src/*")
+  if("${WORKSPACE_TYPE}" STREQUAL "make")
+    set(NFILES_IF_EMPTY 1)
+  else()
+    set(NFILES_IF_EMPTY 0)
+  endif()
+  list(LENGTH SRC_FILES NFILES)
+  if(NFILES EQUAL ${NFILES_IF_EMPTY})
+    execute_process(
+      COMMAND ${INIT_COMMAND}
+      WORKING_DIRECTORY "${CATKIN_DIR}"
+      COMMAND_ERROR_IS_FATAL ANY
+    )
+  else()
+    file(MAKE_DIRECTORY "${CATKIN_DIR}/devel")
+    file(TOUCH "${CATKIN_DIR}/devel/setup.bash")
+  endif()
 endif()
 
 if(NOT EXISTS "${CAKTIN_DIR}/.gitignore")
