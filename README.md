@@ -86,6 +86,7 @@ The following CMake options can be passed:
 | `WITH_LSSOL` | `OFF` | Enable the LSSOL QP solver, you must have access to the eigen-lssol package |
 | `INSTALL_DOCUMENTATION` | `OFF` | Generate and install projects documentation on your local machine |
 | `MC_RTC_SUPERBUILD_VERBOSE` | `OFF` | Output more information about the build actions |
+| `VERBOSE_TEST_OUTPUT` | `OFF` | Output more information during testing |
 | `MC_RTC_SUPERBUILD_SET_ENVIRONMENT` | `ON` | (Windows only) Changes the PATH variable |
 | `BUILD_BENCHMARKS` | `OFF` | Build mc_rtc benchmarks |
 | `INSTALL_SYSTEM_DEPENDENCIES` | `ON` | Install system-level dependencies, do not disable unless you known these requirements are fullfilled |

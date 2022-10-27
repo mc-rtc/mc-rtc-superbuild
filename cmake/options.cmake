@@ -14,6 +14,7 @@ endif()
 option(WITH_ROS_SUPPORT "Enable ROS support" ${WITH_ROS_SUPPORT_DEFAULT})
 option(INSTALL_DOCUMENTATION "Install documentation of the projects" OFF)
 option(MC_RTC_SUPERBUILD_VERBOSE "Output more information at configuration time" OFF)
+option(VERBOSE_TEST_OUTPUT "Output more information while running unit tests" OFF)
 
 if(WIN32)
   option(MC_RTC_SUPERBUILD_SET_ENVIRONMENT "Allow mc-rtc-superbuild to manipulate the PATH variable" ON)
