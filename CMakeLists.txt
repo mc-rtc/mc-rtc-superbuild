@@ -36,8 +36,8 @@ if(UNIX AND NOT APPLE AND NOT EMSCRIPTEN)
 endif()
 
 if(WITH_ROS_SUPPORT)
-  CreateCatkinWorkspace(ID data_ws DIR "${SOURCE_DESTINATION}/catkin_data_ws" CATKIN_MAKE)
-  CreateCatkinWorkspace(ID mc_rtc_ws DIR "${SOURCE_DESTINATION}/catkin_ws" CATKIN_BUILD)
+  CreateCatkinWorkspace(ID data_ws DIR "catkin_data_ws" CATKIN_MAKE)
+  CreateCatkinWorkspace(ID mc_rtc_ws DIR "catkin_ws" CATKIN_BUILD)
 endif()
 
 AddProject(ndcurves

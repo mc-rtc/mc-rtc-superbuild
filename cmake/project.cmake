@@ -416,7 +416,6 @@ function(AddCatkinProject NAME)
       SKIP_SYMBOLIC_LINKS
       ${ADD_CATKIN_PROJECT_ARGS_UNPARSED_ARGUMENTS}
     )
-    #FIXME After switching to the submodule approach this can be reversed and the leaf system can be removed
     add_dependencies(catkin-build-${WORKSPACE} ${NAME})
     set_property(GLOBAL APPEND PROPERTY CATKIN_WORKSPACE_${WORKSPACE} "${NAME}")
   else()
