@@ -27,7 +27,7 @@ endif()
 
 if(WITH_ROS_SUPPORT AND ROS_DISTRO)
   if(DPKG)
-    set(ROS_APT_DEPENDENCIES "ros-${ROS_DISTRO}-ros-base" "ros-${ROS_DISTRO}-rosdoc-lite" "ros-${ROS_DISTRO}-common-msgs" "ros-${ROS_DISTRO}-tf2-ros" "ros-${ROS_DISTRO}-xacro" "ros-${ROS_DISTRO}-rviz")
+    set(ROS_APT_DEPENDENCIES "ros-${ROS_DISTRO}-ros-base" "ros-${ROS_DISTRO}-rosdoc-lite" "ros-${ROS_DISTRO}-common-msgs" "ros-${ROS_DISTRO}-tf2-ros" "ros-${ROS_DISTRO}-xacro" "ros-${ROS_DISTRO}-rviz" "python3-catkin-tools")
     if(NOT EXISTS /etc/apt/sources.list.d/ros-latest.list)
       message(STATUS "Adding ROS APT mirror for your system")
       execute_process(COMMAND sudo ${CMAKE_COMMAND} -E make_directory /etc/apt/sources.list.d RESULT_VARIABLE BASH_FAILED)
