@@ -1,7 +1,7 @@
 # How many times we retry before giving up
 set(RETRY_COUNT 5)
 # How much time (seconds) we wait between attempts
-set(RETRY_WAIT 1)
+set(RETRY_WAIT 5)
 
 if(GIT_TAG MATCHES "^origin/(.*)")
   set(GIT_TAG_IS_TAG OFF)
