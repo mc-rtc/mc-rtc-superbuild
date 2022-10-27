@@ -19,7 +19,6 @@ endif()
 
 find_program(DPKG dpkg)
 if(DPKG)
-  include(${PROJECT_SOURCE_DIR}/cmake/apt.cmake)
   if(APT_DEPENDENCIES)
     list(APPEND APT_DEPENDENCIES curl git)
     AptInstall(${APT_DEPENDENCIES})
