@@ -9,6 +9,7 @@ include(cmake/sudo.cmake)
 include(CMakeDependentOption)
 include(ExternalProject)
 
+add_custom_target(clone)
 add_custom_target(uninstall)
 add_custom_target(update)
 
@@ -63,6 +64,8 @@ function(AddProject NAME)
       set(SOURCE_DIR "${SOURCE_DESTINATION}/${NAME}")
     endif()
   endif()
+  cmake_path(RELATIVE_PATH SOURCE_DIR BASE_DIRECTORY "${SOURCE_DESTINATION}" OUTPUT_VARIABLE RELATIVE_SOURCE_DIR)
+  set(STAMP_DIR "${PROJECT_BINARY_DIR}/prefix/${NAME}/src/${NAME}-stamp/")
   # Handle multiple definition of the same project
   # This could happen if the same project is included in multiple extensions for example
   # We check if the same remote/branch has been defined and error out if not
@@ -80,6 +83,25 @@ But the previous call used:
   ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG}
 This is likely a conflict between different extensions.")
   endif()
+  if(NOT "${GIT_REPOSITORY}" STREQUAL "")
+    add_custom_command(
+      OUTPUT "${STAMP_DIR}/${NAME}-submodule-init"
+      COMMAND
+        "${CMAKE_COMMAND}"
+          -DSOURCE_DESTINATION=${SOURCE_DESTINATION}
+          -DTARGET_FOLDER=${RELATIVE_SOURCE_DIR}
+          -DGIT_REPOSITORY=${GIT_REPOSITORY}
+          -DGIT_TAG=${GIT_TAG}
+          -DOPERATION="init"
+          -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/git-submodule-init-update.cmake
+      COMMAND "${CMAKE_COMMAND}" -E touch "${STAMP_DIR}/${NAME}-submodule-init"
+      COMMENT "Init ${NAME} repository"
+    )
+    add_custom_target(${NAME}-submodule-init DEPENDS "${STAMP_DIR}/${NAME}-submodule-init")
+  else()
+    add_custom_target(${NAME}-submodule-init)
+  endif()
+  add_dependencies(${NAME}-submodule-init init-superbuild)
   # This is true if the project was added in a previous run
   # If the repository has already been cloned the operation might lose local work if it hasn't been saved,
   # therefore we check for this and error if there is local changes
@@ -103,13 +125,28 @@ To
 You have local changes in ${SOURCE_DIR} that would be overwritten by this change. Save your work before continuing")
         endif()
       endif()
-      # Changing only GIT_TAG does not trigger a change so we force the download step to re-run in that case
-      if("${PREVIOUS_GIT_REPOSITORY}" STREQUAL "${GIT_REPOSITORY}")
-        set(STAMP_DIR "${PROJECT_BINARY_DIR}/prefix/${NAME}/src/${NAME}-stamp/")
-        file(REMOVE "${STAMP_DIR}/${NAME}-download" "${STAMP_DIR}/${NAME}-gitclone-lastrun.txt")
-      endif()
     endif()
+    add_custom_command(
+      OUTPUT "${STAMP_DIR}/${NAME}-submodule-update"
+      COMMAND
+        "${CMAKE_COMMAND}"
+          -DSOURCE_DESTINATION=${SOURCE_DESTINATION}
+          -DTARGET_FOLDER=${RELATIVE_SOURCE_DIR}
+          -DGIT_REPOSITORY=${GIT_REPOSITORY}
+          -DGIT_TAG=${GIT_TAG}
+          -DOPERATION="update"
+          -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/git-submodule-init-update.cmake
+      COMMAND "${CMAKE_COMMAND}" -E touch "${STAMP_DIR}/${NAME}-submodule-update"
+      COMMENT "Update ${NAME} repository settings"
+    )
+    add_custom_target(${NAME}-submodule-update DEPENDS "${STAMP_DIR}/${NAME}-submodule-update")
+  else()
+    add_custom_target(${NAME}-submodule-update)
   endif()
+  add_dependencies(${NAME}-submodule-update ${NAME}-submodule-init)
+  add_custom_target(clone-${NAME})
+  add_dependencies(clone-${NAME} ${NAME}-submodule-update)
+  add_dependencies(clone clone-${NAME})
   # Handle NO_NINJA
   if(NOT WIN32)
     if(ADD_PROJECT_ARGS_NO_NINJA)
@@ -245,9 +282,15 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
     message("UNPARSED_ARGUMENTS: ${ADD_PROJECT_ARGS_UNPARSED_ARGUMENTS}")
   endif()
   if(NOT "${GIT_REPOSITORY}" STREQUAL "")
-    set(GIT_OPTIONS GIT_REPOSITORY ${GIT_REPOSITORY} GIT_TAG ${GIT_TAG})
+    set(GIT_OPTIONS DOWNLOAD_COMMAND "")
   else()
     set(GIT_OPTIONS "")
+  endif()
+  set(SOURCE_DIR_DID_NOT_EXIST FALSE)
+  if(NOT EXISTS "${SOURCE_DIR}")
+    set(SOURCE_DIR_DID_NOT_EXIST TRUE)
+    file(MAKE_DIRECTORY "${SOURCE_DIR}")
+    file(TOUCH "${SOURCE_DIR}/.mc-rtc-superbuild")
   endif()
   ExternalProject_Add(${NAME}
     PREFIX "${PROJECT_BINARY_DIR}/prefix/${NAME}"
@@ -264,8 +307,11 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
     ${DEPENDS}
     ${ADD_PROJECT_ARGS_UNPARSED_ARGUMENTS}
   )
+  if(SOURCE_DIR_DID_NOT_EXIST)
+    file(REMOVE_RECURSE "${SOURCE_DIR}")
+  endif()
   ExternalProject_Add_StepTargets(${NAME} configure)
-  add_dependencies(${NAME} init-superbuild)
+  add_dependencies(${NAME} ${NAME}-submodule-update)
   SetCatkinDependencies(${NAME} "${ADD_PROJECT_ARGS_DEPENDS}" "${ADD_PROJECT_ARGS_WORKSPACE}")
   if(NOT ADD_PROJECT_ARGS_CLONE_ONLY AND NOT ADD_PROJECT_ARGS_WORKSPACE)
     add_custom_target(uninstall-${NAME}
