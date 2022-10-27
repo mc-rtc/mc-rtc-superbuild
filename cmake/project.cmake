@@ -317,6 +317,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
   endif()
   ExternalProject_Add_StepTargets(${NAME} configure)
   add_dependencies(${NAME} ${NAME}-submodule-update)
+  add_dependencies(${NAME}-configure ${NAME}-submodule-update)
   SetCatkinDependencies(${NAME} "${ADD_PROJECT_ARGS_DEPENDS}" "${ADD_PROJECT_ARGS_WORKSPACE}")
   if(NOT ADD_PROJECT_ARGS_CLONE_ONLY AND NOT ADD_PROJECT_ARGS_WORKSPACE)
     add_custom_target(uninstall-${NAME}
