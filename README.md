@@ -56,9 +56,7 @@ The following CMake options can be passed:
 | :---    | :-----: | :---        |
 | `WITH_ROS_SUPPORT` | `ON` (Linux)<br/>`OFF` (others) | Build mc_rtc with the ROS plugin, install ROS if necessary |
 | `WITH_LSSOL` | `OFF` | Enable the LSSOL QP solver, you must have access to the eigen-lssol package |
-| `UPDATE_ALL` | `ON` | Update all packages when the super-project is built. If this is off you can select a subset of packages to update anyway |
 | `INSTALL_DOCUMENTATION` | `OFF` | Generate and install projects documentation on your local machine |
-| `CLONE_ONLY` | `OFF` | Only clone (or update) the packages |
 | `MC_RTC_SUPERBUILD_VERBOSE` | `OFF` | Output more information about the build actions |
 | `MC_RTC_SUPERBUILD_SET_ENVIRONMENT` | `ON` | (Windows only) Changes the PATH variable |
 | `BUILD_BENCHMARKS` | `OFF` | Build mc_rtc benchmarks |

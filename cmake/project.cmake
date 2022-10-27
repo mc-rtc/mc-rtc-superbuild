@@ -18,7 +18,7 @@ add_custom_target(update)
 # Options
 # =======
 #
-# - CLONE_ONLY Always act as if the CLONE_ONLY option was on
+# - CLONE_ONLY Only clone the repository
 # - SKIP_TEST Do not run tests
 # - SKIP_SYMBOLIC_LINKS Skip symbolic links creation mandated by LINK_BUILD_AND_SRC and LINK_COMPILE_COMMANDS
 # - NO_SOURCE_MONITOR Do not monitor source for changes
@@ -260,7 +260,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
     set(DEPENDS DEPENDS ${ADD_PROJECT_ARGS_DEPENDS})
   endif()
   # -- CLONE_ONLY option
-  if(CLONE_ONLY OR ADD_PROJECT_ARGS_CLONE_ONLY)
+  if(ADD_PROJECT_ARGS_CLONE_ONLY)
     set(CONFIGURE_COMMAND ${CMAKE_COMMAND} -E true)
     set(BUILD_COMMAND ${CMAKE_COMMAND} -E true)
     set(INSTALL_COMMAND ${CMAKE_COMMAND} -E true)
@@ -361,7 +361,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
     )
   endif()
   if(NOT WIN32)
-    if(NOT CLONE_ONLY AND NOT ADD_PROJECT_ARGS_SKIP_SYMBOLIC_LINKS)
+    if(NOT ADD_PROJECT_ARGS_SKIP_SYMBOLIC_LINKS)
       if(LINK_BUILD_AND_SRC)
         ExternalProject_Add_Step(${NAME} link-build-and-src
           COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${SOURCE_DIR} -DBINARY_DIR=${BINARY_DIR} -DBUILD_LINK_SUFFIX=${BUILD_LINK_SUFFIX} -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-source-and-build.cmake

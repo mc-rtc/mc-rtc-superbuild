@@ -13,7 +13,6 @@ else()
 endif()
 option(WITH_ROS_SUPPORT "Enable ROS support" ${WITH_ROS_SUPPORT_DEFAULT})
 option(INSTALL_DOCUMENTATION "Install documentation of the projects" OFF)
-option(CLONE_ONLY "Clone (or update) the packages only" OFF)
 option(MC_RTC_SUPERBUILD_VERBOSE "Output more information at configuration time" OFF)
 
 if(WIN32)
