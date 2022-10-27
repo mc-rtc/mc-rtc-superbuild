@@ -234,6 +234,7 @@ if(WITH_ROS_SUPPORT)
   if(NOT "${ID}" STREQUAL "")
     get_property(DIR GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_DIR)
     set(FINAL_MESSAGE "${FINAL_MESSAGE}
+export ROS_PARALLEL_JOBS=$ENV{ROS_PARALLEL_JOBS}
 source ${DIR}/devel/setup.bash
 
 Please replace setup.bash with setup.zsh in that last line if you are using zsh")
@@ -250,5 +251,7 @@ endif()
 
 message("${FINAL_MESSAGE}")
 
+install(CODE "message(\"\")")
 install(CODE "message(\"Installation done\")")
+install(CODE "message(\"\")")
 install(CODE "message(\"${FINAL_MESSAGE}\")")
