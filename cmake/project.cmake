@@ -308,6 +308,10 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
     ${DEPENDS}
     ${ADD_PROJECT_ARGS_UNPARSED_ARGUMENTS}
   )
+  add_custom_target(force-${NAME}
+    COMMAND "${CMAKE_COMMAND}" -E remove "${STAMP_DIR}/${NAME}-configure"
+    COMMAND "${CMAKE_COMMAND}" --build "${PROJECT_BINARY_DIR}" --target ${NAME} --config $<CONFIG>
+  )
   if(SOURCE_DIR_DID_NOT_EXIST)
     file(REMOVE_RECURSE "${SOURCE_DIR}")
   endif()
