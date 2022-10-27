@@ -35,6 +35,7 @@ set(APT_DEPENDENCIES
   python3-pyqt5
   libspdlog-dev
   ninja-build
+  python-is-python3
 )
 if(BUILD_BENCHMARKS)
   list(APPEND APT_DEPENDENCIES libbenchmark-dev)
