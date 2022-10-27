@@ -192,6 +192,11 @@ foreach(extension_dir ${extension_dirs})
   endif()
 endforeach()
 
+### Personal projects can go here although that is not recommended
+### PERSONAL_PROJECTS
+
+### No more personal projects past this point
+
 FinalizeCatkinWorkspaces()
 
 message("
