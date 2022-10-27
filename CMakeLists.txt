@@ -37,7 +37,7 @@ endif()
 
 if(WITH_ROS_SUPPORT)
   CreateCatkinWorkspace(ID data_ws DIR "${SOURCE_DESTINATION}/catkin_data_ws" CATKIN_MAKE)
-  CreateCatkinWorkspace(ID mc_rtc_ws DIR "${SOURCE_DESTINATION}/catkin_ws" CATKIN_MAKE)
+  CreateCatkinWorkspace(ID mc_rtc_ws DIR "${SOURCE_DESTINATION}/catkin_ws" CATKIN_BUILD)
 endif()
 
 AddProject(ndcurves
@@ -140,6 +140,7 @@ AddCatkinProject(mc_rtc_data
   GIT_TAG origin/master
   WORKSPACE data_ws
 )
+
 if(WITH_ROS_SUPPORT)
   AddCatkinProject(mc_rtc_msgs
     GITHUB jrl-umi3218/mc_rtc_msgs

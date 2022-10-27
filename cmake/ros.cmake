@@ -69,11 +69,11 @@ function(CreateCatkinWorkspace)
   AppendROSWorkspace("${DIR}/devel" "${DIR}/src")
   GetCommandPrefix(COMMAND_PREFIX)
   add_custom_command(
-    OUTPUT "${DIR}/devel/setup.bash"
+    OUTPUT "${DIR}/devel/setup.sh"
     COMMAND ${COMMAND_PREFIX} "${CMAKE_COMMAND}" -DCATKIN_DIR=${DIR} -DWORKSPACE_TYPE=${WORKSPACE_TYPE} -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/init-catkin-workspace.cmake"
     COMMENT "Initializing catkin workspace in ${DIR}"
   )
-  add_custom_target(catkin-init-${ID} DEPENDS "${DIR}/devel/setup.bash")
+  add_custom_target(catkin-init-${ID} DEPENDS "${DIR}/devel/setup.sh")
   get_property(PREVIOUS_WORKSPACE GLOBAL PROPERTY PREVIOUS_CATKIN_WORKSPACE)
   if(NOT "${PREVIOUS_WORKSPACE}" STREQUAL "")
     add_dependencies(catkin-init-${ID} catkin-init-${PREVIOUS_WORKSPACE})
