@@ -18,6 +18,10 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
+    - name: Add GFortran DLL to path
+      shell:  bash
+      run: |
+        echo "C:/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin" >> $GITHUB_PATH
     - name: Install system dependencies
       run: |
         cmake -S $Env:GITHUB_WORKSPACE -B C:/build-mc-rtc -DCMAKE_INSTALL_PREFIX=C:/devel/install -DPYTHON_BINDING=OFF -DVERBOSE_TEST_OUTPUT=OFF
