@@ -129,12 +129,6 @@ AddProject(Tasks
   DEPENDS ${Tasks_DEPENDS}
 )
 
-AddProject(mc_rbdyn_urdf
-  GITHUB jrl-umi3218/mc_rbdyn_urdf
-  GIT_TAG origin/master
-  DEPENDS RBDyn
-)
-
 AddCatkinProject(mc_rtc_data
   GITHUB jrl-umi3218/mc_rtc_data
   GIT_TAG origin/master
@@ -150,7 +144,7 @@ if(WITH_ROS_SUPPORT)
   list(APPEND mc_rtc_DEPENDS mc_rtc_msgs)
 endif()
 
-list(APPEND mc_rtc_DEPENDS Tasks mc_rbdyn_urdf mc_rtc_data ndcurves state-observation)
+list(APPEND mc_rtc_DEPENDS Tasks mc_rtc_data ndcurves state-observation)
 if(TARGET spdlog)
   list(APPEND mc_rtc_DEPENDS spdlog)
 endif()
