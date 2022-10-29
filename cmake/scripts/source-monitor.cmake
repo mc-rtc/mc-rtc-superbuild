@@ -79,7 +79,7 @@ endif()
 
 # Should only be the case on the first run, no sources have appeared yet
 if(${SOURCES_LENGTH} EQUAL 0)
-  file(REMOVE "${STAMP_DIR}/${NAME}-configure")
+  file(REMOVE "${CONFIGURE_STAMP}")
   return()
 endif()
 
@@ -87,7 +87,7 @@ endif()
 # Let's compare them
 if(NOT ${SOURCES_LENGTH} EQUAL ${PREVIOUS_SOURCES_LENGTH})
   # Remove the configure stamp because the list of sources has changed
-  file(REMOVE "${STAMP_DIR}/${NAME}-configure")
+  file(REMOVE "${CONFIGURE_STAMP}")
   _PutSourceInformationInCache(${NAME} "${SOURCES}")
   return()
 endif()
@@ -99,7 +99,7 @@ while(LIST_I LESS ${SOURCES_LENGTH})
   list(GET PREVIOUS_SOURCES ${LIST_I} PREVIOUS_SOURCE)
   if(NOT "${SOURCE}" STREQUAL "${PREVIOUS_SOURCE}")
     # Remove the configure stamp because the list of sources has changed
-    file(REMOVE "${STAMP_DIR}/${NAME}-configure")
+    file(REMOVE "${CONFIGURE_STAMP}")
     _PutSourceInformationInCache(${NAME} "${SOURCES}")
     return()
   endif()
@@ -107,7 +107,7 @@ while(LIST_I LESS ${SOURCES_LENGTH})
   list(GET PREVIOUS_SOURCES_TIMESTAMP ${LIST_I} PREVIOUS_SOURCE_TIMESTAMP)
   if("${SOURCE_TIMESTAMP}" STREQUAL "" OR "${SOURCE_TIMESTAMP}" STRGREATER "${PREVIOUS_SOURCE_TIMESTAMP}")
     # Remove the configure stamp because a source has been updated"
-    file(REMOVE "${STAMP_DIR}/${NAME}-configure")
+    file(REMOVE "${CONFIGURE_STAMP}")
     _PutSourceInformationInCache(${NAME} "${SOURCES}")
     return()
   endif()
