@@ -126,22 +126,24 @@ To
 You have local changes in ${SOURCE_DIR} that would be overwritten by this change. Save your work before continuing")
         endif()
       endif()
+      message("-- ${NAME} repository will be updated from ${PREVIOUS_GIT_REPOSITORY}#${GIT_TAG} to ${GIT_REPOSITORY}#${GIT_TAG}")
+      add_custom_command(
+        OUTPUT "${STAMP_DIR}/${NAME}-submodule-update"
+        COMMAND
+          "${CMAKE_COMMAND}"
+            -DSOURCE_DESTINATION=${SOURCE_DESTINATION}
+            -DTARGET_FOLDER=${RELATIVE_SOURCE_DIR}
+            -DGIT_REPOSITORY=${GIT_REPOSITORY}
+            -DGIT_TAG=${GIT_TAG}
+            -DOPERATION="update"
+            -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/git-submodule-init-update.cmake
+        COMMAND "${CMAKE_COMMAND}" -E touch "${STAMP_DIR}/${NAME}-submodule-update"
+        COMMENT "Update ${NAME} repository settings"
+      )
+      add_custom_target(${NAME}-submodule-update DEPENDS "${STAMP_DIR}/${NAME}-submodule-update")
     endif()
-    add_custom_command(
-      OUTPUT "${STAMP_DIR}/${NAME}-submodule-update"
-      COMMAND
-        "${CMAKE_COMMAND}"
-          -DSOURCE_DESTINATION=${SOURCE_DESTINATION}
-          -DTARGET_FOLDER=${RELATIVE_SOURCE_DIR}
-          -DGIT_REPOSITORY=${GIT_REPOSITORY}
-          -DGIT_TAG=${GIT_TAG}
-          -DOPERATION="update"
-          -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/git-submodule-init-update.cmake
-      COMMAND "${CMAKE_COMMAND}" -E touch "${STAMP_DIR}/${NAME}-submodule-update"
-      COMMENT "Update ${NAME} repository settings"
-    )
-    add_custom_target(${NAME}-submodule-update DEPENDS "${STAMP_DIR}/${NAME}-submodule-update")
-  else()
+  endif()
+  if(NOT TARGET ${NAME}-submodule-update)
     add_custom_target(${NAME}-submodule-update)
   endif()
   add_dependencies(${NAME}-submodule-update ${NAME}-submodule-init)
