@@ -1,7 +1,7 @@
 # How many times we retry before giving up
 set(RETRY_COUNT 5)
 # How much time (seconds) we wait between attempts
-set(RETRY_WAIT 5)
+set(RETRY_WAIT 15)
 
 if(GIT_TAG MATCHES "^origin/(.*)")
   set(GIT_TAG_IS_TAG OFF)
@@ -54,8 +54,8 @@ while(${RETRY_I} LESS_EQUAL ${RETRY_COUNT})
     break()
   endif()
   math(EXPR RETRY_I "${RETRY_I} + 1")
-  message("git submodule operation failed, try ${RETRY_I} out of ${RETRY_COUNT}")
   execute_process(COMMAND "${CMAKE_COMMAND}" -E sleep ${RETRY_WAIT})
+  message("git submodule operation failed, try ${RETRY_I} out of ${RETRY_COUNT}")
 endwhile()
 
 execute_process(
@@ -80,6 +80,24 @@ while(${RETRY_I} LESS_EQUAL ${RETRY_COUNT})
     break()
   endif()
   math(EXPR RETRY_I "${RETRY_I} + 1")
-  message("git submodule operation failed, try ${RETRY_I} out of ${RETRY_COUNT}")
   execute_process(COMMAND "${CMAKE_COMMAND}" -E sleep ${RETRY_WAIT})
+  message("git submodule operation failed, try ${RETRY_I} out of ${RETRY_COUNT}")
 endwhile()
+
+if("${OPERATION}" STREQUAL "init")
+  set(COMMIT_MSG "[${TARGET_FOLDER}] Added submodule")
+else()
+  set(COMMIT_MSG "[${TARGET_FOLDER}] Updated submodule parameter")
+endif()
+execute_process(
+  COMMAND git add .
+  WORKING_DIRECTORY "${SOURCE_DESTINATION}"
+  OUTPUT_QUIET ERROR_QUIET
+)
+execute_process(
+  COMMAND git commit -m "${COMMIT_MSG}"
+  WORKING_DIRECTORY "${SOURCE_DESTINATION}"
+  OUTPUT_QUIET ERROR_QUIET
+)
+
+execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${STAMP_OUT})

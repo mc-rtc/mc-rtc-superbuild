@@ -76,15 +76,17 @@ if(EXISTS "${SOURCE_DESTINATION}" AND NOT EXISTS "${SOURCE_DESTINATION}/.mc-rtc-
   message(FATAL_ERROR "Cannot use ${SOURCE_DESTINATION} as SOURCE_DESTINATION. SOURCE_DESTINATION must be an empty folder or an existing superbuild folder")
 endif()
 set(PREVIOUS_SOURCE_DESTINATION "${SOURCE_DESTINATION}" CACHE INTERNAL "")
-if(NOT EXISTS "${SOURCE_DESTINATION}/.git")
+set(SUPERBUILD_STAMP "${SOURCE_DESTINATION}/.mc-rtc-superbuild")
+if(NOT EXISTS "${SUPERBUILD_STAMP}")
   add_custom_command(
-    OUTPUT "${PROJECT_BINARY_DIR}/init-superbuild"
+    OUTPUT "${SUPERBUILD_STAMP}"
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${SOURCE_DESTINATION}"
-    COMMAND "${CMAKE_COMMAND}" -E touch "${SOURCE_DESTINATION}/.mc-rtc-superbuild"
-    COMMAND git init
-    COMMAND "${CMAKE_COMMAND}" -E touch "${PROJECT_BINARY_DIR}/init-superbuild"
-    WORKING_DIRECTORY "${SOURCE_DESTINATION}")
-  add_custom_target(init-superbuild DEPENDS "${PROJECT_BINARY_DIR}/init-superbuild")
+    COMMAND "${CMAKE_COMMAND}" -E touch "${SUPERBUILD_STAMP}"
+    COMMAND "${CMAKE_COMMAND}" -E chdir "${SOURCE_DESTINATION}" git init
+    COMMAND "${CMAKE_COMMAND}" -E chdir "${SOURCE_DESTINATION}" git add .mc-rtc-superbuild
+    COMMAND "${CMAKE_COMMAND}" -E chdir "${SOURCE_DESTINATION}" git commit -m "Initial commit"
+    COMMAND "${CMAKE_COMMAND}" -E touch "${SUPERBUILD_STAMP}")
+  add_custom_target(init-superbuild DEPENDS "${SUPERBUILD_STAMP}")
 else()
   add_custom_target(init-superbuild)
 endif()

@@ -73,3 +73,14 @@ execute_process(
   COMMAND git submodule update --init --recursive
   WORKING_DIRECTORY "${SOURCE_DIR}"
 )
+
+execute_process(
+  COMMAND git add .
+  WORKING_DIRECTORY "${SOURCE_DESTINATION}"
+  OUTPUT_QUIET ERROR_QUIET
+)
+execute_process(
+  COMMAND git commit -m "[${TARGET_FOLDER}] Updated submodule"
+  WORKING_DIRECTORY "${SOURCE_DESTINATION}"
+  OUTPUT_QUIET ERROR_QUIET
+)

@@ -38,6 +38,7 @@ function(AddProject NAME)
   set(oneValueArgs ${MC_RTC_SUPERBUILD_SOURCES} GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER WORKSPACE)
   set(multiValueArgs CMAKE_ARGS BUILD_COMMAND CONFIGURE_COMMAND INSTALL_COMMAND DEPENDS)
   cmake_parse_arguments(ADD_PROJECT_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  list(APPEND ADD_PROJECT_ARGS_DEPENDS ${GLOBAL_DEPENDS})
   # Handle GIT_REPOSITORY
   set(GIT_REPOSITORY "")
   foreach(SOURCE ${MC_RTC_SUPERBUILD_SOURCES})
@@ -94,8 +95,8 @@ This is likely a conflict between different extensions.")
           -DGIT_REPOSITORY=${GIT_REPOSITORY}
           -DGIT_TAG=${GIT_TAG}
           -DOPERATION="init"
+          -DSTAMP_OUT=${STAMP_DIR}/${NAME}-submodule-init
           -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/git-submodule-init-update.cmake
-      COMMAND "${CMAKE_COMMAND}" -E touch "${STAMP_DIR}/${NAME}-submodule-init"
       COMMENT "Init ${NAME} repository"
     )
     add_custom_target(${NAME}-submodule-init DEPENDS "${STAMP_DIR}/${NAME}-submodule-init")
@@ -103,6 +104,9 @@ This is likely a conflict between different extensions.")
     add_custom_target(${NAME}-submodule-init)
   endif()
   add_dependencies(${NAME}-submodule-init init-superbuild)
+  foreach(DEP ${ADD_PROJECT_ARGS_DEPENDS})
+    add_dependencies(${NAME}-submodule-init ${DEP}-submodule-update)
+  endforeach()
   # This is true if the project was added in a previous run
   # If the repository has already been cloned the operation might lose local work if it hasn't been saved,
   # therefore we check for this and error if there is local changes
@@ -135,9 +139,9 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
             -DTARGET_FOLDER=${RELATIVE_SOURCE_DIR}
             -DGIT_REPOSITORY=${GIT_REPOSITORY}
             -DGIT_TAG=${GIT_TAG}
+            -DSTAMP_OUT=${STAMP_DIR}/${NAME}-submodule-update
             -DOPERATION="update"
             -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/git-submodule-init-update.cmake
-        COMMAND "${CMAKE_COMMAND}" -E touch "${STAMP_DIR}/${NAME}-submodule-update"
         COMMENT "Update ${NAME} repository settings"
       )
       add_custom_target(${NAME}-submodule-update DEPENDS "${STAMP_DIR}/${NAME}-submodule-update")
@@ -261,7 +265,6 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
     set(TEST_STEP_OPTIONS TEST_AFTER_INSTALL TRUE TEST_COMMAND ${COMMAND_PREFIX} ctest -C $<CONFIG> ${VERBOSE_OPTION})
   endif()
   # -- Depends option
-  list(APPEND ADD_PROJECT_ARGS_DEPENDS ${GLOBAL_DEPENDS})
   if("${ADD_PROJECT_ARGS_DEPENDS}" STREQUAL "")
     set(DEPENDS "")
   else()
@@ -348,6 +351,8 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
               -DNAME=${NAME}
               -DSOURCE_DIR=${SOURCE_DIR}
               -DGIT_TAG=${GIT_TAG}
+              -DSOURCE_DESTINATION=${SOURCE_DESTINATION}
+              -DTARGET_FOLDER=${RELATIVE_SOURCE_DIR}
               -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/update-project.cmake
   )
   add_dependencies(update update-${NAME})
