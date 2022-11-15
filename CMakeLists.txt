@@ -144,7 +144,7 @@ if(WITH_ROS_SUPPORT)
   list(APPEND mc_rtc_DEPENDS mc_rtc_msgs)
 endif()
 
-list(APPEND mc_rtc_DEPENDS Tasks mc_rtc_data ndcurves state-observation)
+list(APPEND mc_rtc_DEPENDS Tasks mc_rtc_data ndcurves state-observation eigen-quadprog)
 if(TARGET spdlog)
   list(APPEND mc_rtc_DEPENDS spdlog)
 endif()
