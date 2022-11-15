@@ -12,6 +12,7 @@ endif()
 
 if("${OPERATION}" STREQUAL "init")
   if(EXISTS "${SOURCE_DESTINATION}/${TARGET_FOLDER}/.git")
+    execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${STAMP_OUT})
     return()
   endif()
   if(EXISTS "${SOURCE_DESTINATION}/${TARGET_FOLDER}")
@@ -85,9 +86,9 @@ while(${RETRY_I} LESS_EQUAL ${RETRY_COUNT})
 endwhile()
 
 if("${OPERATION}" STREQUAL "init")
-  set(COMMIT_MSG "[${TARGET_FOLDER}] Added submodule")
+  set(COMMIT_MSG "[${TARGET_FOLDER}] Added submodule\n\nUsing ${GIT_REPOSITORY}#${GIT_TAG}")
 else()
-  set(COMMIT_MSG "[${TARGET_FOLDER}] Updated submodule parameter")
+  set(COMMIT_MSG "[${TARGET_FOLDER}] Updated submodule parameter\n\n${GIT_COMMIT_EXTRA_MSG}")
 endif()
 execute_process(
   COMMAND git add .

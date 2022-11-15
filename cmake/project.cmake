@@ -130,7 +130,8 @@ To
 You have local changes in ${SOURCE_DIR} that would be overwritten by this change. Save your work before continuing")
         endif()
       endif()
-      message("-- ${NAME} repository will be updated from ${PREVIOUS_GIT_REPOSITORY}#${GIT_TAG} to ${GIT_REPOSITORY}#${GIT_TAG}")
+      set(GIT_COMMIT_EXTRA_MSG "Updating from ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG} to ${GIT_REPOSITORY}#${GIT_TAG}")
+      message("-- ${NAME} repository will be updated from ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG} to ${GIT_REPOSITORY}#${GIT_TAG}")
       add_custom_command(
         OUTPUT "${STAMP_DIR}/${NAME}-submodule-update"
         COMMAND
@@ -141,6 +142,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
             -DGIT_TAG=${GIT_TAG}
             -DSTAMP_OUT=${STAMP_DIR}/${NAME}-submodule-update
             -DOPERATION="update"
+            -DGIT_COMMIT_EXTRA_MSG=${GIT_COMMIT_EXTRA_MSG}
             -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/git-submodule-init-update.cmake
         COMMENT "Update ${NAME} repository settings"
       )
