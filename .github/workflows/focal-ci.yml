@@ -30,4 +30,6 @@ jobs:
     - name: Install mc_rtc and related projects
       shell: bash
       run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@example.com"
         cmake --build ${TMPDIR-/tmp}/build-mc-rtc --config RelWithDebInfo

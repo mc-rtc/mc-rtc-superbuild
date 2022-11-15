@@ -27,4 +27,6 @@ jobs:
         cmake -S $Env:GITHUB_WORKSPACE -B C:/build-mc-rtc -DCMAKE_INSTALL_PREFIX=C:/devel/install -DPYTHON_BINDING=OFF -DVERBOSE_TEST_OUTPUT=OFF
     - name: Install mc_rtc and related projects
       run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@example.com"
         cmake --build C:/build-mc-rtc --config RelWithDebInfo
