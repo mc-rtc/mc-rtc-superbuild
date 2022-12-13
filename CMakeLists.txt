@@ -4,7 +4,7 @@ project(mc_rtc_superbuild)
 include(CTest)
 enable_testing()
 
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES AND NOT ENV{CMAKE_BUILD_TYPE})
   message(STATUS "Setting default build type to RelWithDebInfo as none was provided")
   set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose the type of a build" FORCE)
 endif()
