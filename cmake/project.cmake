@@ -185,6 +185,11 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
       "-DBOOST_ROOT=${BOOST_ROOT}"
     )
   endif()
+  if(APPLE)
+    list(PREPEND CMAKE_ARGS
+      "-DCMAKE_MACOSX_RPATH:BOOL=ON"
+    )
+  endif()
   if(DEFINED CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     list(PREPEND CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
   endif()
