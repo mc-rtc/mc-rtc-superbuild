@@ -34,6 +34,7 @@ set(APT_DEPENDENCIES
   libqwt-qt5-dev
   python-matplotlib
   ninja-build
+  libnotify-dev
 )
 
 function(mc_rtc_extra_steps)

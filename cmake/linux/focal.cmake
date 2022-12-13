@@ -36,6 +36,7 @@ set(APT_DEPENDENCIES
   libspdlog-dev
   ninja-build
   python-is-python3
+  libnotify-dev
 )
 if(BUILD_BENCHMARKS)
   list(APPEND APT_DEPENDENCIES libbenchmark-dev)
