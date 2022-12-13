@@ -325,7 +325,8 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
     COMMAND "${CMAKE_COMMAND}" --build "${PROJECT_BINARY_DIR}" --target ${NAME} --config $<CONFIG>
   )
   if(SOURCE_DIR_DID_NOT_EXIST)
-    file(REMOVE_RECURSE "${SOURCE_DIR}")
+    file(REMOVE "${SOURCE_DIR}/.mc-rtc-superbuild")
+    execute_process(COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${SOURCE_DIR} -DSOURCE_DESTINATION=${SOURCE_DESTINATION} -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/clean-src-folders.cmake")
   endif()
   ExternalProject_Add_StepTargets(${NAME} configure)
   add_dependencies(${NAME} ${NAME}-submodule-update)
