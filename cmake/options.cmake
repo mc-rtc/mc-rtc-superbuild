@@ -13,8 +13,8 @@ else()
 endif()
 option(WITH_ROS_SUPPORT "Enable ROS support" ${WITH_ROS_SUPPORT_DEFAULT})
 option(INSTALL_DOCUMENTATION "Install documentation of the projects" OFF)
-option(CLONE_ONLY "Clone (or update) the packages only" OFF)
 option(MC_RTC_SUPERBUILD_VERBOSE "Output more information at configuration time" OFF)
+option(VERBOSE_TEST_OUTPUT "Output more information while running unit tests" OFF)
 
 if(WIN32)
   option(MC_RTC_SUPERBUILD_SET_ENVIRONMENT "Allow mc-rtc-superbuild to manipulate the PATH variable" ON)
@@ -26,15 +26,37 @@ option(LINK_COMPILE_COMMANDS "Create a symbolic to compile_commands.json in the 
 #########################
 # -- Python bindings -- #
 #########################
-option(PYTHON_BINDING "Generate Python binding" ON)
+set(PYTHON_BINDING_DEFAULT ON)
+set(PYTHON_BINDING_FORCE_PYTHON3_DEFAULT ON)
+set(PYTHON_BINDING_FORCE_PYTHON2_DEFAULT OFF)
+
+find_program(MC_RTC_SUPERBUILD_DEFAULT_PYTHON python3)
+if(NOT MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
+  set(PYTHON_BINDING_FORCE_PYTHON3_DEFAULT OFF)
+  find_program(MC_RTC_SUPERBUILD_DEFAULT_PYTHON python)
+  if(NOT MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
+    find_program(MC_RTC_SUPERBUILD_DEFAULT_PYTHON python2)
+    if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
+      set(PYTHON_BINDING_FORCE_PYTHON2_DEFAULT ON)
+    else()
+      set(PYTHON_BINDING_DEFAULT OFF)
+    endif()
+  endif()
+endif()
+
+if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
+  message("-- Use Python for install: ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON}")
+endif()
+
+option(PYTHON_BINDING "Generate Python binding" ${PYTHON_BINDING_DEFAULT})
 if(WIN32)
   set(PYTHON_BINDING_USER_INSTALL_DEFAULT ON)
 else()
   set(PYTHON_BINDING_USER_INSTALL_DEFAULT OFF)
 endif()
 option(PYTHON_BINDING_USER_INSTALL "Install the Python binding in user space" ${PYTHON_BINDING_USER_INSTALL_DEFAULT})
-option(PYTHON_BINDING_FORCE_PYTHON2 "Force usage of python2 instead of python" OFF)
-option(PYTHON_BINDING_FORCE_PYTHON3 "Force usage of python3 instead of python" OFF)
+option(PYTHON_BINDING_FORCE_PYTHON2 "Force usage of python2 instead of python" ${PYTHON_BINDING_FORCE_PYTHON2_DEFAULT})
+option(PYTHON_BINDING_FORCE_PYTHON3 "Force usage of python3 instead of python" ${PYTHON_BINDING_FORCE_PYTHON3_DEFAULT})
 set(PYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3_DEFAULT OFF)
 option(PYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3 "Build Python 2 and Python 3 bindings" ${PYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3_DEFAULT})
 if(${PYTHON_BINDING_FORCE_PYTHON2} AND ${PYTHON_BINDING_FORCE_PYTHON3})
@@ -44,13 +66,30 @@ endif()
 ###########################
 # -- Clone destination -- #
 ###########################
-if(NOT DEFINED SOURCE_DESTINATION)
-  set(SOURCE_DESTINATION "${PROJECT_BINARY_DIR}/src")
+set(SOURCE_DESTINATION "${PROJECT_BINARY_DIR}/src" CACHE PATH "Where the source should be located")
+if(NOT DEFINED PREVIOUS_SOURCE_DESTINATION)
+  set(PREVIOUS_SOURCE_DESTINATION "${SOURCE_DESTINATION}")
+endif()
+if(EXISTS "${SOURCE_DESTINATION}" AND NOT EXISTS "${SOURCE_DESTINATION}/.mc-rtc-superbuild" AND NOT "${SOURCE_DESTINATION}" STREQUAL "${PREVIOUS_SOURCE_DESTINATION}")
+  message(FATAL_ERROR "Cannot use ${SOURCE_DESTINATION} as SOURCE_DESTINATION. SOURCE_DESTINATION must be an empty folder or an existing superbuild folder")
+endif()
+set(PREVIOUS_SOURCE_DESTINATION "${SOURCE_DESTINATION}" CACHE INTERNAL "")
+set(SUPERBUILD_STAMP "${SOURCE_DESTINATION}/.mc-rtc-superbuild")
+if(NOT EXISTS "${SUPERBUILD_STAMP}")
+  add_custom_command(
+    OUTPUT "${SUPERBUILD_STAMP}"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${SOURCE_DESTINATION}"
+    COMMAND "${CMAKE_COMMAND}" -E touch "${SUPERBUILD_STAMP}"
+    COMMAND "${CMAKE_COMMAND}" -E chdir "${SOURCE_DESTINATION}" git init
+    COMMAND "${CMAKE_COMMAND}" -E chdir "${SOURCE_DESTINATION}" git add .mc-rtc-superbuild
+    COMMAND "${CMAKE_COMMAND}" -E chdir "${SOURCE_DESTINATION}" git commit -m "Initial commit"
+    COMMAND "${CMAKE_COMMAND}" -E touch "${SUPERBUILD_STAMP}")
+  add_custom_target(init-superbuild DEPENDS "${SUPERBUILD_STAMP}")
+else()
+  add_custom_target(init-superbuild)
 endif()
 
 ###########################
 # -- Location of build -- #
 ###########################
-if(NOT DEFINED BUILD_DESTINATION)
-  set(BUILD_DESTINATION "${PROJECT_BINARY_DIR}/build")
-endif()
+set(BUILD_DESTINATION "${PROJECT_BINARY_DIR}/build" CACHE PATH "Where the project should be built")

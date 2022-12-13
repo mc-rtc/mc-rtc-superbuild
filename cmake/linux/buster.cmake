@@ -34,6 +34,7 @@ set(APT_DEPENDENCIES
   libqwt-qt5-dev
   python-matplotlib
   ninja-build
+  libnotify-dev
 )
 if(BUILD_BENCHMARKS)
   list(APPEND APT_DEPENDENCIES libbenchmark-dev)

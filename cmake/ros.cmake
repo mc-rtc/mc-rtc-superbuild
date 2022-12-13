@@ -1,11 +1,17 @@
 include(cmake/command-prefix.cmake)
 
 set_property(GLOBAL PROPERTY CATKIN_WORKSPACES)
+set_property(GLOBAL PROPERTY PREVIOUS_CATKIN_WORKSPACE)
 
 # A function to mimic source $WORKSPACE/devel/setup.bash in CMake
 function(AppendROSWorkspace DEV_DIR SRC_DIR)
   if("$ENV{CMAKE_PREFIX_PATH}" MATCHES "${DEV_DIR}")
     return()
+  endif()
+  if("ENV{ROS_PARALLEL_JOBS}" STREQUAL "")
+    include(ProcessorCount)
+    ProcessorCount(N)
+    set(ENV{ROS_PARALLEL_JOBS} "-j${N} -l${N}")
   endif()
   set(ENV{CMAKE_PREFIX_PATH} "${DEV_DIR}:$ENV{CMAKE_PREFIX_PATH}")
   if(APPLE)
@@ -50,52 +56,40 @@ function(CreateCatkinWorkspace)
   if(NOT CC_WORKSPACE_ARGS_DIR)
     message(FATAL_ERROR "[CreateCatkinWorkspace] DIR is required")
   endif()
-  set(DIR "${CC_WORKSPACE_ARGS_DIR}")
+  if(IS_ABSOLUTE "${CC_WORKSPACE_ARGS_DIR}")
+    message(FATAL_ERROR "[CreateCatkinWorkspace] DIR must be relative to SOURCE_DESTINATION")
+  endif()
+  set(DIR "${SOURCE_DESTINATION}/${CC_WORKSPACE_ARGS_DIR}")
   set(use_catkin_make TRUE)
   if(CC_WORKSPACE_ARGS_CATKIN_BUILD)
     set(use_catkin_make FALSE)
   endif()
-  file(MAKE_DIRECTORY "${DIR}/src")
   if(use_catkin_make)
-    if(NOT EXISTS "${DIR}/src/CMakeLists.txt")
-      execute_process(
-        COMMAND catkin_init_workspace
-        WORKING_DIRECTORY "${DIR}/src"
-        COMMAND_ERROR_IS_FATAL ANY
-      )
-    endif()
-    if(NOT EXISTS "${DIR}/devel/setup.bash")
-      execute_process(
-        COMMAND catkin_make -C "${DIR}"
-        COMMAND_ERROR_IS_FATAL ANY
-      )
-    endif()
+    set(WORKSPACE_TYPE "make")
   else()
-    if(NOT EXISTS "${DIR}/.catkin_tools")
-      execute_process(
-        COMMAND catkin init
-        WORKING_DIRECTORY "${DIR}"
-        COMMAND_ERROR_IS_FATAL ANY
-      )
-    endif()
-    if(NOT EXISTS "${DIR}/devel/setup.bash")
-      execute_process(
-        COMMAND catkin build
-        WORKING_DIRECTORY "${DIR}"
-        COMMAND_ERROR_IS_FATAL ANY
-      )
-    endif()
+    set(WORKSPACE_TYPE "build")
   endif()
+  AppendROSWorkspace("${DIR}/devel" "${DIR}/src")
+  GetCommandPrefix(COMMAND_PREFIX)
+  add_custom_command(
+    OUTPUT "${DIR}/devel/setup.sh"
+    COMMAND ${COMMAND_PREFIX} "${CMAKE_COMMAND}" -DCATKIN_DIR=${DIR} -DWORKSPACE_TYPE=${WORKSPACE_TYPE} -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/init-catkin-workspace.cmake"
+    COMMENT "Initializing catkin workspace in ${DIR}"
+  )
+  add_custom_target(catkin-init-${ID} DEPENDS "${DIR}/devel/setup.sh")
+  get_property(PREVIOUS_WORKSPACE GLOBAL PROPERTY PREVIOUS_CATKIN_WORKSPACE)
+  if(NOT "${PREVIOUS_WORKSPACE}" STREQUAL "")
+    add_dependencies(catkin-init-${ID} catkin-init-${PREVIOUS_WORKSPACE})
+  endif()
+  set_property(GLOBAL PROPERTY PREVIOUS_CATKIN_WORKSPACE "${ID}")
   set_property(GLOBAL APPEND PROPERTY CATKIN_WORKSPACES "${ID}")
   set_property(GLOBAL PROPERTY CATKIN_WORKSPACE_${ID})
   set_property(GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_DIR "${DIR}")
   set_property(GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_IS_LEAF TRUE)
-  AppendROSWorkspace("${DIR}/devel" "${DIR}/src")
-  GetCommandPrefix(COMMAND_PREFIX)
   if(use_catkin_make)
     set(BUILD_COMMAND ${COMMAND_PREFIX} catkin_make -C "${DIR}" -DCMAKE_BUILD_TYPE=$<CONFIG>)
   else()
-    set(BUILD_COMMAND ${COMMAND_PREFIX} "${CMAKE_COMMAND}" -E chdir "${DIR}" catkin build ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS})
+    set(BUILD_COMMAND ${COMMAND_PREFIX} "${CMAKE_COMMAND}" -E chdir "${DIR}" catkin build -DCMAKE_BUILD_TYPE=$<CONFIG> ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS})
   endif()
   set(STAMP_DIR "${PROJECT_BINARY_DIR}/catkin-stamps/")
   set(STAMP_FILE "${STAMP_DIR}/${ID}.stamp")
@@ -108,6 +102,7 @@ function(CreateCatkinWorkspace)
     COMMENT "Build catkin workspace ${ID} at ${DIR}"
   )
   add_custom_target(catkin-build-${ID} DEPENDS "${STAMP_FILE}")
+  add_dependencies(catkin-build-${ID} catkin-init-${ID})
 endfunction()
 
 function(EnsureValidCatkinWorkspace ID)

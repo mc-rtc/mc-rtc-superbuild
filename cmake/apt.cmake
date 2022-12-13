@@ -1,4 +1,7 @@
 function(AptInstall)
+  if(NOT DPKG)
+    return()
+  endif()
   execute_process(COMMAND dpkg-query -W ${ARGV} OUTPUT_QUIET ERROR_QUIET RESULT_VARIABLE MISSING_DEPS)
   if(MISSING_DEPS)
     message(STATUS "Install missing dependencies")

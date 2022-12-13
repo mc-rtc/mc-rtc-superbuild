@@ -18,11 +18,15 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
+    - name: Bootstrap
+      shell: bash
+      run: |
+        ./utils/bootstrap-macos.sh
     - name: Install system dependencies
       shell: bash
       run: |
         mkdir -p ${TMPDIR-/tmp}/build-mc-rtc
-        cmake -S ${GITHUB_WORKSPACE} -B ${TMPDIR-/tmp}/build-mc-rtc -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUPDATE_ALL=OFF
+        cmake -S ${GITHUB_WORKSPACE} -B ${TMPDIR-/tmp}/build-mc-rtc -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVERBOSE_TEST_OUTPUT=ON -DMC_RTC_SUPERBUILD_VERBOSE=ON
     - name: Install mc_rtc and related projects
       shell: bash
       run: |

@@ -18,12 +18,18 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
+    - name: Bootstrap
+      shell: bash
+      run: |
+        ./utils/bootstrap-linux.sh
     - name: Install system dependencies
       shell: bash
       run: |
         mkdir -p ${TMPDIR-/tmp}/build-mc-rtc
-        cmake -S ${GITHUB_WORKSPACE} -B ${TMPDIR-/tmp}/build-mc-rtc -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUPDATE_ALL=OFF
+        cmake -S ${GITHUB_WORKSPACE} -B ${TMPDIR-/tmp}/build-mc-rtc -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVERBOSE_TEST_OUTPUT=ON
     - name: Install mc_rtc and related projects
       shell: bash
       run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@example.com"
         cmake --build ${TMPDIR-/tmp}/build-mc-rtc --config RelWithDebInfo

@@ -20,6 +20,7 @@ set(BREW_DEPENDENCIES
   spdlog
   ninja
   git
+  libnotify
 )
 if(BUILD_BENCHMARKS)
   list(APPEND BREW_DEPENDENCIES google-benchmark)
@@ -47,15 +48,9 @@ if(INSTALL_SYSTEM_DEPENDENCIES)
   execute_process(COMMAND brew unlink gfortran)
   execute_process(COMMAND brew link gfortran)
   if(PYTHON_BINDING)
-    if(PYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3)
-      execute_process(COMMAND sudo python2 -m pip install ${PIP_DEPENDENCIES})
-      execute_process(COMMAND sudo python3 -m pip install ${PIP_DEPENDENCIES})
-    elseif(PYTHON_BINDING_FORCE_PYTHON2)
-      execute_process(COMMAND sudo python2 -m pip install ${PIP_DEPENDENCIES})
-    elseif(PYTHON_BINDING_FORCE_PYTHON3)
-      execute_process(COMMAND sudo python3 -m pip install ${PIP_DEPENDENCIES})
-    else()
-      execute_process(COMMAND sudo python -m pip install ${PIP_DEPENDENCIES})
+    if(PYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3 OR PYTHON_BINDING_FORCE_PYTHON2)
+      message(FATAL_ERROR "Python 2 is not supported on macOS, disable PYTHON_BINDING or enable Python 3 bindings only")
     endif()
+    execute_process(COMMAND sudo ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON} -m pip install ${PIP_DEPENDENCIES})
   endif()
 endif()

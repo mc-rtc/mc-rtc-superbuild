@@ -19,7 +19,7 @@ then
 fi
 
 ${SUDO} apt-get update
-${SUDO} apt-get install -y wget apt-transport-https gnupg lsb-release build-essential gfortran curl git sudo cmake cmake-curses-gui
+${SUDO} apt-get install -y wget apt-transport-https gnupg lsb-release build-essential gfortran curl git sudo cmake cmake-curses-gui python3-pip
 
 if [[ `lsb_release -si` == "Ubuntu" ]]
 then

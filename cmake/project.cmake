@@ -1,12 +1,16 @@
+include(cmake/apt.cmake)
+include(cmake/download.cmake)
 include(cmake/options.cmake)
 include(cmake/ros.cmake)
 include(cmake/setup-env.cmake)
+include(cmake/setup-source-monitor.cmake)
 include(cmake/sources.cmake)
 include(cmake/sudo.cmake)
 
 include(CMakeDependentOption)
 include(ExternalProject)
 
+add_custom_target(clone)
 add_custom_target(uninstall)
 add_custom_target(update)
 
@@ -15,7 +19,7 @@ add_custom_target(update)
 # Options
 # =======
 #
-# - CLONE_ONLY Always act as if the CLONE_ONLY option was on
+# - CLONE_ONLY Only clone the repository
 # - SKIP_TEST Do not run tests
 # - SKIP_SYMBOLIC_LINKS Skip symbolic links creation mandated by LINK_BUILD_AND_SRC and LINK_COMPILE_COMMANDS
 # - NO_SOURCE_MONITOR Do not monitor source for changes
@@ -31,9 +35,10 @@ add_custom_target(update)
 function(AddProject NAME)
   get_property(MC_RTC_SUPERBUILD_SOURCES GLOBAL PROPERTY MC_RTC_SUPERBUILD_SOURCES)
   set(options NO_NINJA NO_SOURCE_MONITOR CLONE_ONLY SKIP_TEST SKIP_SYMBOLIC_LINKS)
-  set(oneValueArgs ${MC_RTC_SUPERBUILD_SOURCES} GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER SOURCE_SUBDIR WORKSPACE)
+  set(oneValueArgs ${MC_RTC_SUPERBUILD_SOURCES} GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER WORKSPACE)
   set(multiValueArgs CMAKE_ARGS BUILD_COMMAND CONFIGURE_COMMAND INSTALL_COMMAND DEPENDS)
   cmake_parse_arguments(ADD_PROJECT_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  list(APPEND ADD_PROJECT_ARGS_DEPENDS ${GLOBAL_DEPENDS})
   # Handle GIT_REPOSITORY
   set(GIT_REPOSITORY "")
   foreach(SOURCE ${MC_RTC_SUPERBUILD_SOURCES})
@@ -61,6 +66,8 @@ function(AddProject NAME)
       set(SOURCE_DIR "${SOURCE_DESTINATION}/${NAME}")
     endif()
   endif()
+  cmake_path(RELATIVE_PATH SOURCE_DIR BASE_DIRECTORY "${SOURCE_DESTINATION}" OUTPUT_VARIABLE RELATIVE_SOURCE_DIR)
+  set(STAMP_DIR "${PROJECT_BINARY_DIR}/prefix/${NAME}/src/${NAME}-stamp/")
   # Handle multiple definition of the same project
   # This could happen if the same project is included in multiple extensions for example
   # We check if the same remote/branch has been defined and error out if not
@@ -78,6 +85,28 @@ But the previous call used:
   ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG}
 This is likely a conflict between different extensions.")
   endif()
+  if(NOT "${GIT_REPOSITORY}" STREQUAL "")
+    add_custom_command(
+      OUTPUT "${STAMP_DIR}/${NAME}-submodule-init"
+      COMMAND
+        "${CMAKE_COMMAND}"
+          -DSOURCE_DESTINATION=${SOURCE_DESTINATION}
+          -DTARGET_FOLDER=${RELATIVE_SOURCE_DIR}
+          -DGIT_REPOSITORY=${GIT_REPOSITORY}
+          -DGIT_TAG=${GIT_TAG}
+          -DOPERATION="init"
+          -DSTAMP_OUT=${STAMP_DIR}/${NAME}-submodule-init
+          -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/git-submodule-init-update.cmake
+      COMMENT "Init ${NAME} repository"
+    )
+    add_custom_target(${NAME}-submodule-init DEPENDS "${STAMP_DIR}/${NAME}-submodule-init")
+  else()
+    add_custom_target(${NAME}-submodule-init)
+  endif()
+  add_dependencies(${NAME}-submodule-init init-superbuild)
+  foreach(DEP ${ADD_PROJECT_ARGS_DEPENDS})
+    add_dependencies(${NAME}-submodule-init ${DEP}-submodule-update)
+  endforeach()
   # This is true if the project was added in a previous run
   # If the repository has already been cloned the operation might lose local work if it hasn't been saved,
   # therefore we check for this and error if there is local changes
@@ -101,13 +130,32 @@ To
 You have local changes in ${SOURCE_DIR} that would be overwritten by this change. Save your work before continuing")
         endif()
       endif()
-      # Changing only GIT_TAG does not trigger a change so we force the download step to re-run in that case
-      if("${PREVIOUS_GIT_REPOSITORY}" STREQUAL "${GIT_REPOSITORY}")
-        set(STAMP_DIR "${PROJECT_BINARY_DIR}/prefix/${NAME}/src/${NAME}-stamp/")
-        file(REMOVE "${STAMP_DIR}/${NAME}-download" "${STAMP_DIR}/${NAME}-gitclone-lastrun.txt")
-      endif()
+      set(GIT_COMMIT_EXTRA_MSG "Updating from ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG} to ${GIT_REPOSITORY}#${GIT_TAG}")
+      message("-- ${NAME} repository will be updated from ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG} to ${GIT_REPOSITORY}#${GIT_TAG}")
+      add_custom_command(
+        OUTPUT "${STAMP_DIR}/${NAME}-submodule-update"
+        COMMAND
+          "${CMAKE_COMMAND}"
+            -DSOURCE_DESTINATION=${SOURCE_DESTINATION}
+            -DTARGET_FOLDER=${RELATIVE_SOURCE_DIR}
+            -DGIT_REPOSITORY=${GIT_REPOSITORY}
+            -DGIT_TAG=${GIT_TAG}
+            -DSTAMP_OUT=${STAMP_DIR}/${NAME}-submodule-update
+            -DOPERATION="update"
+            -DGIT_COMMIT_EXTRA_MSG=${GIT_COMMIT_EXTRA_MSG}
+            -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/git-submodule-init-update.cmake
+        COMMENT "Update ${NAME} repository settings"
+      )
+      add_custom_target(${NAME}-submodule-update DEPENDS "${STAMP_DIR}/${NAME}-submodule-update")
     endif()
   endif()
+  if(NOT TARGET ${NAME}-submodule-update)
+    add_custom_target(${NAME}-submodule-update)
+  endif()
+  add_dependencies(${NAME}-submodule-update ${NAME}-submodule-init)
+  add_custom_target(clone-${NAME})
+  add_dependencies(clone-${NAME} ${NAME}-submodule-update)
+  add_dependencies(clone clone-${NAME})
   # Handle NO_NINJA
   if(NOT WIN32)
     if(ADD_PROJECT_ARGS_NO_NINJA)
@@ -135,6 +183,13 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
   if(WIN32)
     list(PREPEND CMAKE_ARGS
       "-DBOOST_ROOT=${BOOST_ROOT}"
+    )
+  endif()
+  if(APPLE)
+    list(PREPEND CMAKE_ARGS
+      "-DCMAKE_MACOSX_RPATH:BOOL=ON"
+      "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}"
+      "-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}"
     )
   endif()
   if(DEFINED CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -167,7 +222,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
   endif()
   # -- Configure command
   if(NOT ADD_PROJECT_ARGS_CONFIGURE_COMMAND AND NOT CONFIGURE_COMMAND IN_LIST ADD_PROJECT_ARGS_KEYWORDS_MISSING_VALUES)
-    set(CONFIGURE_COMMAND ${COMMAND_PREFIX} ${EMCMAKE} ${CMAKE_COMMAND} -G "${GENERATOR}" -B "${BINARY_DIR}" -S "${SOURCE_DIR}/${ADD_PROJECT_ARGS_SOURCE_SUBDIR}" ${CMAKE_EXTRA_ARGS} ${CMAKE_ARGS})
+    set(CONFIGURE_COMMAND ${COMMAND_PREFIX} ${EMCMAKE} ${CMAKE_COMMAND} -G "${GENERATOR}" -B "${BINARY_DIR}" -S "${SOURCE_DIR}" ${CMAKE_EXTRA_ARGS} ${CMAKE_ARGS})
   else()
     if("${ADD_PROJECT_ARGS_CONFIGURE_COMMAND}" STREQUAL "")
       set(CONFIGURE_COMMAND ${CMAKE_COMMAND} -E true)
@@ -210,18 +265,22 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
     set(INSTALL_COMMAND ${CMAKE_COMMAND} -E true)
   endif()
   # -- Test command
+  if(VERBOSE_TEST_OUTPUT)
+    set(VERBOSE_OPTION "--extra-verbose")
+  else()
+    set(VERBOSE_OPTION "")
+  endif()
   if(NOT ADD_PROJECT_ARGS_SKIP_TEST AND BUILD_TESTING)
-    set(TEST_STEP_OPTIONS TEST_AFTER_INSTALL TRUE TEST_COMMAND ${COMMAND_PREFIX} ctest -C $<CONFIG>)
+    set(TEST_STEP_OPTIONS TEST_AFTER_INSTALL TRUE TEST_COMMAND ${COMMAND_PREFIX} ctest -C $<CONFIG> ${VERBOSE_OPTION})
   endif()
   # -- Depends option
-  list(APPEND ADD_PROJECT_ARGS_DEPENDS ${GLOBAL_DEPENDS})
   if("${ADD_PROJECT_ARGS_DEPENDS}" STREQUAL "")
     set(DEPENDS "")
   else()
     set(DEPENDS DEPENDS ${ADD_PROJECT_ARGS_DEPENDS})
   endif()
   # -- CLONE_ONLY option
-  if(CLONE_ONLY OR ADD_PROJECT_ARGS_CLONE_ONLY)
+  if(ADD_PROJECT_ARGS_CLONE_ONLY)
     set(CONFIGURE_COMMAND ${CMAKE_COMMAND} -E true)
     set(BUILD_COMMAND ${CMAKE_COMMAND} -E true)
     set(INSTALL_COMMAND ${CMAKE_COMMAND} -E true)
@@ -243,9 +302,15 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
     message("UNPARSED_ARGUMENTS: ${ADD_PROJECT_ARGS_UNPARSED_ARGUMENTS}")
   endif()
   if(NOT "${GIT_REPOSITORY}" STREQUAL "")
-    set(GIT_OPTIONS GIT_REPOSITORY ${GIT_REPOSITORY} GIT_TAG ${GIT_TAG})
+    set(GIT_OPTIONS DOWNLOAD_COMMAND "")
   else()
     set(GIT_OPTIONS "")
+  endif()
+  set(SOURCE_DIR_DID_NOT_EXIST FALSE)
+  if(NOT EXISTS "${SOURCE_DIR}")
+    set(SOURCE_DIR_DID_NOT_EXIST TRUE)
+    file(MAKE_DIRECTORY "${SOURCE_DIR}")
+    file(TOUCH "${SOURCE_DIR}/.mc-rtc-superbuild")
   endif()
   ExternalProject_Add(${NAME}
     PREFIX "${PROJECT_BINARY_DIR}/prefix/${NAME}"
@@ -262,6 +327,17 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
     ${DEPENDS}
     ${ADD_PROJECT_ARGS_UNPARSED_ARGUMENTS}
   )
+  add_custom_target(force-${NAME}
+    COMMAND "${CMAKE_COMMAND}" -E remove "${STAMP_DIR}/${NAME}-configure"
+    COMMAND "${CMAKE_COMMAND}" --build "${PROJECT_BINARY_DIR}" --target ${NAME} --config $<CONFIG>
+  )
+  if(SOURCE_DIR_DID_NOT_EXIST)
+    file(REMOVE "${SOURCE_DIR}/.mc-rtc-superbuild")
+    execute_process(COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${SOURCE_DIR} -DSOURCE_DESTINATION=${SOURCE_DESTINATION} -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/clean-src-folders.cmake")
+  endif()
+  ExternalProject_Add_StepTargets(${NAME} configure)
+  add_dependencies(${NAME} ${NAME}-submodule-update)
+  add_dependencies(${NAME}-configure ${NAME}-submodule-update)
   SetCatkinDependencies(${NAME} "${ADD_PROJECT_ARGS_DEPENDS}" "${ADD_PROJECT_ARGS_WORKSPACE}")
   if(NOT ADD_PROJECT_ARGS_CLONE_ONLY AND NOT ADD_PROJECT_ARGS_WORKSPACE)
     add_custom_target(uninstall-${NAME}
@@ -285,25 +361,13 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
               -DNAME=${NAME}
               -DSOURCE_DIR=${SOURCE_DIR}
               -DGIT_TAG=${GIT_TAG}
+              -DSOURCE_DESTINATION=${SOURCE_DESTINATION}
+              -DTARGET_FOLDER=${RELATIVE_SOURCE_DIR}
               -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/update-project.cmake
   )
   add_dependencies(update update-${NAME})
   if(NOT "${GIT_REPOSITORY}" STREQUAL "" AND NOT ADD_PROJECT_ARGS_NO_SOURCE_MONITOR)
-    # This glob expression forces CMake to re-run if the source directory content changes
-    file(GLOB_RECURSE ${NAME}_SOURCES CONFIGURE_DEPENDS "${SOURCE_DIR}/*")
-    # But we don't care about all the files
-    execute_process(COMMAND git ls-files --recurse-submodules
-                    WORKING_DIRECTORY "${SOURCE_DIR}"
-                    OUTPUT_VARIABLE ${NAME}_SOURCES
-                    ERROR_QUIET
-                    OUTPUT_STRIP_TRAILING_WHITESPACE)
-    string(REPLACE "\n" ";" ${NAME}_SOURCES "${${NAME}_SOURCES}")
-    list(TRANSFORM ${NAME}_SOURCES PREPEND "${SOURCE_DIR}/")
-    ExternalProject_Add_Step(${NAME} check-sources
-      DEPENDEES patch
-      DEPENDERS configure
-      DEPENDS ${${NAME}_SOURCES}
-    )
+    SetupSourceMonitor(${NAME} "${SOURCE_DIR}")
     # This makes sure the output of git ls-files is usable
     ExternalProject_Add_Step(${NAME} set-git-config
       COMMAND  git config core.quotepath off
@@ -325,7 +389,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
     )
   endif()
   if(NOT WIN32)
-    if(NOT CLONE_ONLY AND NOT ADD_PROJECT_ARGS_SKIP_SYMBOLIC_LINKS)
+    if(NOT ADD_PROJECT_ARGS_SKIP_SYMBOLIC_LINKS)
       if(LINK_BUILD_AND_SRC)
         ExternalProject_Add_Step(${NAME} link-build-and-src
           COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${SOURCE_DIR} -DBINARY_DIR=${BINARY_DIR} -DBUILD_LINK_SUFFIX=${BUILD_LINK_SUFFIX} -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-source-and-build.cmake
@@ -411,8 +475,5 @@ function(AddProjectPlugin NAME PROJECT)
     CLONE_ONLY
     ${ADD_PROJECT_PLUGIN_ARGS_UNPARSED_ARGUMENTS}
   )
-  if(NOT TARGET ${PROJECT}-configure)
-    ExternalProject_Add_StepTargets(${PROJECT} configure)
-  endif()
   add_dependencies(${PROJECT}-configure ${NAME})
 endfunction()
