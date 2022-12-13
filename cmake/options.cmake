@@ -66,9 +66,7 @@ endif()
 ###########################
 # -- Clone destination -- #
 ###########################
-if(NOT DEFINED SOURCE_DESTINATION)
-  set(SOURCE_DESTINATION "${PROJECT_BINARY_DIR}/src")
-endif()
+set(SOURCE_DESTINATION "${PROJECT_BINARY_DIR}/src" CACHE PATH "Where the source should be located")
 if(NOT DEFINED PREVIOUS_SOURCE_DESTINATION)
   set(PREVIOUS_SOURCE_DESTINATION "${SOURCE_DESTINATION}")
 endif()
@@ -94,6 +92,4 @@ endif()
 ###########################
 # -- Location of build -- #
 ###########################
-if(NOT DEFINED BUILD_DESTINATION)
-  set(BUILD_DESTINATION "${PROJECT_BINARY_DIR}/build")
-endif()
+set(BUILD_DESTINATION "${PROJECT_BINARY_DIR}/build" CACHE PATH "Where the project should be built")
