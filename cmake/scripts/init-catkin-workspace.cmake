@@ -46,9 +46,6 @@ if(NOT EXISTS "${CATKIN_DIR}/devel/setup.sh")
       WORKING_DIRECTORY "${CATKIN_DIR}"
       COMMAND_ERROR_IS_FATAL ANY
     )
-  else()
-    file(MAKE_DIRECTORY "${CATKIN_DIR}/devel")
-    file(TOUCH "${CATKIN_DIR}/devel/setup.sh")
   endif()
 endif()
 
