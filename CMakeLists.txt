@@ -204,11 +204,18 @@ You can also use the [COMMAND]-[NAME] form to update particular projects
 Or use your regular build command to build all projects
 ")
 
+set(RC_FILE ".bashrc")
+set(RC_EXT ".bash")
+if("$ENV{SHELL}" STREQUAL "/usr/bin/zsh" OR "$ENV{SHELL}" STREQUAL "/bin/zsh")
+  set(RC_FILE ".zshrc")
+  set(RC_EXT ".zsh")
+endif()
+
 set(FINAL_MESSAGE
 "
 Source will be cloned in ${SOURCE_DESTINATION}
 
-Please add the following lines to your .bashrc/.zshrc file:
+Please add the following lines to your ${RC_FILE} file:
 
 export PATH=${CMAKE_INSTALL_PREFIX}/bin:$PATH
 export PKG_CONFIG_PATH=${CMAKE_INSTALL_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH"
@@ -234,10 +241,9 @@ if(WITH_ROS_SUPPORT)
   if(NOT "${ID}" STREQUAL "")
     get_property(DIR GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_DIR)
     set(FINAL_MESSAGE "${FINAL_MESSAGE}
-export ROS_PARALLEL_JOBS=$ENV{ROS_PARALLEL_JOBS}
-source ${DIR}/devel/setup.bash
-
-Please replace setup.bash with setup.zsh in that last line if you are using zsh")
+export ROS_PARALLEL_JOBS=\"$ENV{ROS_PARALLEL_JOBS}\"
+source ${DIR}/devel/setup${RC_EXT}
+")
   endif()
 endif()
 
