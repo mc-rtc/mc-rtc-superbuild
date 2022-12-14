@@ -35,7 +35,7 @@ add_custom_target(update)
 function(AddProject NAME)
   get_property(MC_RTC_SUPERBUILD_SOURCES GLOBAL PROPERTY MC_RTC_SUPERBUILD_SOURCES)
   set(options NO_NINJA NO_SOURCE_MONITOR CLONE_ONLY SKIP_TEST SKIP_SYMBOLIC_LINKS)
-  set(oneValueArgs ${MC_RTC_SUPERBUILD_SOURCES} GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER WORKSPACE)
+  set(oneValueArgs ${MC_RTC_SUPERBUILD_SOURCES} GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER WORKSPACE LINK_TO)
   set(multiValueArgs CMAKE_ARGS BUILD_COMMAND CONFIGURE_COMMAND INSTALL_COMMAND DEPENDS)
   cmake_parse_arguments(ADD_PROJECT_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
   list(APPEND ADD_PROJECT_ARGS_DEPENDS ${GLOBAL_DEPENDS})
@@ -66,6 +66,12 @@ function(AddProject NAME)
       set(SOURCE_DIR "${SOURCE_DESTINATION}/${NAME}")
     endif()
   endif()
+  # Handle SUBMODULE_NAME
+  if(ADD_PROJECT_ARGS_LINK_TO)
+    set(LINK_TO "${ADD_PROJECT_ARGS_LINK_TO}")
+  else()
+    set(LINK_TO "")
+  endif()
   cmake_path(RELATIVE_PATH SOURCE_DIR BASE_DIRECTORY "${SOURCE_DESTINATION}" OUTPUT_VARIABLE RELATIVE_SOURCE_DIR)
   set(STAMP_DIR "${PROJECT_BINARY_DIR}/prefix/${NAME}/src/${NAME}-stamp/")
   # Handle multiple definition of the same project
@@ -94,6 +100,7 @@ This is likely a conflict between different extensions.")
           -DTARGET_FOLDER=${RELATIVE_SOURCE_DIR}
           -DGIT_REPOSITORY=${GIT_REPOSITORY}
           -DGIT_TAG=${GIT_TAG}
+          -DLINK_TO=${LINK_TO}
           -DOPERATION="init"
           -DSTAMP_OUT=${STAMP_DIR}/${NAME}-submodule-init
           -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/git-submodule-init-update.cmake
@@ -140,6 +147,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
             -DTARGET_FOLDER=${RELATIVE_SOURCE_DIR}
             -DGIT_REPOSITORY=${GIT_REPOSITORY}
             -DGIT_TAG=${GIT_TAG}
+            -DLINK_TO=${LINK_TO}
             -DSTAMP_OUT=${STAMP_DIR}/${NAME}-submodule-update
             -DOPERATION="update"
             -DGIT_COMMIT_EXTRA_MSG=${GIT_COMMIT_EXTRA_MSG}
@@ -468,10 +476,11 @@ function(AddProjectPlugin NAME PROJECT)
   endif()
   cmake_parse_arguments(ADD_PROJECT_PLUGIN_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
   ExternalProject_Get_Property(${PROJECT} SOURCE_DIR)
-  set(PLUGIN_DEST_DIR  "${SOURCE_DIR}/${ADD_PROJECT_PLUGIN_ARGS_SUBFOLDER}/${NAME}")
+  set(PLUGIN_DEST_DIR  "${SOURCE_DESTINATION}/.plugins/${PROJECT}_${ADD_PROJECT_PLUGIN_ARGS_SUBFOLDER}_${NAME}")
   AddProject(${NAME}
     SOURCE_DIR "${PLUGIN_DEST_DIR}"
     BINARY_DIR "${PLUGIN_DEST_DIR}"
+    LINK_TO "${SOURCE_DIR}/${ADD_PROJECT_PLUGIN_ARGS_SUBFOLDER}/${NAME}"
     CLONE_ONLY
     ${ADD_PROJECT_PLUGIN_ARGS_UNPARSED_ARGUMENTS}
   )

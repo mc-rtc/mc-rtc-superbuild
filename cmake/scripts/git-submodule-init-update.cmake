@@ -22,7 +22,7 @@ if("${OPERATION}" STREQUAL "init")
   if(GIT_TAG_IS_TAG)
     set(BRANCH_OPTION)
   endif()
-  set(GIT_COMMAND git submodule add ${BRANCH_OPTION} ${GIT_REPOSITORY} "${TARGET_FOLDER}")
+  set(GIT_COMMAND git submodule add -f ${BRANCH_OPTION} ${GIT_REPOSITORY} "${TARGET_FOLDER}")
 elseif("${OPERATION}" STREQUAL "update")
   execute_process(COMMAND
     git submodule set-url ${TARGET_FOLDER} ${GIT_REPOSITORY}
@@ -65,6 +65,17 @@ execute_process(
   COMMAND_ERROR_IS_FATAL ANY
 )
 
+if(NOT "${LINK_TO}" STREQUAL "")
+  if(NOT WIN32)
+    file(CREATE_LINK "${SOURCE_DESTINATION}/${TARGET_FOLDER}" "${LINK_TO}" SYMBOLIC)
+  else()
+    file(COPY "${SOURCE_DESTINATION}/${TARGET_FOLDER}" "${LINK_TO}")
+    if("${OPERATION}" STREQUAL "init")
+      file(APPEND "${SOURCE_DESTINATION}/.gitignore" "${LINK_TO}/*")
+    endif()
+  endif()
+endif()
+
 set(RETRY_I 1)
 while(${RETRY_I} LESS_EQUAL ${RETRY_COUNT})
   set(COMMAND_ERROR_IS_FATAL)
@@ -85,13 +96,23 @@ while(${RETRY_I} LESS_EQUAL ${RETRY_COUNT})
   message("git submodule operation failed, try ${RETRY_I} out of ${RETRY_COUNT}")
 endwhile()
 
-if("${OPERATION}" STREQUAL "init")
-  set(COMMIT_MSG "[${TARGET_FOLDER}] Added submodule\n\nUsing ${GIT_REPOSITORY}#${GIT_TAG}")
+if(NOT "${LINK_TO}" STREQUAL "")
+  cmake_path(RELATIVE_PATH LINK_TO BASE_DIRECTORY "${SOURCE_DESTINATION}" OUTPUT_VARIABLE RELATIVE_LINK)
+  set(COMMIT_EXTRA_MSG "\n\nCloned to ${TARGET_FOLDER}")
+  set(COMMIT_MSG "[${RELATIVE_LINK}] ")
 else()
-  set(COMMIT_MSG "[${TARGET_FOLDER}] Updated submodule parameter\n\n${GIT_COMMIT_EXTRA_MSG}")
+  set(COMMIT_EXTRA_MSG "")
+  set(COMMIT_MSG "[${TARGET_FOLDER}] ")
 endif()
+if("${OPERATION}" STREQUAL "init")
+  set(COMMIT_MSG "${COMMIT_MSG}Added submodule\n\nUsing ${GIT_REPOSITORY}#${GIT_TAG}")
+else()
+  set(COMMIT_MSG "${COMMIT_MSG}Updated submodule parameter\n\n${GIT_COMMIT_EXTRA_MSG}")
+endif()
+set(COMMIT_MSG "${COMMIT_MSG}${COMMIT_EXTRA_MSG}")
+
 execute_process(
-  COMMAND git add .
+  COMMAND git add -f "${TARGET_FOLDER}" .gitignore .gitmodules
   WORKING_DIRECTORY "${SOURCE_DESTINATION}"
   OUTPUT_QUIET ERROR_QUIET
 )
