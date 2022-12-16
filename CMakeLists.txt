@@ -184,6 +184,9 @@ foreach(extension_dir ${extension_dirs})
   if(EXISTS "${extension_dir}/CMakeLists.txt")
     add_subdirectory(${extension_dir})
   endif()
+  if(extension_dir MATCHES ".cmake$")
+    include(${extension_dir})
+  endif()
 endforeach()
 
 ### Personal projects can go here although that is not recommended

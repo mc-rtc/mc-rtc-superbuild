@@ -111,6 +111,11 @@ You can:
 mkdir -p extensions/local
 editor extensions/local/CMakeLists.txt
 ```
+- Create a simple `.cmake` under the `extensions` folder with your projects:
+```shell
+touch extensions/local.cmake
+editor extensions/local.cmake
+```
 
 The remainder is an introduction of the functions offered by superbuild to specify your own project.
 
