@@ -385,17 +385,6 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
       INDEPENDENT ON
     )
   endif()
-  if(NOT "${GIT_REPOSITORY}" STREQUAL "" AND GIT_TAG MATCHES "^origin/(.*)")
-    set(LOCAL_BRANCH "${CMAKE_MATCH_1}")
-    string(REPLACE "/" "_" LOCAL_BRANCH_ "${LOCAL_BRANCH}")
-    ExternalProject_Add_Step(${NAME} checkout-${LOCAL_BRANCH_}
-      COMMAND git checkout ${LOCAL_BRANCH}
-      WORKING_DIRECTORY <SOURCE_DIR>
-      DEPENDEES download
-      DEPENDERS update
-      INDEPENDENT ON
-    )
-  endif()
   if(NOT WIN32)
     if(NOT ADD_PROJECT_ARGS_SKIP_SYMBOLIC_LINKS)
       if(LINK_BUILD_AND_SRC)
