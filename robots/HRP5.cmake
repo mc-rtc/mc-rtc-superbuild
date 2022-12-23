@@ -5,13 +5,13 @@ if(NOT WITH_HRP5)
 endif()
 
 AddCatkinProject(hrp5_p_description
-  GITE mc-hrp5/hrp5_p_description
+  GITHUB isri-aist/hrp5_p_description
   GIT_TAG origin/master
   WORKSPACE data_ws
 )
 
 AddProject(mc_hrp5_p
-  GITE mc-hrp5/mc_hrp5_p
+  GITHUB isri-aist/mc_hrp5_p
   GIT_TAG origin/master
   DEPENDS hrp5_p_description mc_rtc
 )
