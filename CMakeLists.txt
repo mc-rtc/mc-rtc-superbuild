@@ -177,6 +177,21 @@ if(WITH_ROS_SUPPORT)
   )
 endif()
 
+if(WITH_ROS_SUPPORT)
+  AddProject(gram_savitzky_golay
+    GITHUB arntanguy/gram_savitzky_golay
+    GIT_TAG origin/master
+  )
+  set(MC_STATE_OBSERVATION_ROS_OPTION "-DWITH_ROS_OBSERVERS=ON")
+else()
+  set(MC_STATE_OBSERVATION_ROS_OPTION "-DWITH_ROS_OBSERVERS=OFF")
+endif()
+AddProject(mc_state_observation
+  GITHUB jrl-umi3218/mc_state_observation
+  CMAKE_ARGS ${MC_STATE_OBSERVATION_ROS_OPTION}
+  DEPENDS mc_rtc
+)
+
 add_subdirectory(robots)
 
 file(GLOB extension_dirs CONFIGURE_DEPENDS "extensions/*")
