@@ -5,7 +5,7 @@ if(NOT WITH_Sawyer)
 endif()
 
 AddCatkinProject(sawyer_description
-  GITHUB jrl-umi3218/sawyer_description
+  GITHUB jrl-umi3218/sawyer_robot
   GIT_TAG origin/master
   WORKSPACE data_ws
 )
