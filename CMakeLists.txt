@@ -183,13 +183,15 @@ if(WITH_ROS_SUPPORT)
     GIT_TAG origin/master
   )
   set(MC_STATE_OBSERVATION_ROS_OPTION "-DWITH_ROS_OBSERVERS=ON")
+  set(MC_STATE_OBSERVATION_ROS_DEPENDS "gram_savitzky_golay")
 else()
   set(MC_STATE_OBSERVATION_ROS_OPTION "-DWITH_ROS_OBSERVERS=OFF")
+  set(MC_STATE_OBSERVATION_ROS_DEPENDS)
 endif()
 AddProject(mc_state_observation
   GITHUB jrl-umi3218/mc_state_observation
   CMAKE_ARGS ${MC_STATE_OBSERVATION_ROS_OPTION}
-  DEPENDS mc_rtc
+  DEPENDS mc_rtc ${MC_STATE_OBSERVATION_ROS_DEPENDS}
 )
 
 add_subdirectory(robots)
