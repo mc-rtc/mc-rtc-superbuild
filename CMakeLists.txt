@@ -177,6 +177,25 @@ if(WITH_ROS_SUPPORT)
   )
 endif()
 
+set(MC_STATE_OBSERVATION_DEPENDS mc_rtc)
+set(MC_STATE_OBSERVATION_OPTIONS "-DWITH_ROS_OBSERVERS=OFF")
+
+if(WITH_ROS_SUPPORT)
+  AddProject(gram_savitzky_golay
+    GITHUB arntanguy/gram_savitzky_golay
+    GIT_TAG origin/master
+  )
+  list(APPEND MC_STATE_OBSERVATION_DEPENDS gram_savitzky_golay)
+  set(MC_STATE_OBSERVATION_OPTIONS "-DWITH_ROS_OBSERVERS=ON")
+  AptInstall(ros-${ROS_DISTRO}-tf2-eigen)
+endif()
+
+AddProject(mc_state_observation
+  GITHUB jrl-umi3218/mc_state_observation
+  CMAKE_ARGS ${MC_STATE_OBSERVATION_OPTIONS}
+  DEPENDS ${MC_STATE_OBSERVATION_DEPENDS}
+)
+
 add_subdirectory(robots)
 
 file(GLOB extension_dirs CONFIGURE_DEPENDS "extensions/*")
