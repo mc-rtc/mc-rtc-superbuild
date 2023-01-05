@@ -37,6 +37,7 @@ set(APT_DEPENDENCIES
   ninja-build
   python-is-python3
   libnotify-dev
+  python3-git
 )
 if(BUILD_BENCHMARKS)
   list(APPEND APT_DEPENDENCIES libbenchmark-dev)
