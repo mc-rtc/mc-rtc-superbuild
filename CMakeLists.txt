@@ -129,12 +129,32 @@ AddProject(Tasks
   DEPENDS ${Tasks_DEPENDS}
 )
 
+AddProject(lexls
+  GITHUB jrl-umi3218/lexls
+  GIT_TAG origin/master
+  CMAKE_ARGS -DINSTALL_PDF_DOCUMENTATION:BOOL=OFF -DINSTALL_HTML_DOCUMENTATION:BOOL=OFF
+)
+
+if(WITH_LSSOL)
+  set(tvm_EXTRA_DEPENDS eigen-lssol)
+else()
+  set(tvm_EXTRA_DEPENDS)
+endif()
+
+AddProject(tvm
+  GITHUB jrl-umi3218/tvm
+  GIT_TAG origin/master
+  DEPENDS eigen-qld eigen-quadprog lexls ${tvm_EXTRA_DEPENDS}
+  CMAKE_ARGS -DTVM_WITH_QLD:BOOL=ON -DTVM_WITH_QUADPROG:BOOL=ON -DTVM_WITH_LEXLS:BOOL=ON -DTVM_WITH_ROBOT:BOOL=OFF -DTVM_THOROUGH_TESTING:BOOL=OFF -DTVM_WITH_LSSOL:BOOL=${WITH_LSSOL}
+)
+
 AddCatkinProject(mc_rtc_data
   GITHUB jrl-umi3218/mc_rtc_data
   GIT_TAG origin/master
   WORKSPACE data_ws
 )
 
+set(mc_rtc_DEPENDS tvm Tasks mc_rtc_data ndcurves state-observation)
 if(WITH_ROS_SUPPORT)
   AddCatkinProject(mc_rtc_msgs
     GITHUB jrl-umi3218/mc_rtc_msgs
@@ -144,7 +164,6 @@ if(WITH_ROS_SUPPORT)
   list(APPEND mc_rtc_DEPENDS mc_rtc_msgs)
 endif()
 
-list(APPEND mc_rtc_DEPENDS Tasks mc_rtc_data ndcurves state-observation eigen-quadprog)
 if(TARGET spdlog)
   list(APPEND mc_rtc_DEPENDS spdlog)
 endif()
