@@ -217,10 +217,32 @@ AddProject(mc_state_observation
 
 add_subdirectory(robots)
 
+set_property(GLOBAL PROPERTY ADDED_EXTENSIONS)
+
+function(RequireExtension FOLDER)
+  if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extensions/${FOLDER}")
+    include(FetchContent)
+    FetchContent_Declare(${FOLDER} ${ARGN} SOURCE_DIR "${PROJECT_SOURCE_DIR}/extensions/${FOLDER}")
+    FetchContent_Populate(${FOLDER})
+  endif()
+  AddExtension(${PROJECT_SOURCE_DIR}/extensions/${FOLDER})
+endfunction()
+
+function(AddExtension FOLDER)
+  if(EXISTS "${FOLDER}/required-extensions.cmake")
+    include("${FOLDER}/required-extensions.cmake")
+  endif()
+  get_property(ADDED_EXTENSIONS GLOBAL PROPERTY ADDED_EXTENSIONS)
+  if(NOT ${FOLDER} IN_LIST ADDED_EXTENSIONS)
+    set_property(GLOBAL APPEND PROPERTY ADDED_EXTENSIONS ${FOLDER})
+    add_subdirectory(${FOLDER})
+  endif()
+endfunction()
+
 file(GLOB extension_dirs CONFIGURE_DEPENDS "extensions/*")
 foreach(extension_dir ${extension_dirs})
   if(EXISTS "${extension_dir}/CMakeLists.txt")
-    add_subdirectory(${extension_dir})
+    AddExtension(${extension_dir})
   endif()
   if(extension_dir MATCHES ".cmake$")
     include(${extension_dir})

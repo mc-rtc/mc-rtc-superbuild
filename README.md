@@ -199,3 +199,12 @@ AptInstall
 ** `AptInstall(<package> ...)` **
 
 Wrapper around the `apt` command to install system packages. The function does nothing on non-Debian-based systems. Otherwise it installs the provided packages that are missing.
+
+RequireExtension
+==
+
+**`RequireExtension(FOLDER ...)`**
+
+This allows an extension to require another extension and make sure this extension is included before the one being processed.
+
+Supported arguments are the one of [`FetchContent_Declare`](https://cmake.org/cmake/help/latest/module/FetchContent.html)
