@@ -71,12 +71,17 @@ function(CreateCatkinWorkspace)
   endif()
   AppendROSWorkspace("${DIR}/devel" "${DIR}/src")
   GetCommandPrefix(COMMAND_PREFIX)
+  set(STAMP_DIR "${PROJECT_BINARY_DIR}/catkin-stamps/")
+  file(MAKE_DIRECTORY "${STAMP_DIR}")
+  set(STAMP_FILE "${STAMP_DIR}/${ID}.init.stamp")
   add_custom_command(
-    OUTPUT "${DIR}/devel/setup.sh"
+    OUTPUT "${STAMP_FILE}"
+    BYPRODUCTS "${DIR}/devel/setup.sh"
     COMMAND ${COMMAND_PREFIX} "${CMAKE_COMMAND}" -DCATKIN_DIR=${DIR} -DWORKSPACE_TYPE=${WORKSPACE_TYPE} -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/init-catkin-workspace.cmake"
+    COMMAND "${CMAKE_COMMAND}" -E touch "${STAMP_FILE}"
     COMMENT "Initializing catkin workspace in ${DIR}"
   )
-  add_custom_target(catkin-init-${ID} DEPENDS "${DIR}/devel/setup.sh")
+  add_custom_target(catkin-init-${ID} DEPENDS "${STAMP_FILE}")
   get_property(PREVIOUS_WORKSPACE GLOBAL PROPERTY PREVIOUS_CATKIN_WORKSPACE)
   if(NOT "${PREVIOUS_WORKSPACE}" STREQUAL "")
     add_dependencies(catkin-init-${ID} catkin-init-${PREVIOUS_WORKSPACE})
@@ -91,10 +96,8 @@ function(CreateCatkinWorkspace)
   else()
     set(BUILD_COMMAND ${COMMAND_PREFIX} "${CMAKE_COMMAND}" -E chdir "${DIR}" catkin build -DCMAKE_BUILD_TYPE=$<CONFIG> ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS})
   endif()
-  set(STAMP_DIR "${PROJECT_BINARY_DIR}/catkin-stamps/")
   set(STAMP_FILE "${STAMP_DIR}/${ID}.stamp")
   set_property(GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_STAMP "${STAMP_FILE}")
-  file(MAKE_DIRECTORY "${STAMP_DIR}")
   add_custom_command(
     OUTPUT "${STAMP_FILE}"
     COMMAND ${BUILD_COMMAND}
