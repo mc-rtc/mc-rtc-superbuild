@@ -169,6 +169,13 @@ AddCatkinProject
 
 Adds a catkin project into the provided workspace. The git repository is provided through the same way as with `AddProject`.
 
+AddPackageToCatkinSkiplist
+==
+
+** `AddPackageToCatkinSkiplist(<id> <package>)`
+
+Adds the given package to the catkin build's skiplist
+
 
 AddGitSource
 ==
