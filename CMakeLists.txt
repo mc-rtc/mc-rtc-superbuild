@@ -239,15 +239,7 @@ function(AddExtension FOLDER)
   endif()
 endfunction()
 
-file(GLOB extension_dirs CONFIGURE_DEPENDS "extensions/*")
-foreach(extension_dir ${extension_dirs})
-  if(EXISTS "${extension_dir}/CMakeLists.txt")
-    AddExtension(${extension_dir})
-  endif()
-  if(extension_dir MATCHES ".cmake$")
-    include(${extension_dir})
-  endif()
-endforeach()
+add_subdirectory(extensions)
 
 ### Personal projects can go here although that is not recommended
 ### PERSONAL_PROJECTS
