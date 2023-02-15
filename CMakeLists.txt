@@ -246,8 +246,6 @@ add_subdirectory(extensions)
 
 ### No more personal projects past this point
 
-FinalizeCatkinWorkspaces()
-
 message("
 mc-rtc-superbuild is now ready, the following special targets are available:
 - clone: clone all projects into their location
