@@ -36,7 +36,7 @@ if(UNIX AND NOT APPLE AND NOT EMSCRIPTEN)
 endif()
 
 if(WITH_ROS_SUPPORT)
-  CreateCatkinWorkspace(ID data_ws DIR "catkin_data_ws" CATKIN_MAKE)
+  CreateCatkinWorkspace(ID data_ws DIR "catkin_data_ws" CATKIN_MAKE CATKIN_BUILD_ARGS -DCATKIN_ENABLE_TESTING:BOOL=OFF)
   CreateCatkinWorkspace(ID mc_rtc_ws DIR "catkin_ws" CATKIN_BUILD)
 endif()
 
