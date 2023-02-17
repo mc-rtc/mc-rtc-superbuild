@@ -13,6 +13,14 @@ on:
 
 jobs:
   run:
+    strategy:
+      fail-fast: false
+      matrix:
+        use-mc-rtc-apt-mirror: [ON, OFF]
+        use-mc-rtc-apt-mirror-stable: [ON, OFF]
+        exclude:
+          - use-mc-rtc-apt-mirror: OFF
+            use-mc-rtc-apt-mirror-stable: ON
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
@@ -32,4 +40,4 @@ jobs:
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@example.com"
-        cmake --build ${TMPDIR-/tmp}/build-mc-rtc --config RelWithDebInfo
+        cmake --build ${TMPDIR-/tmp}/build-mc-rtc --config RelWithDebInfo -DUSE_MC_RTC_APT_MIRROR=${{ matrix.use-mc-rtc-apt-mirror }} -DUSE_MC_RTC_APT_MIRROR_STABLE=${{ matrix.use-mc-rtc-apt-mirror-stable }}

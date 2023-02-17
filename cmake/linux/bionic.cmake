@@ -40,11 +40,14 @@ if(BUILD_BENCHMARKS)
   list(APPEND APT_DEPENDENCIES libbenchmark-dev)
 endif()
 
+include(${CMAKE_CURRENT_LIST_DIR}/mc-rtc-mirror.cmake)
+
 # We need spdlog >= 1.5.0 and it is not available in Bionic
 AddProject(spdlog
   GITHUB gabime/spdlog
   GIT_TAG v1.6.1
   CMAKE_ARGS -DSPDLOG_BUILD_EXAMPLE:BOOL=OFF -DSPDLOG_BUILD_SHARED:BOOL=ON
   SKIP_TEST
+  APT_PACKAGES libspdlog-dev
 )
 list(APPEND GLOBAL_DEPENDS spdlog)

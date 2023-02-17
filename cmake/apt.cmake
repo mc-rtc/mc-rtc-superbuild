@@ -1,4 +1,4 @@
-function(AptInstall)
+function(AptInstallNow)
   if(NOT DPKG)
     return()
   endif()
@@ -14,4 +14,21 @@ function(AptInstall)
       message(FATAL_ERROR "apt install failed, check the error and try again")
     endif()
   endif()
+endfunction()
+
+
+set_property(GLOBAL PROPERTY APT_INSTALL_PACKAGES)
+
+function(FinalizeAptInstall)
+  get_property(APT_INSTALL_PACKAGES GLOBAL PROPERTY APT_INSTALL_PACKAGES)
+  list(LENGTH APT_INSTALL_PACKAGES NPACKAGES)
+  if(NOT NPACKAGES EQUAL 0)
+    AptInstallNow(${APT_INSTALL_PACKAGES})
+  endif()
+endfunction()
+
+cmake_language(DEFER DIRECTORY ${PROJECT_SOURCE_DIR} CALL FinalizeAptInstall)
+
+function(AptInstall)
+  set_property(GLOBAL APPEND PROPERTY APT_INSTALL_PACKAGES ${ARGV})
 endfunction()

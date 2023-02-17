@@ -13,6 +13,10 @@ else()
   message(AUTHOR_WARNING "You can add a file: ${PROJECT_SOURCE_DIR}/cmake/linux/${DISTRO}.cmake to inform this script about the distribution.")
 endif()
 
+if(NOT DEFINED USE_MC_RTC_APT_MIRROR)
+  set(USE_MC_RTC_APT_MIRROR OFF)
+endif()
+
 if(WITH_ROS_SUPPORT AND NOT ROS_DISTRO AND NOT DEFINED ENV{ROS_DISTRO})
   message(FATAL_ERROR "Unknown ROS_DISTRO for ${DISTRO} and ROS environment has not been sourced.")
 endif()

@@ -48,3 +48,5 @@ function(mc_rtc_extra_steps)
     message(FATAL_ERROR "Python 2 is not supported on Focal, disable PYTHON_BINDING or enable Python 3 binding only")
   endif()
 endfunction()
+
+include(${CMAKE_CURRENT_LIST_DIR}/mc-rtc-mirror.cmake)
