@@ -34,10 +34,10 @@ jobs:
       shell: bash
       run: |
         mkdir -p ${TMPDIR-/tmp}/build-mc-rtc
-        cmake -S ${GITHUB_WORKSPACE} -B ${TMPDIR-/tmp}/build-mc-rtc -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVERBOSE_TEST_OUTPUT=ON
+        cmake -S ${GITHUB_WORKSPACE} -B ${TMPDIR-/tmp}/build-mc-rtc -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVERBOSE_TEST_OUTPUT=ON -DUSE_MC_RTC_APT_MIRROR=${{ matrix.use-mc-rtc-apt-mirror }} -DUSE_MC_RTC_APT_MIRROR_STABLE=${{ matrix.use-mc-rtc-apt-mirror-stable }}
     - name: Install mc_rtc and related projects
       shell: bash
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@example.com"
-        cmake --build ${TMPDIR-/tmp}/build-mc-rtc --config RelWithDebInfo -DUSE_MC_RTC_APT_MIRROR=${{ matrix.use-mc-rtc-apt-mirror }} -DUSE_MC_RTC_APT_MIRROR_STABLE=${{ matrix.use-mc-rtc-apt-mirror-stable }}
+        cmake --build ${TMPDIR-/tmp}/build-mc-rtc --config RelWithDebInfo
