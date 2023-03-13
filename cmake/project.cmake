@@ -394,6 +394,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
               -DGIT_TAG=${GIT_TAG}
               -DSOURCE_DESTINATION=${SOURCE_DESTINATION}
               -DTARGET_FOLDER=${RELATIVE_SOURCE_DIR}
+              -DLINK_TO=${LINK_TO}
               -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/update-project.cmake
   )
   add_dependencies(update update-${NAME})

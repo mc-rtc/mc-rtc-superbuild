@@ -84,3 +84,14 @@ execute_process(
   WORKING_DIRECTORY "${SOURCE_DESTINATION}"
   OUTPUT_QUIET ERROR_QUIET
 )
+
+if(NOT "${LINK_TO}" STREQUAL "")
+  if(NOT WIN32)
+    file(CREATE_LINK "${SOURCE_DESTINATION}/${TARGET_FOLDER}" "${LINK_TO}" SYMBOLIC)
+  else()
+    file(COPY "${SOURCE_DESTINATION}/${TARGET_FOLDER}" "${LINK_TO}")
+    if("${OPERATION}" STREQUAL "init")
+      file(APPEND "${SOURCE_DESTINATION}/.gitignore" "${LINK_TO}/*")
+    endif()
+  endif()
+endif()
