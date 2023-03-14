@@ -35,7 +35,7 @@ add_custom_target(update)
 function(AddProject NAME)
   get_property(MC_RTC_SUPERBUILD_SOURCES GLOBAL PROPERTY MC_RTC_SUPERBUILD_SOURCES)
   set(options NO_NINJA NO_SOURCE_MONITOR CLONE_ONLY SKIP_TEST SKIP_SYMBOLIC_LINKS)
-  set(oneValueArgs ${MC_RTC_SUPERBUILD_SOURCES} GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER WORKSPACE LINK_TO SOURCE_SUBDIR)
+  set(oneValueArgs ${MC_RTC_SUPERBUILD_SOURCES} GIT_TAG SOURCE_DIR BINARY_DIR SUBFOLDER WORKSPACE LINK_TO SOURCE_SUBDIR INSTALL_PREFIX)
   set(multiValueArgs CMAKE_ARGS BUILD_COMMAND CONFIGURE_COMMAND INSTALL_COMMAND DEPENDS APT_PACKAGES)
   cmake_parse_arguments(ADD_PROJECT_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
   if(USE_MC_RTC_APT_MIRROR AND ADD_PROJECT_ARGS_APT_PACKAGES)
@@ -196,6 +196,13 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
   if(ADD_PROJECT_ARGS_CMAKE_ARGS)
     set(CMAKE_ARGS "${ADD_PROJECT_ARGS_CMAKE_ARGS}")
   endif()
+  if(ADD_PROJECT_ARGS_INSTALL_PREFIX)
+    set(INSTALL_PREFIX ${ADD_PROJECT_ARGS_INSTALL_PREFIX})
+    PrefixRequireSudo(${INSTALL_PREFIX} INSTALL_PREFIX_USE_SUDO)
+  else()
+    set(INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+    set(INSTALL_PREFIX_USE_SUDO ${USE_SUDO})
+  endif()
   list(PREPEND CMAKE_ARGS
     "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
     "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON"
@@ -281,7 +288,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
       set(INSTALL_COMMAND ${COMMAND_PREFIX} ${ADD_PROJECT_ARGS_INSTALL_COMMAND})
     endif()
   endif()
-  if(USE_SUDO AND NOT "${INSTALL_COMMAND}" STREQUAL "")
+  if(INSTALL_PREFIX_USE_SUDO AND NOT "${INSTALL_COMMAND}" STREQUAL "")
     set(INSTALL_COMMAND ${SUDO_CMD} -E ${INSTALL_COMMAND})
     if(NOT DEFINED ENV{USER})
       execute_process(COMMAND whoami OUTPUT_VARIABLE USER OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -374,7 +381,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
     add_custom_target(uninstall-${NAME}
       COMMAND ${CMAKE_COMMAND}
                 -DBINARY_DIR=${BINARY_DIR}
-                -DUSE_SUDO=${USE_SUDO}
+                -DUSE_SUDO=${INSTALL_PREFIX_USE_SUDO}
                 -DSUDO_CMD=${SUDO_CMD}
                 -DINSTALL_STAMP="${PROJECT_BINARY_DIR}/prefix/${NAME}/src/${NAME}-stamp/${NAME}-install"
                 -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/uninstall-project.cmake

@@ -146,6 +146,7 @@ Other options for `AddProject` are:
 - `NO_NINJA`: use CMake's default generator rather than ninja
 - `NO_SOURCE_MONITOR`: disable source monitoring. By default, superbuild will monitor the source folder to force the rebuild of packages and their dependents when change happens. Some projects systematically trigger rebuilds under this monitor and this option disable it. Rebuilds then have to be triggered manually via the `force-${NAME}` target.
 - `SKIP_SYMBOLIC_LINKS`: disable the creation of symbolic links. By default, on supported platforms, superbuild creates a link between the source folder and the build folder as well as a link from the source folder to the CMake's generated `compile_commands.json`. This option disables the behavior.
+- `INSTALL_PREFIX`: override the provided `CMAKE_INSTALL_PREFIX`
 
 For advanced usage, other options supported by [ExternalProject_Add](https://cmake.org/cmake/help/latest/module/ExternalProject.html) are also supported by `AddProject`.
 
