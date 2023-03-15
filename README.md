@@ -24,8 +24,8 @@ Usage
 
 ```shell
 git clone https://github.com/mc-rtc/mc-rtc-superbuild
-cmake -S mc-rtc-superbuild -B . -DSOURCE_DESTINATION=${HOME}/mc-rtc
-cmake --build . --config RelWithDebInfo
+cmake -S mc-rtc-superbuild -B mc-rtc-superbuild/build -DSOURCE_DESTINATION=${HOME}/devel/src -DBUILD_DESTINATION=${HOME}/devel/build
+cmake --build mc-rtc-superbuild/build --config RelWithDebInfo
 ```
 
 This will:
@@ -44,7 +44,8 @@ If you want to clone everything before attempting the first build you can use th
 
 ```shell
 git clone https://github.com/mc-rtc/mc-rtc-superbuild
-cmake -S mc-rtc-superbuild -B . -DSOURCE_DESTINATION=${HOME}/mc-rtc
+cmake -S mc-rtc-superbuild -B mc-rtc-superbuild/build -DSOURCE_DESTINATION=${HOME}/devel/src -DBUILD_DESTINATION=${HOME}/devel/build
+cd mc-rtc-superbuild/build
 cmake --build . --config RelWithDebInfo --target clone
 cmake --build . --config RelWithDebInfo
 ```
