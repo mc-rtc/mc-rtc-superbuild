@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 
+if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+  message(FATAL_ERROR "Do not run cmake inside mc-rtc-superbuild folder, it will break.
+  Please remove CMakeCache.txt and the CMakeFiles folder that were just created")
+endif()
+
 project(mc_rtc_superbuild LANGUAGES C CXX)
 include(CTest)
 enable_testing()
