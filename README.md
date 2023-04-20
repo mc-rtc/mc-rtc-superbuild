@@ -199,9 +199,11 @@ superbuild knows the following source:
 AddProjectPlugin
 ==
 
-** `AddProjectPlugin(<name> <project> [SUBFOLDER <folder>] [<options>]...)` **
+** `AddProjectPlugin(<name> <project> [SUBFOLDER <folder>] [LINK_NAME <name>] [<options>]...)` **
 
 Clone the project inside the provided `SUBFOLDER` of `<project>`. Other options are passed to `AddProject` but `CLONE_ONLY` is always enabled.
+
+By default, the project is cloned in an hidden folder (due to submodule limitations) and linked inside the specified project's source directory as `${SUBFOLDER}/${NAME}`. `LINK_NAME` can override this behavior and create the link to `${SUBFOLDER}/${LINK_NAME}`.
 
 AptInstall
 ==

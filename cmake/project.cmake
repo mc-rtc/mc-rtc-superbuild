@@ -492,7 +492,7 @@ endfunction()
 # - SUBFOLDER Directory inside the main project where the plugin should be cloned
 function(AddProjectPlugin NAME PROJECT)
   set(options)
-  set(oneValueArgs SUBFOLDER)
+  set(oneValueArgs SUBFOLDER LINK_NAME)
   set(multiValueArgs)
   if(NOT TARGET ${PROJECT})
     message(FATAL_ERROR "Cannot add a plugin to unknown project: ${PROJECT}")
@@ -500,10 +500,16 @@ function(AddProjectPlugin NAME PROJECT)
   cmake_parse_arguments(ADD_PROJECT_PLUGIN_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
   ExternalProject_Get_Property(${PROJECT} SOURCE_DIR)
   set(PLUGIN_DEST_DIR  "${SOURCE_DESTINATION}/.plugins/${PROJECT}_${ADD_PROJECT_PLUGIN_ARGS_SUBFOLDER}_${NAME}")
+  set(LINK_TO "${SOURCE_DIR}/${ADD_PROJECT_PLUGIN_ARGS_SUBFOLDER}")
+  if(ADD_PROJECT_PLUGIN_ARGS_LINK_NAME)
+    set(LINK_TO "${LINK_TO}/${ADD_PROJECT_ARGS_LINK_NAME}")
+  else()
+    set(LINK_TO "${LINK_TO}/${NAME}")
+  endif()
   AddProject(${NAME}
     SOURCE_DIR "${PLUGIN_DEST_DIR}"
     BINARY_DIR "${PLUGIN_DEST_DIR}"
-    LINK_TO "${SOURCE_DIR}/${ADD_PROJECT_PLUGIN_ARGS_SUBFOLDER}/${NAME}"
+    LINK_TO "${LINK_TO}"
     CLONE_ONLY
     ${ADD_PROJECT_PLUGIN_ARGS_UNPARSED_ARGUMENTS}
   )
