@@ -71,7 +71,7 @@ You can add extensions to the superbuild system by cloning extensions projects i
 ```shell
 cd mc-rtc-superbuild/extensions
 git clone https://github.com/mc-rtc/lipm-walking-controller-superbuild
-cd ../../
+cd ../build/
 # Will build mc_rtc and then the lipm-walking-controller project and its dependencies
 cmake --build . --config RelWithDebInfo
 ```
