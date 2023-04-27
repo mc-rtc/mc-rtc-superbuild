@@ -254,7 +254,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
       set(BINARY_DIR "${BUILD_DESTINATION}/${NAME}")
     endif()
   endif()
-  GetCommandPrefix(COMMAND_PREFIX)
+  GetCommandPrefix(COMMAND_PREFIX "${STAMP_DIR}/cmake-prefix.cmake")
   if(EMSCRIPTEN)
     set(EMCMAKE emcmake)
     set(EMMAKE emmake)
@@ -282,7 +282,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
   endif()
   # -- Build command
   if(NOT ADD_PROJECT_ARGS_BUILD_COMMAND AND NOT BUILD_COMMAND IN_LIST ADD_PROJECT_ARGS_KEYWORDS_MISSING_VALUES)
-    set(BUILD_COMMAND ${COMMAND_PREFIX} ${EMMAKE} ${CMAKE_COMMAND} --build . --config $<CONFIG>)
+    set(BUILD_COMMAND ${COMMAND_PREFIX} ${EMMAKE} ${CMAKE_COMMAND} --build ${BINARY_DIR} --config $<CONFIG>)
   else()
     if("${ADD_PROJECT_ARGS_BUILD_COMMAND}" STREQUAL "")
       set(BUILD_COMMAND ${CMAKE_COMMAND} -E true)
@@ -292,7 +292,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
   endif()
   # -- Install command
   if(NOT ADD_PROJECT_ARGS_INSTALL_COMMAND AND NOT INSTALL_COMMAND IN_LIST ADD_PROJECT_ARGS_KEYWORDS_MISSING_VALUES)
-    set(INSTALL_COMMAND ${EMMAKE} ${CMAKE_COMMAND} --build ${BINARY_DIR} --target install --config $<CONFIG>)
+    set(INSTALL_COMMAND ${COMMAND_PREFIX} ${EMMAKE} ${CMAKE_COMMAND} --build ${BINARY_DIR} --target install --config $<CONFIG>)
   else()
     if("${ADD_PROJECT_ARGS_INSTALL_COMMAND}" STREQUAL "")
       set(INSTALL_COMMAND "")
