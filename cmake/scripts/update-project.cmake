@@ -8,7 +8,7 @@ endif()
 
 # Skip update for fixed tags
 # It is technically possible to reposition a tag but we accept the risk
-if(NOT GIT_TAG MATCHES "^origin/(.*)")
+if(DEFINED GIT_TAG AND NOT GIT_TAG MATCHES "^origin/(.*)")
   message("[SKIP] Update ${NAME}: fixed to ${GIT_TAG}")
   return()
 endif()
@@ -53,7 +53,12 @@ execute_process(
   WORKING_DIRECTORY "${SOURCE_DIR}"
 )
 
-if(git_rev_parse_err OR NOT "${CURRENT_REMOTE_BRANCH}" STREQUAL "${GIT_TAG}")
+if(git_rev_parse_err)
+  message("[SKIP] Update ${NAME}: cannot figure tracking branch")
+  return()
+endif()
+
+if(DEFINED GIT_TAG AND NOT "${CURRENT_REMOTE_BRANCH}" STREQUAL "${GIT_TAG}")
   message("[SKIP] Update ${NAME}: not tracking ${GIT_TAG}")
   return()
 endif()
@@ -73,6 +78,10 @@ execute_process(
   COMMAND git submodule update --init --recursive
   WORKING_DIRECTORY "${SOURCE_DIR}"
 )
+
+if(NOT DEFINED SOURCE_DESTINATION)
+  return()
+endif()
 
 execute_process(
   COMMAND git add .

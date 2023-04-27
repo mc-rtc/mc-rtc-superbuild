@@ -24,6 +24,7 @@ Usage
 
 ```shell
 git clone https://github.com/mc-rtc/mc-rtc-superbuild
+# Run the bootstrap script in mc-rtc-superbuild/utils folder if required
 cmake -S mc-rtc-superbuild -B mc-rtc-superbuild/build -DSOURCE_DESTINATION=${HOME}/devel/src -DBUILD_DESTINATION=${HOME}/devel/build
 cmake --build mc-rtc-superbuild/build --config RelWithDebInfo
 ```
@@ -36,6 +37,12 @@ This will:
 4. Build each project in the `${BUILD_DESTINATION}/${PROJECT}` folder and install it in the provided `${CMAKE_INSTALL_PREFIX}`
 
 You can then use the projects that were built and clone by the superbuild as you would use projects you built and clone yourself. If you modify some projects, the superbuild will pick up on it and rebuild its dependents.
+
+#### Note
+
+On Linux and macOS, all commands of the form `cmake --build ${FOLDER} --config RelWithDebInfo --target ${TARGET}` can also be run by `make ${TARGET}` in `${FOLDER}`. In particular, you can start a build by simply doing `make` in the build folder.
+
+You should avoid running something like `make -jN`. This will build up to `N` projects in parallel but each project will run its own parallelized build and that will likely be too much for your machine RAM or CPU.
 
 Separate clone and build
 ==
@@ -63,10 +70,18 @@ Or invididually pull some of the projects and their dependencies:
 cmake --build . --config RelWithDebInfo --target update-mc_rtc
 ```
 
+Update mc-rtc-superbuild and extensions
+==
+
+You can run the `self-update` target to update mc-rtc-superbuild and all the cloned extensions:
+```shell
+cmake --build . --config RelWithDebInfo --target self-update
+```
+
 Extensions
 --
 
-You can add extensions to the superbuild system by cloning extensions projects into the `extensions` folder, see for example the [lipm-walking-controller-superbuild](https://github.com/mc-rtc/lipm-walking-controller-superbuild) project.
+You can add extensions to the superbuild system by cloning extensions projects into the `extensions` folder, see for example the [lipm-walking-controller-superbuild](https://github.com/mc-rtc/lipm-walking-controller-superbuild) for an example centered around a single project.
 
 ```shell
 cd mc-rtc-superbuild/extensions
@@ -75,6 +90,8 @@ cd ../../
 # Will build mc_rtc and then the lipm-walking-controller project and its dependencies
 cmake --build . --config RelWithDebInfo
 ```
+
+You can also check out [superbuild-extensions](https://github.com/mc-rtc/superbuild-extensions) for commonly availabe extensions. Please refer to this repository for usage instructions.
 
 Options
 --

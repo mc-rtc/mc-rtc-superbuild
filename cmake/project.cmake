@@ -1,5 +1,6 @@
 include(cmake/apt.cmake)
 include(cmake/download.cmake)
+include(cmake/extensions.cmake)
 include(cmake/options.cmake)
 include(cmake/ros.cmake)
 include(cmake/setup-env.cmake)
@@ -13,6 +14,14 @@ include(ExternalProject)
 add_custom_target(clone)
 add_custom_target(uninstall)
 add_custom_target(update)
+
+add_custom_target(self-update
+  COMMAND ${CMAKE_COMMAND}
+            -DNAME=mc-rtc-superbuild
+            -DSOURCE_DIR=${PROJECT_SOURCE_DIR}
+            -DGIT_TAG=origin/main
+            -P ${CMAKE_CURRENT_LIST_DIR}/scripts/update-project.cmake
+)
 
 # Wrapper around the ExternalProject_Add function to allow simplified usage
 #
