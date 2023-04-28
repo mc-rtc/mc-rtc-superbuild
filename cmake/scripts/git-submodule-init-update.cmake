@@ -122,4 +122,13 @@ execute_process(
   OUTPUT_QUIET ERROR_QUIET
 )
 
+if(DEFINED PRE_COMMIT AND EXISTS "${SOURCE_DIR}/.pre-commit-config.yaml" AND EXISTS "${SOURCE_DIR}/.git")
+  execute_process(
+    COMMAND ${PRE_COMMIT} install
+    WORKING_DIRECTORY ${SOURCE_DIR}
+    OUTPUT_QUIET ERROR_QUIET
+    COMMAND_ERROR_IS_FATAL ANY
+  )
+endif()
+
 execute_process(COMMAND ${CMAKE_COMMAND} -E touch ${STAMP_OUT})

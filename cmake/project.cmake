@@ -119,6 +119,11 @@ But the previous call used:
   ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG}
 This is likely a conflict between different extensions.")
   endif()
+  if(MC_RTC_SUPERBUILD_PRE_COMMIT)
+    set(PRE_COMMIT_OPTION -DPRE_COMMIT=${MC_RTC_SUPERBUILD_PRE_COMMIT})
+  else()
+    set(PRE_COMMIT_OPTION)
+  endif()
   if(NOT "${GIT_REPOSITORY}" STREQUAL "")
     add_custom_command(
       OUTPUT "${STAMP_DIR}/${NAME}-submodule-init"
@@ -131,6 +136,7 @@ This is likely a conflict between different extensions.")
           -DLINK_TO=${LINK_TO}
           -DOPERATION="init"
           -DSTAMP_OUT=${STAMP_DIR}/${NAME}-submodule-init
+          ${PRE_COMMIT_OPTION}
           -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/git-submodule-init-update.cmake
       COMMENT "Init ${NAME} repository"
     )
@@ -414,6 +420,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
               -DSOURCE_DESTINATION=${SOURCE_DESTINATION}
               -DTARGET_FOLDER=${RELATIVE_SOURCE_DIR}
               -DLINK_TO=${LINK_TO}
+              ${PRE_COMMIT_OPTION}
               -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/update-project.cmake
   )
   add_dependencies(update update-${NAME})

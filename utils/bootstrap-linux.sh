@@ -34,3 +34,8 @@ else
   chmod +x /tmp/cmake-${CMAKE_VERSION_FULL}
   ${SUDO} /tmp/cmake-${CMAKE_VERSION_FULL} --skip-license --prefix=/usr --exclude-subdir
 fi
+
+if [[ ! -f $HOME/.local/bin/pre-commit ]]
+then
+  /usr/bin/python3 -m pip install --user pre-commit
+fi
