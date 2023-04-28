@@ -55,15 +55,15 @@ if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
     OUTPUT_STRIP_TRAILING_WHITESPACE
     COMMAND_ERROR_IS_FATAL ANY
   )
-  find_program(MC_RTC_SUPERBUILD_PRE_COMMIT NAMES pre-commit HINTS ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON}/bin)
-  if(NOT PRE_COMMIT)
+  find_program(MC_RTC_SUPERBUILD_PRE_COMMIT NAMES pre-commit HINTS ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON_USER_BASE}/bin)
+  if(NOT MC_RTC_SUPERBUILD_PRE_COMMIT)
     # Install pre-commit with pip
     execute_process(
       COMMAND ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON} -m pip install --user pre-commit
       COMMAND_ERROR_IS_FATAL ANY
     )
-    find_program(MC_RTC_SUPERBUILD_PRE_COMMIT NAMES pre-commit HINTS ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON}/bin)
-    if(NOT PRE_COMMIT)
+    find_program(MC_RTC_SUPERBUILD_PRE_COMMIT NAMES pre-commit HINTS ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON_USER_BASE}/bin)
+    if(NOT MC_RTC_SUPERBUILD_PRE_COMMIT)
       message(FATAL_ERROR "Failed to find pre-commit despite installing via pip?")
     endif()
   endif()
