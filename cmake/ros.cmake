@@ -40,6 +40,7 @@ function(ConfigureSkipList ID)
             -DWKS_DIR=${WKS_DIR}
             -DSKIPLIST_STAMP=${SKIPLIST_STAMP}
             -DSKIPLIST_FILE=${SKIPLIST_FILE_CACHE}
+            -DROS_DISTRO=${ROS_DISTRO}
             -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/catkin-configure-skiplist.cmake
     DEPENDS "${SKIPLIST_FILE_CACHE}"
   )
