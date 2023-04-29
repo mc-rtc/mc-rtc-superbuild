@@ -58,7 +58,7 @@ if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
   if(WIN32)
     execute_process(
       COMMAND
-        ${PYTHON} -c
+        ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON} -c
         "import sys; print(\"{}{}\".format(sys.version_info.major, sys.version_info.minor));"
       OUTPUT_VARIABLE MC_RTC_SUPERBUILD_DEFAULT_PYTHON_VERSION
       OUTPUT_STRIP_TRAILING_WHITESPACE)
