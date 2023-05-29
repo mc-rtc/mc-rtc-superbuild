@@ -26,7 +26,7 @@ jobs:
       shell: bash
       run: |
         mkdir -p ${TMPDIR-/tmp}/build-mc-rtc
-        cmake -S ${GITHUB_WORKSPACE} -B ${TMPDIR-/tmp}/build-mc-rtc -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVERBOSE_TEST_OUTPUT=ON -DMC_RTC_SUPERBUILD_VERBOSE=ON -DPYTHON_BINDING=OFF
+        cmake -S ${GITHUB_WORKSPACE} -B ${TMPDIR-/tmp}/build-mc-rtc -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVERBOSE_TEST_OUTPUT=ON -DMC_RTC_SUPERBUILD_VERBOSE=ON
     - name: Install mc_rtc and related projects
       shell: bash
       run: |
