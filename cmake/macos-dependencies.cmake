@@ -21,13 +21,11 @@ set(BREW_DEPENDENCIES
   ninja
   git
   libnotify
-  cython
-  numpy
 )
 if(BUILD_BENCHMARKS)
   list(APPEND BREW_DEPENDENCIES google-benchmark)
 endif()
-set(PIP_DEPENDENCIES coverage nose pytest matplotlib)
+set(PIP_DEPENDENCIES coverage nose pytest matplotlib cython numpy)
 if(WITH_ROS_SUPPORT AND NOT DEFINED ENV{ROS_DISTRO})
   message(FATAL_ERROR "ROS support is enabled but ROS_DISTRO is not set. Please source the setup before continuing or disable ROS support.")
 endif()
