@@ -22,6 +22,7 @@ if(PYTHON_BINDING)
   AddProject(Eigen3ToPython
     GITHUB jrl-umi3218/Eigen3ToPython
     GIT_TAG origin/master
+    CMAKE_ARGS -DPIP_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
     APT_PACKAGES python-eigen python3-eigen
   )
   list(APPEND SpaceVecAlg_DEPENDS Eigen3ToPython)
@@ -45,6 +46,7 @@ if(PYTHON_BINDING)
   AddProject(sch-core-python
     GITHUB jrl-umi3218/sch-core-python
     GIT_TAG origin/master
+    CMAKE_ARGS -DPIP_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
     DEPENDS sch-core SpaceVecAlg
     APT_PACKAGES python-sch-core python3-sch-core
   )
