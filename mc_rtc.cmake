@@ -107,13 +107,11 @@ AddProject(Tasks
   APT_PACKAGES libtasks-qld-dev python-tasks python3-tasks
 )
 
-if(USE_MC_RTC_APT_MIRROR)
-  message("WARNING LexLS will not be used by mc-rtc if mc-rtc apt packages are used")
-endif()
 AddProject(lexls
   GITHUB jrl-umi3218/lexls
   GIT_TAG origin/master
   CMAKE_ARGS -DINSTALL_PDF_DOCUMENTATION:BOOL=OFF -DINSTALL_HTML_DOCUMENTATION:BOOL=OFF
+  APT_PACKAGES liblexls-dev
 )
 
 if(WITH_LSSOL)
