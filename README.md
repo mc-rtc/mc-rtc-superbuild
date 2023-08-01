@@ -78,6 +78,22 @@ You can run the `self-update` target to update mc-rtc-superbuild and all the clo
 cmake --build . --config RelWithDebInfo --target self-update
 ```
 
+
+Uninstall projects
+==
+
+You can run the `uninstall` target to uninstall all the projects at once:
+```shell
+cmake --build . --target uninstall
+```
+It might require `sudo` if you install to a non-writable prefix (e.g. `/usr/local`)
+
+You cam also uninstall a specific project:
+```shell
+cmake --build . --target uninstall-mc_rtc
+```
+
+
 Extensions
 --
 
