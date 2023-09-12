@@ -1,4 +1,4 @@
-option(WITH_HUMAN "Build human model for mc_rtc" ON)
+option(WITH_HUMAN "Build human model for mc_rtc" OFF)
 
 if(NOT WITH_HUMAN)
   return()
