@@ -5,7 +5,9 @@ set(EXTRA_ARGS FALSE)
 foreach(ARGC RANGE ${CMAKE_ARGC})
   set(ARGV ${CMAKE_ARGV${ARGC}})
   if(EXTRA_ARGS)
-    if("${ARGV}" MATCHES " ")
+    # Enclose arguments that have space in them if there are no quotes
+    # This assumes the arguments are already well quoted otherwise which should be the case
+    if("${ARGV}" MATCHES " " AND NOT "${ARGV}" MATCHES "\"")
       string(APPEND CMAKE_COMMAND_WITH_PREFIX " \"${CMAKE_ARGV${ARGC}}\"")
     else()
       string(APPEND CMAKE_COMMAND_WITH_PREFIX " ${CMAKE_ARGV${ARGC}}")
