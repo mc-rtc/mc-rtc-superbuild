@@ -40,11 +40,25 @@ if(WITH_ROS_SUPPORT AND ROS_DISTRO)
     else()
       set(PYTHON_CAKTIN_TOOLS python3-colcon-common-extensions)
     endif()
-    set(ROS_APT_DEPENDENCIES "ros-${ROS_DISTRO}-ros-base" "ros-${ROS_DISTRO}-tf2-ros" "ros-${ROS_DISTRO}-xacro" "${PYTHON_CAKTIN_TOOLS}")
+    set(ROS_APT_DEPENDENCIES
+          ros-${ROS_DISTRO}-ros-base
+          ros-${ROS_DISTRO}-tf2-ros
+          ros-${ROS_DISTRO}-xacro
+          ${PYTHON_CAKTIN_TOOLS}
+    )
     if(ROS_IS_ROS2)
-      list(APPEND ROS_APT_DEPENDENCIES ros-${ROS_DISTRO}-rviz2 ros-${ROS_DISTRO}-geometry-msgs ros-${ROS_DISTRO}-rosidl-default-generators ros-${ROS_DISTRO}-rosidl-default-runtime)
+      list(APPEND ROS_APT_DEPENDENCIES
+                    ros-${ROS_DISTRO}-rviz2
+                    ros-${ROS_DISTRO}-geometry-msgs
+                    ros-${ROS_DISTRO}-rosidl-default-generators
+                    ros-${ROS_DISTRO}-rosidl-default-runtime
+      )
     else()
-      list(APPEND ROS_APT_DEPENDENCIES ros-${ROS_DISTRO}-common-msgs ros-${ROS_DISTRO}-rosdoc-lite ros-${ROS_DISTRO}-rviz)
+      list(APPEND ROS_APT_DEPENDENCIES
+                    ros-${ROS_DISTRO}-common-msgs
+                    ros-${ROS_DISTRO}-rosdoc-lite
+                    ros-${ROS_DISTRO}-rviz
+      )
     endif()
     if(NOT EXISTS /etc/apt/sources.list.d/ros-latest.list)
       message(STATUS "Adding ROS APT mirror for your system")
