@@ -128,9 +128,14 @@ AddProject(tvm
   APT_PACKAGES libtvm-dev
 )
 
+if(ROS_IS_ROS2)
+  set(MC_RTC_ROS_BRANCH origin/ROS2)
+else()
+  set(MC_RTC_ROS_BRANCH origin/master)
+endif()
 AddCatkinProject(mc_rtc_data
   GITHUB jrl-umi3218/mc_rtc_data
-  GIT_TAG origin/master
+  GIT_TAG ${MC_RTC_ROS_BRANCH}
   WORKSPACE data_ws
   APT_PACKAGES mc-rtc-data ros-${ROS_DISTRO}-mc-rtc-data
 )
@@ -139,7 +144,7 @@ set(mc_rtc_DEPENDS tvm Tasks mc_rtc_data ndcurves state-observation)
 if(WITH_ROS_SUPPORT)
   AddCatkinProject(mc_rtc_msgs
     GITHUB jrl-umi3218/mc_rtc_msgs
-    GIT_TAG origin/master
+    GIT_TAG ${MC_RTC_ROS_BRANCH}
     WORKSPACE data_ws
     APT_PACKAGES ros-${ROS_DISTRO}-mc-rtc-msgs
   )
@@ -170,7 +175,7 @@ AddProject(mc_rtc
   APT_PACKAGES libmc-rtc-dev mc-rtc-utils python-mc-rtc python3-mc-rtc ros-${ROS_DISTRO}-mc-rtc-plugin
 )
 
-if(WITH_ROS_SUPPORT)
+if(WITH_ROS_SUPPORT AND NOT ROS_IS_ROS2)
   AddCatkinProject(mc_rtc_ros
     GITHUB jrl-umi3218/mc_rtc_ros
     GIT_TAG origin/master

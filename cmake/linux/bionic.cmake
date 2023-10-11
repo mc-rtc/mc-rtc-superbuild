@@ -1,4 +1,5 @@
 set(ROS_DISTRO melodic)
+set(ROS_WORKSPACE_INSTALL_PYTHON_DESTINATION "lib/python2.7/dist-packages")
 set(APT_DEPENDENCIES
   wget
   cmake

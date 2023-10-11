@@ -1,4 +1,5 @@
 set(ROS_DISTRO noetic)
+set(ROS_WORKSPACE_INSTALL_PYTHON_DESTINATION "lib/python3/dist-packages")
 set(APT_DEPENDENCIES
   wget
   cmake

@@ -112,9 +112,14 @@ if(WITH_ROS_SUPPORT)
   get_property(ID GLOBAL PROPERTY PREVIOUS_CATKIN_WORKSPACE)
   if(NOT "${ID}" STREQUAL "")
     get_property(DIR GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_DIR)
+    if(ROS_IS_ROS2)
+      set(ROS_SETUP_PATH "${DIR}/install/setup${RC_EXT}")
+    else()
+      set(ROS_SETUP_PATH "${DIR}/devel/setup${RC_EXT}")
+    endif()
     set(FINAL_MESSAGE "${FINAL_MESSAGE}
 export ROS_PARALLEL_JOBS=\"$ENV{ROS_PARALLEL_JOBS}\"
-source ${DIR}/devel/setup${RC_EXT}
+source ${ROS_SETUP_PATH}
 ")
   endif()
 endif()

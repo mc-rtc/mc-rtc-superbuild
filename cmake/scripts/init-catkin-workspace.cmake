@@ -2,6 +2,21 @@ cmake_minimum_required(VERSION 3.20)
 
 file(MAKE_DIRECTORY "${CATKIN_DIR}/src")
 
+if(NOT EXISTS "${CAKTIN_DIR}/.gitignore")
+  file(WRITE "${CATKIN_DIR}/.gitignore"
+".catkin_tools/*
+.catkin_workspace
+build/*
+devel/*
+install/*
+logs/*
+src/CMakeLists.txt")
+endif()
+
+if(ROS_IS_ROS2)
+  return()
+endif()
+
 if("${WORKSPACE_TYPE}" STREQUAL "make")
   set(INIT_COMMAND catkin_init_workspace)
   set(INIT_WORKDIR "${CATKIN_DIR}/src")
@@ -47,15 +62,4 @@ if(NOT EXISTS "${CATKIN_DIR}/devel/setup.sh")
       COMMAND_ERROR_IS_FATAL ANY
     )
   endif()
-endif()
-
-if(NOT EXISTS "${CAKTIN_DIR}/.gitignore")
-  file(WRITE "${CATKIN_DIR}/.gitignore"
-".catkin_tools/*
-.catkin_workspace
-build/*
-devel/*
-install/*
-logs/*
-src/CMakeLists.txt")
 endif()

@@ -1,6 +1,7 @@
 set(MC_LOG_UI_PYTHON_EXECUTABLE python3)
-set(ROS_DISTRO noetic)
-set(ROS_WORKSPACE_INSTALL_PYTHON_DESTINATION "lib/python3/dist-packages")
+set(ROS_IS_ROS2 ON)
+set(ROS_DISTRO iron)
+set(ROS_WORKSPACE_INSTALL_PYTHON_DESTINATION "lib/python3.10/site-packages")
 set(APT_DEPENDENCIES
   curl
   wget
@@ -8,17 +9,11 @@ set(APT_DEPENDENCIES
   build-essential
   gfortran
   doxygen
-  cython
   cython3
-  python-nose
   python3-nose
-  python-pytest
   python3-pytest
-  python-numpy
   python3-numpy
-  python-coverage
   python3-coverage
-  python-setuptools
   python3-setuptools
   python3-pip
   libeigen3-dev
@@ -30,7 +25,6 @@ set(APT_DEPENDENCIES
   libnanomsg-dev
   libyaml-cpp-dev
   libltdl-dev
-  qt5-default
   libqwt-qt5-dev
   python3-matplotlib
   python3-pyqt5
@@ -50,4 +44,11 @@ function(mc_rtc_extra_steps)
   endif()
 endfunction()
 
-include(${CMAKE_CURRENT_LIST_DIR}/mc-rtc-mirror.cmake)
+AddProject(geos-cpp-inline
+  GITHUB gergondet/geos-cpp-inline-deb
+  GIT_TAG origin/main
+  INSTALL_PREFIX /usr
+  SKIP_TEST
+  NO_SOURCE_MONITOR
+)
+list(APPEND GLOBAL_DEPENDS geos-cpp-inline)
