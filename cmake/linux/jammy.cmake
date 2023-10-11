@@ -50,5 +50,8 @@ AddProject(geos-cpp-inline
   INSTALL_PREFIX /usr
   SKIP_TEST
   NO_SOURCE_MONITOR
+  APT_PACKAGES libgeos++-inline-dev
 )
 list(APPEND GLOBAL_DEPENDS geos-cpp-inline)
+
+include(${CMAKE_CURRENT_LIST_DIR}/mc-rtc-mirror.cmake)
