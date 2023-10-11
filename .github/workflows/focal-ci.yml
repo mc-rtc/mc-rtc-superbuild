@@ -23,9 +23,13 @@ jobs:
             use-mc-rtc-apt-mirror-stable: ON
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
+    - name: Workarounds
+      shell: bash
+      run: |
+        sudo apt-mark hold grub-efi-amd64-signed
     - name: Bootstrap
       shell: bash
       run: |
