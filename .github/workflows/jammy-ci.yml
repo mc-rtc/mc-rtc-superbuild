@@ -24,11 +24,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Maximize build space
-      uses: easimon/maximize-build-space@master
-      with:
-        remove-dotnet: 'true'
-        remove-haskell: 'true'
-        remove-docker-images: 'true'
+      shell: bash
+      run: |
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo docker image prune --all --force
     - uses: actions/checkout@v3
       with:
         submodules: recursive
