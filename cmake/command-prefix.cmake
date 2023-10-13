@@ -14,7 +14,7 @@ function(GetCommandPrefix VAR WRITE_TO)
                   ROS_ROOT=$ENV{ROS_ROOT}
                   ROS_ETC_DIR=$ENV{ROS_ETC_DIR}
                   ROS_PARALLEL_JOBS="$ENV{ROS_PARALLEL_JOBS}"
-                  ROS_VERSION="${ROS_VERSION}"
+                  ROS_VERSION="$ENV{ROS_VERSION}"
     )
     if(ROS_IS_ROS2)
       list(APPEND CMAKE_COMMAND_PREFIX
