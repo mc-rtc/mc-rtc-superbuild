@@ -144,7 +144,7 @@ set(mc_rtc_DEPENDS tvm Tasks mc_rtc_data ndcurves state-observation)
 if(WITH_ROS_SUPPORT)
   AddCatkinProject(mc_rtc_msgs
     GITHUB jrl-umi3218/mc_rtc_msgs
-    GIT_TAG ${MC_RTC_ROS_BRANCH}
+    GIT_TAG origin/master
     WORKSPACE data_ws
     APT_PACKAGES ros-${ROS_DISTRO}-mc-rtc-msgs
   )
