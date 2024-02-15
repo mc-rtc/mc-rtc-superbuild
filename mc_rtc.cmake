@@ -128,8 +128,8 @@ AddProject(tvm
   APT_PACKAGES libtvm-dev
 )
 
-if(ROS_IS_ROS2)
-  set(MC_RTC_ROS_BRANCH origin/ROS2)
+if(NOT WITH_ROS_SUPPORT)
+  set(MC_RTC_ROS_BRANCH origin/ROSFree)
 else()
   set(MC_RTC_ROS_BRANCH origin/master)
 endif()

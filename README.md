@@ -206,6 +206,8 @@ AddCatkinProject
 
 Adds a catkin project into the provided workspace. The git repository is provided through the same way as with `AddProject`.
 
+If `WITH_ROS_SUPPORT` is `OFF` then this is treated like `AddProject`
+
 AddPackageToCatkinSkiplist
 ==
 
