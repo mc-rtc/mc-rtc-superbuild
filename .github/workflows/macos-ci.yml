@@ -1,6 +1,9 @@
 name: CI macOS
 
 on:
+  repository_dispatch:
+    types:
+    - build-macos
   push:
     branches:
       - '**'

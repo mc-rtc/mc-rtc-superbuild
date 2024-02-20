@@ -1,6 +1,9 @@
 name: CI Ubuntu Jammy
 
 on:
+  repository_dispatch:
+    types:
+    - build-jammy
   push:
     branches:
       - '**'

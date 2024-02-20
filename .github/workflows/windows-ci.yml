@@ -1,6 +1,9 @@
 name: CI Windows
 
 on:
+  repository_dispatch:
+    types:
+    - build-windows
   push:
     branches:
       - '**'

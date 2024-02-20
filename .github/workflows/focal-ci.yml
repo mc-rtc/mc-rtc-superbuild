@@ -1,6 +1,9 @@
 name: CI Ubuntu Focal
 
 on:
+  repository_dispatch:
+    types:
+    - build-focal
   push:
     branches:
       - '**'
