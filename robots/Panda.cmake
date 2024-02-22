@@ -20,7 +20,7 @@ if(Panda_DEPENDENCIES_FROM_SOURCE)
     AddCatkinProject(franka_ros
       GITHUB frankaemika/franka_ros
       GIT_TAG origin/0.8.1
-      WORKSPACE "${CATKIN_WORKSPACE}"
+      WORKSPACE mc_rtc_ws
       DEPENDS libfranka
     )
     list(APPEND mc_panda_DEPENDS franka_ros)
