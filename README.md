@@ -12,18 +12,29 @@ Requirements
 - [Git](https://git-scm.com/)
 - [Visual Studio 2019 and later](https://visualstudio.microsoft.com/) (Windows)
 
-### Bootstraping
+### Installing the requirements (bootstraping)
 
 You can fullfill the requirements above by invoking our bootstraping script:
 
-- on Debian like distributions: `./utils/bootstrap-linux.sh`
-- on macOS: `./utils/bootstrap-macos.sh`
+```sh
+git clone https://github.com/mc-rtc/mc-rtc-superbuild
+```
+
+- on Debian like distributions: `./mc-rtc-superbuild/utils/bootstrap-linux.sh`
+- on macOS: `./mc-rtc-superbuild/utils/bootstrap-macos.sh`
 
 Usage
 --
 
+First, make sure you have configured `git`:
+```sh
+git config --global user.name "Full Name"
+git config --global user.email "your.email@provider.com"
+```
+
+Then configure and run the superbuild as follows:
+
 ```shell
-git clone https://github.com/mc-rtc/mc-rtc-superbuild
 # Run the bootstrap script in mc-rtc-superbuild/utils folder if required
 cmake -S mc-rtc-superbuild -B mc-rtc-superbuild/build -DSOURCE_DESTINATION=${HOME}/devel/src -DBUILD_DESTINATION=${HOME}/devel/build
 cmake --build mc-rtc-superbuild/build --config RelWithDebInfo
@@ -36,7 +47,7 @@ This will:
 3. Add Git submodules for each of the projects in the meta-repository
 4. Build each project in the `${BUILD_DESTINATION}/${PROJECT}` folder and install it in the provided `${CMAKE_INSTALL_PREFIX}`
 
-You can then use the projects that were built and clone by the superbuild as you would use projects you built and clone yourself. If you modify some projects, the superbuild will pick up on it and rebuild its dependents.
+You can then use the projects that were built and cloned by the superbuild as you would use projects you built and clone yourself. If you modify some projects, the superbuild will pick up on it and rebuild its dependents.
 
 #### Note
 
