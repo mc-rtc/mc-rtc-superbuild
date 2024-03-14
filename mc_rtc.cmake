@@ -175,7 +175,7 @@ AddProject(mc_rtc
   APT_PACKAGES libmc-rtc-dev mc-rtc-utils python-mc-rtc python3-mc-rtc ros-${ROS_DISTRO}-mc-rtc-plugin
 )
 
-if(WITH_ROS_SUPPORT AND NOT ROS_IS_ROS2)
+if(WITH_ROS_SUPPORT)
   AddCatkinProject(mc_rtc_ros
     GITHUB jrl-umi3218/mc_rtc_ros
     GIT_TAG origin/master
