@@ -6,7 +6,7 @@ endif()
 
 AddCatkinProject(rhps1_description
   GITHUB_PRIVATE isri-aist/rhps1_description
-  GIT_TAG origin/main
+  GIT_TAG origin/master
   WORKSPACE data_ws
 )
 
