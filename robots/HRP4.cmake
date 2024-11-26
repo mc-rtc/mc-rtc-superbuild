@@ -1,4 +1,4 @@
-option(WITH_HRP4 "Build HRP4 support, requires access to mc-hrp4 group on gite.lirmm.fr" OFF)
+option(WITH_HRP4 "Build HRP4 support, requires access right to this model" OFF)
 
 if(NOT WITH_HRP4)
   return()
