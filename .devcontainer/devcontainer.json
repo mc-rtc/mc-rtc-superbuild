@@ -1,0 +1,15 @@
+{
+  "name": "mc-rtc-superbuild",
+  "build": { "dockerfile": "Dockerfile" },
+
+  "runArgs": ["--network=host"],
+
+  "features":
+  {
+    "ghcr.io/duduribeiro/devcontainer-features/neovim:1": { "version": "nightly" }
+  },
+
+  "remoteUser": "ubuntu",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/home/ubuntu/workspace/mc-rtc-superbuild,type=bind",
+  "workspaceFolder": "/home/ubuntu/workspace/mc-rtc-superbuild",
+}
