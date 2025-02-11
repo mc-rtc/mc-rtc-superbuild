@@ -1,8 +1,12 @@
 {
-  "name": "mc-rtc-superbuild",
+  "name": "mc-rtc-superbuild-noble",
   "build": { "dockerfile": "Dockerfile" },
 
   "runArgs": ["--network=host"],
+
+  "containerEnv": {
+    "UBUNTU_VERSION": "focal"
+  },
 
   "features":
   {
