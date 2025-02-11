@@ -19,9 +19,29 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   Please remove CMakeCache.txt and the CMakeFiles folder that were just created")
 endif()
 
+
 project(mc_rtc_superbuild LANGUAGES C CXX)
 include(CTest)
 enable_testing()
+
+find_program(CCACHE_PROGRAM ccache)
+if (CCACHE_PROGRAM)
+    message(NOTICE "Selected CCache: ${CCACHE_PROGRAM}")
+  # get_filename_component(PARENT_DIR ${PROJECT_SOURCE_DIR} DIRECTORY)
+  # use cmake_path instead
+message(STATUS "PROJECT_SOURCE_DIR: ${PROJECT_SOURCE_DIR}")
+  cmake_path(GET PROJECT_SOURCE_DIR PARENT_PATH PARENT_DIR)
+  message(STATUS "PARENT_DIR: ${PARENT_DIR}")
+    set(ccacheEnv
+            CCACHE_BASEDIR=${PARENT_DIR}
+            # locale and umask are important for docker containers
+            # no_hash_dir useful?
+            CCACHE_SLOPPINESS="umask,locale,no_hash_dir,pch_defines,file_macro,include_file_ctime"
+            CCACHE_NOHASHDIR=true
+    )
+    set(CMAKE_C_COMPILER_LAUNCHER ${CMAKE_COMMAND} -E env ${ccacheEnv} ${CCACHE_PROGRAM})
+    set(CMAKE_CXX_COMPILER_LAUNCHER ${CMAKE_COMMAND} -E env ${ccacheEnv} ${CCACHE_PROGRAM})
+endif ()
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES AND NOT ENV{CMAKE_BUILD_TYPE})
   message(STATUS "Setting default build type to RelWithDebInfo as none was provided")
