@@ -26,15 +26,15 @@ enable_testing()
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
-    message(NOTICE "Selected CCache: ${CCACHE_PROGRAM}")
-  # get_filename_component(PARENT_DIR ${PROJECT_SOURCE_DIR} DIRECTORY)
-  # use cmake_path instead
-message(STATUS "PROJECT_SOURCE_DIR: ${PROJECT_SOURCE_DIR}")
+  message(NOTICE "Selected CCache: ${CCACHE_PROGRAM}")
   cmake_path(GET PROJECT_SOURCE_DIR PARENT_PATH PARENT_DIR)
-  message(STATUS "PARENT_DIR: ${PARENT_DIR}")
     set(ccacheEnv
+            # Rewrite all absolute paths that contain the CCACHE_BASEDIR into relative paths
+            # This is done to ensure that the cache will be used even if the project is pulled in a different tree location
+            # than the one used for generating the cache (e.g docker workspace path, other user's machine, etc)
+            # See https://ccache.dev/manual/4.10.2.html#_compiling_in_different_directories
             CCACHE_BASEDIR=${PARENT_DIR}
-            # locale and umask are important for docker containers
+            # locale and umask are important for docker containers: if either differs, the cache won't be used.
             # no_hash_dir useful?
             CCACHE_SLOPPINESS="umask,locale,no_hash_dir,pch_defines,file_macro,include_file_ctime"
             CCACHE_NOHASHDIR=true

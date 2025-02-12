@@ -14,7 +14,7 @@
   "features":
   {
     // "ghcr.io/devcontainers-extra/features/cmake:1": {},
-    "ghcr.io/duduribeiro/devcontainer-features/neovim:1": { "version": "nightly" }
+    // "ghcr.io/duduribeiro/devcontainer-features/neovim:1": { "version": "nightly" }
   },
 
   "remoteUser": "vscode",
