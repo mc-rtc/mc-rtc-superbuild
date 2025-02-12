@@ -30,7 +30,9 @@ RUN git config --global user.email "${EMAIL}" && git config --global user.name "
 # todo remove this line
 RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/docker-ccache \
   --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/ccache \
-  cp -r /home/vscode/.cache/ccache/* /home/vscode/.cache/docker-ccache
+  if [ "$(ls -A ~/.cache/docker-ccache)" ]; then \
+    cp -r /home/vscode/.cache/ccache/* /home/vscode/.cache/docker-ccache; \
+  fi
 
 RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/docker-ccache \
   if [ "$(ls -A ~/.cache/docker-ccache)" ]; then \
