@@ -24,6 +24,16 @@ project(mc_rtc_superbuild LANGUAGES C CXX)
 include(CTest)
 enable_testing()
 
+if(${CMAKE_GENERATOR} STREQUAL "Ninja")
+  message(STATUS "Using Generator: Ninja")
+  message(STATUS "To prevent excessive ressource usage, forcing Ninja to build ${PROJECT_NAME} on a single core. Subprojects will be built in parallel according to their own requirements.")
+  set_property(GLOBAL APPEND PROPERTY JOB_POOLS no_parallel=1)
+  # Initialize JOB_POOL_COMPILE on all targets
+  # The trick here is that mc-rtc-superbuild configures and builds sub-projects by re-running cmake, thus they do not inherit from this property
+  # and can themselves be built in parallel
+  set(CMAKE_JOB_POOL_COMPILE no_parallel)
+endif ()
+
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
   message(NOTICE "Selected CCache: ${CCACHE_PROGRAM}")

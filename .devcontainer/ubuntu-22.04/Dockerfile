@@ -16,10 +16,10 @@ RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/nul
  && rm /usr/share/keyrings/kitware-archive-keyring.gpg \
  && apt-get install -y --no-install-recommends kitware-archive-keyring \
  && apt-get update \
- && apt-get install -y --no-install-recommends cmake
+ && apt-get install -y --no-install-recommends cmake cmake-curses-gui
 
 RUN --mount=type=cache,target=/var/cache/apt \
-  apt-get -y install --no-install-recommends ccache python3-venv python3-pip ripgrep cmake
+  apt-get -y install --no-install-recommends ccache python3-venv python3-pip ripgrep cmake cmake-curses-gui
 
 
 # Add mc-rtc-superbuild to the build context
@@ -51,13 +51,15 @@ WORKDIR /home/vscode/workspace/mc-rtc-superbuild
 # Configure CMake will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)
 # TODO: mount pip cache
 RUN --mount=type=cache,target=/var/cache/apt \
+  --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/pip \
   cmake --preset relwithdebinfo-jammy
 
 # Build everything to populate ccache  (keep ccache in mounted cache ~/.cache/ccache)
 RUN --mount=type=cache,target=/var/cache/apt \
+  --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/pip \
   ccache -z \
-  && cmake --build --preset build-relwithdebinfo-jammy \
-  && echo "Removing temporary build from the image" \
+  && cmake --build --preset relwithdebinfo-jammy \
+  && echo "Removing temporary build artefacts from the image" \
   && rm -rf /home/vscode/workspace/mc-rtc-superbuild \
   && ccache -sv
 
