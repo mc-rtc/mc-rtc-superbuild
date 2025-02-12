@@ -42,6 +42,29 @@
         "rhs": "jammy"
       },
       "graphviz": "build/superbuild/relwithdebinfo-jammy/graphviz.dot"
+    },
+    {
+      "name": "relwithdebinfo-jammy-ninja",
+      "displayName": "RelWithDebInfo (jammy)",
+      "generator": "Ninja",
+      "binaryDir": "build/superbuild/relwithdebinfo-jammy",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "SOURCE_DESTINATION": "devel/jammy",
+        "BUILD_DESTINATION": "build/projects/relwithdebinfo-jammy",
+        "CMAKE_INSTALL_PREFIX": "install/relwithdebinfo-jammy",
+        "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
+        "CMAKE_JOB_POOLS": "'compile=1;link=1'",
+        "CMAKE_JOB_POOL_COMPILE": "compile",
+        "CMAKE_JOB_POOL_LINK": "link"
+      },
+      "condition":
+      {
+        "type": "equals",
+        "lhs": "$env{UBUNTU_VERSION}",
+        "rhs": "jammy"
+      },
+      "graphviz": "build/superbuild/relwithdebinfo-jammy/graphviz.dot"
     }
   ],
   "buildPresets": [
