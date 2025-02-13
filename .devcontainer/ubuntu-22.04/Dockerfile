@@ -27,12 +27,9 @@ USER vscode
 # Git now forces you to have an email
 RUN git config --global user.email "${EMAIL}" && git config --global user.name "${NAME}"
 
-# todo remove this line
-RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/docker-ccache \
-  --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/ccache \
-  if [ "$(ls -A ~/.cache/docker-ccache)" ]; then \
-    cp -r /home/vscode/.cache/ccache/* /home/vscode/.cache/docker-ccache; \
-  fi
+# Explicitely set ccache directory
+# This ensures that ccache will always look here even if tools change the default cache location with XDG_CACHE_HOME (e.g nvim-remote)
+ENV CCACHE_DIR=/home/vscode/.cache/ccache
 
 RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/docker-ccache \
   if [ "$(ls -A ~/.cache/docker-ccache)" ]; then \
