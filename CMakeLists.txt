@@ -98,15 +98,18 @@ add_subdirectory(extensions)
 ### No more personal projects past this point
 
 message("
-mc-rtc-superbuild is now ready, the following special targets are available:
-- clone: clone all projects into their location
-- update: update all the projects at once
-- uninstall: uninstall all the project at once
-
-You can also use the [COMMAND]-[NAME] form to update particular projects
-
-Or use your regular build command to build all projects
-")
+================================================================================
+**
+** mc-rtc-superbuild is now ready, the following special targets are available:
+** - clone: clone all projects into their location
+** - update: update all the projects at once
+** - uninstall: uninstall all the project at once
+**
+** You can also use the [COMMAND]-[NAME] form to update particular projects
+**
+** Or use your regular build command to build all projects
+**
+** - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
 
 set(RC_FILE ".bashrc")
 set(RC_EXT ".bash")
@@ -116,25 +119,37 @@ if("$ENV{SHELL}" STREQUAL "/usr/bin/zsh" OR "$ENV{SHELL}" STREQUAL "/bin/zsh")
 endif()
 
 set(FINAL_MESSAGE
+"**
+** Source will be cloned in ${SOURCE_DESTINATION}
+**
+** Build will be generated in:
+** - mc-rtc-superbuild: ${CMAKE_BINARY_DIR}
+**   Build targets here can be used to update/build/install all projects in the superbuild (and its extensions).
+**   This is the recommended way to build as it ensures that all changes will be taken into account and avoid potential ABI inconsistencies.
+** - Each project's build files will be in ${BUILD_DESTINATION}/<project_name>
+**
+** Please add the following lines to your ${RC_FILE} file:
+**
+** source ${CMAKE_INSTALL_PREFIX}/setup_mc_rtc.sh
+**
+================================================================================
 "
-Source will be cloned in ${SOURCE_DESTINATION}
-
-Please add the following lines to your ${RC_FILE} file:
-
-export PATH=${CMAKE_INSTALL_PREFIX}/bin:$PATH
-export PKG_CONFIG_PATH=${CMAKE_INSTALL_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH"
 )
 
+set(FINAL_COMMAND
+"export PATH=${CMAKE_INSTALL_PREFIX}/bin:$PATH
+export PKG_CONFIG_PATH=${CMAKE_INSTALL_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH")
+
 if(APPLE)
-  set(FINAL_MESSAGE "${FINAL_MESSAGE}
+  set(FINAL_COMMAND "${FINAL_COMMAND}
 export DYLD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:$DYLD_LIBRARY_PATH")
 elseif(UNIX)
-  set(FINAL_MESSAGE "${FINAL_MESSAGE}
+  set(FINAL_COMMAND "${FINAL_COMMAND}
 export LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:$LD_LIBRARY_PATH")
 endif()
 
 if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON AND NOT PYTHON_BINDING_USER_INSTALL)
-  set(FINAL_MESSAGE "${FINAL_MESSAGE}
+  set(FINAL_COMMAND "${FINAL_COMMAND}
 export PYTHONPATH=${EXTRA_PYTHONPATH}:$PYTHONPATH")
 endif()
 
@@ -147,7 +162,7 @@ if(WITH_ROS_SUPPORT)
     else()
       set(ROS_SETUP_PATH "${DIR}/devel/setup${RC_EXT}")
     endif()
-    set(FINAL_MESSAGE "${FINAL_MESSAGE}
+    set(FINAL_COMMAND "${FINAL_COMMAND}
 export ROS_PARALLEL_JOBS=\"$ENV{ROS_PARALLEL_JOBS}\"
 source ${ROS_SETUP_PATH}
 ")
@@ -163,8 +178,17 @@ This has already been set in your environment. Please open a new shell for the c
 endif()
 
 message("${FINAL_MESSAGE}")
+file(GENERATE OUTPUT ${CMAKE_BINARY_DIR}/setup_mc_rtc.sh
+  CONTENT ${FINAL_COMMAND})
 
+install(FILES ${CMAKE_BINARY_DIR}/setup_mc_rtc.sh
+  DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+# Show message at the end of install target
 install(CODE "message(\"\")")
-install(CODE "message(\"Installation done\")")
+install(CODE "message(\"=======================\")")
+install(CODE "message(\"** Installation done **\")")
+install(CODE "message(\"=======================\")")
 install(CODE "message(\"\")")
 install(CODE "message(\"${FINAL_MESSAGE}\")")
+
