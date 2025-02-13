@@ -129,3 +129,31 @@ endif()
 # -- Location of build -- #
 ###########################
 set(BUILD_DESTINATION "${PROJECT_BINARY_DIR}/build" CACHE PATH "Where the project should be built")
+
+
+
+##########################
+# CMake argument utilities
+##########################
+
+# Handle forwarding CMAKE_CXX_COMPILER_LAUNCHER and related variables
+# Use this in any project that needs to use the same compiler launcher as the superbuild
+function(handle_compiler_launcher BUILD_ARGS)
+  if(DEFINED CMAKE_C_COMPILER_LAUNCHER)
+    string(REPLACE ";" "$<SEMICOLON>" CMAKE_C_COMPILER_LAUNCHER "${CMAKE_C_COMPILER_LAUNCHER}")
+    list(PREPEND ${BUILD_ARGS} -DCMAKE_C_COMPILER_LAUNCHER="${CMAKE_C_COMPILER_LAUNCHER}")
+  endif()
+  if(DEFINED CMAKE_CXX_COMPILER_LAUNCHER)
+    string(REPLACE ";" "$<SEMICOLON>" CMAKE_CXX_COMPILER_LAUNCHER "${CMAKE_CXX_COMPILER_LAUNCHER}")
+    list(PREPEND ${BUILD_ARGS} -DCMAKE_CXX_COMPILER_LAUNCHER="${CMAKE_CXX_COMPILER_LAUNCHER}")
+  endif()
+  if(DEFINED CMAKE_C_FLAGS AND NOT "${CMAKE_C_FLAGS}" STREQUAL "")
+    string(REPLACE ";" "$<SEMICOLON>" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    list(PREPEND ${BUILD_ARGS} -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS}")
+  endif()
+  if(DEFINED CMAKE_CXX_FLAGS AND NOT "${CMAKE_CXX_FLAGS}" STREQUAL "")
+    string(REPLACE ";" "$<SEMICOLON>" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    list(PREPEND ${BUILD_ARGS} -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS}")
+  endif()
+  set(${BUILD_ARGS} "${${BUILD_ARGS}}" PARENT_SCOPE)
+endfunction()
