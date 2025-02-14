@@ -40,6 +40,16 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/docker-ccach
     echo "ccache mount directory is empty"; \
   fi
 
+# Use cython cache (only for caching pyx to c conversion)
+RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/cython-ccache \
+  if [ "$(ls -A ~/.cache/cython-ccache)" ]; then \
+    echo "Found cython cache, using it"; \
+    cp -r ~/.cache/cython-ccache /home/vscode/.cython; \
+    ls -A ~/.cython; \
+  else \
+    echo "cython mount directory is empty"; \
+  fi
+
 
 # Note that in theory this could be copied into a separate directory as the runtime workspace
 # However due to generated config headers containing install source paths for mc_rtc
@@ -53,7 +63,9 @@ RUN --mount=type=cache,target=/var/cache/apt \
   --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/pip \
   cmake --preset relwithdebinfo-jammy
 
-# Build everything to populate ccache  (keep ccache in mounted cache ~/.cache/ccache)
+# Build everything to populate cache:
+# - ccache in mounted cache ~/.cache/ccache
+# - cython in ~/.cython
 RUN --mount=type=cache,target=/var/cache/apt \
   --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/pip \
   ccache -z \
@@ -62,10 +74,19 @@ RUN --mount=type=cache,target=/var/cache/apt \
   && rm -rf /home/vscode/workspace/mc-rtc-superbuild \
   && ccache -sv
 
-# Copy ccache folder into the build cache.
+# Copy ccache/cython folder into the docker image's build cache.
+# This enables reuse on the next build of this image
 RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/docker-ccache \
   ccache -z \
-  && echo "Copying ccache /home/vscode/.cache/ccache to the image folder /home/vscode/.cache/.docker-ccache" \
+  && echo "Copying ccache /home/vscode/.cache/ccache to the image folder /home/vscode/.cache/docker-ccache" \
   && cp -r /home/vscode/.cache/ccache/* /home/vscode/.cache/docker-ccache
+
+RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/cython-ccache \
+  if [ -d ~/.cython ]; then \
+    echo "Copying cython cache /home/vscode/.cython to the image folder /home/vscode/.cache/cython-cache"; \
+    cp -r /home/vscode/.cython/* /home/vscode/.cache/cython-ccache; \
+  else \
+    echo "cython cache not found"; \
+  fi
 
 ENTRYPOINT ["/bin/bash", "-c"]
