@@ -5,13 +5,13 @@ if(NOT WITH_RHPS1)
 endif()
 
 AddCatkinProject(rhps1_description
-  GITHUB isri-aist/rhps1_description
-  GIT_TAG origin/main
+  GITHUB_PRIVATE isri-aist/rhps1_description
+  GIT_TAG origin/master
   WORKSPACE data_ws
 )
 
 AddProject(mc_rhps1
-  GITHUB isri-aist/mc_rhps1
+  GITHUB_PRIVATE isri-aist/mc_rhps1
   GIT_TAG origin/master
   DEPENDS rhps1_description mc_rtc
 )
