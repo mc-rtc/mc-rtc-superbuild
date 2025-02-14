@@ -13,8 +13,22 @@
 
   "features":
   {
-    // "ghcr.io/devcontainers-extra/features/cmake:1": {},
     // "ghcr.io/duduribeiro/devcontainer-features/neovim:1": { "version": "nightly" }
+  },
+
+  // Configure tool-specific properties.
+  "customizations": {
+      "vscode": {
+          "extensions": [
+              "twxs.cmake",
+              "ms-vscode.cmake-tools",
+              "josetr.cmake-language-support-vscode",
+              "ms-vscode.cpptools",
+              "ms-vscode.docker",
+              "ms-vscode.cpptools-extension-pack",
+              "ms-vscode-remote.remote-containers"
+          ]
+      }
   },
 
   "remoteUser": "vscode",
