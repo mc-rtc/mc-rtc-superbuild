@@ -1,4 +1,4 @@
 build/
 devel/
 install/
-.devcontainer/.devpod-internal
+**/.devpod-internal
