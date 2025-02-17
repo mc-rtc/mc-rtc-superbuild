@@ -89,4 +89,8 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/cython-ccach
     echo "cython cache not found"; \
   fi
 
+# Ask GPG key password in the terminal
+RUN echo "export GPG_TTY=$(tty)" >> /home/vscode/.bashrc
+
+
 ENTRYPOINT ["/bin/bash", "-c"]
