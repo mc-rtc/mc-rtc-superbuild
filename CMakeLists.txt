@@ -51,10 +51,12 @@ if (CCACHE_PROGRAM)
     )
     set(CMAKE_C_COMPILER_LAUNCHER ${CMAKE_COMMAND} -E env ${ccacheEnv} ${CCACHE_PROGRAM})
     set(CMAKE_CXX_COMPILER_LAUNCHER ${CMAKE_COMMAND} -E env ${ccacheEnv} ${CCACHE_PROGRAM})
-    # Define a compiler launcher for cython
-    # This is not supported by default, in our tools we will need to explicitely use it in cython's setup.py
-    set(CYTHON_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
-    set(CYTHON_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+    if(${CYTHON_USE_CCACHE})
+      # Define a compiler launcher for cython
+      # This is not supported by default, in our tools we will need to explicitely use it in cython's setup.py
+      set(CYTHON_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+      set(CYTHON_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+    endif()
 endif ()
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES AND NOT ENV{CMAKE_BUILD_TYPE})
