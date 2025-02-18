@@ -54,7 +54,7 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cython \
 # Note that in theory this could be copied into a separate directory as the runtime workspace
 # However due to generated config headers containing install source paths for mc_rtc
 # It is better to keep it in the same folder in order to increase ccache hit rate
-COPY --chown=vscode:vscode ../.. /home/vscode/workspace/mc-rtc-superbuild
+COPY --chown=vscode:vscode ../../.. /home/vscode/workspace/mc-rtc-superbuild
 WORKDIR /home/vscode/workspace/mc-rtc-superbuild
 
 # Configure CMake will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)

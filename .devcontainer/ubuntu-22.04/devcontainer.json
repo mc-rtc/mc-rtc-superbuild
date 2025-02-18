@@ -1,9 +1,14 @@
 {
   "name": "mc-rtc-superbuild-jammy",
-  "build": { 
-    "dockerfile": "Dockerfile",
-    "context": "../.."
-  },
+
+  // See .github/.devcontainer/ubuntu-22.04/devcontainer.json to see how this image was built
+  // This image contains:
+  // - All of mc-rtc-superbuild dependencies
+  // - A ccache build cache built from the latest sources
+  // - A cython build cache built from the latest sources
+  // - All tools required to build the project
+  // - A sensible default configuration for vscode
+  "image": "ghcr.io/mc-rtc/mc-rtc-superbuild:jammy",
 
   "mounts": [
     "type=bind,source=/home/${localEnv:USER}/.ssh,target=/home/vscode/.ssh,readonly",
@@ -14,32 +19,6 @@
 
   "containerEnv": {
     "UBUNTU_VERSION": "jammy"
-  },
-
-  "features":
-  {
-    // "ghcr.io/duduribeiro/devcontainer-features/neovim:1": { "version": "latest" },
-    "ghcr.io/devcontainers/features/github-cli": { "version": "latest" }
-  },
-
-  // Configure tool-specific properties.
-  "customizations": {
-      "devpod": {
-        "prebuildRepository": "ghcr.io/mc-rtc/mc-rtc-superbuild"
-      },
-      "vscode": {
-          "extensions": [
-            "twxs.cmake",
-            "ms-vscode.cmake-tools",
-            "josetr.cmake-language-support-vscode",
-            "ms-vscode.cpptools",
-            "ms-vscode.docker",
-            "ms-vscode.cpptools-extension-pack",
-            "ms-vscode-remote.remote-containers",
-            "ms-python.python",
-            "GitHub.vscode-github-actions"
-          ]
-      }
   },
 
   "remoteUser": "vscode",
