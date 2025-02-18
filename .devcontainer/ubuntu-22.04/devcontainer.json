@@ -7,7 +7,7 @@
 
   "mounts": [
     "type=bind,source=/home/${localEnv:USER}/.ssh,target=/home/vscode/.ssh,readonly",
-    "type=bind,source=/home/${localEnv:USER}/.gnupg,target=/home/vscode/.gnupg,readonly",
+    "type=bind,source=/home/${localEnv:USER}/.gnupg,target=/home/vscode/.gnupg",
   ],
 
   "runArgs": ["--network=host"],
