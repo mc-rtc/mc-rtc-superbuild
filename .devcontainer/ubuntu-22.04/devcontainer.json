@@ -24,6 +24,9 @@
 
   // Configure tool-specific properties.
   "customizations": {
+      "devpod": {
+        "prebuildRepository": "ghcr.io/mc-rtc/mc-rtc-superbuild"
+      },
       "vscode": {
           "extensions": [
             "twxs.cmake",
