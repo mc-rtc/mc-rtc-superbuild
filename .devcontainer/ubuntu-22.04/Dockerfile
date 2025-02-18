@@ -31,21 +31,21 @@ RUN git config --global user.email "${EMAIL}" && git config --global user.name "
 # This ensures that ccache will always look here even if tools change the default cache location with XDG_CACHE_HOME (e.g nvim-remote)
 ENV CCACHE_DIR=/home/vscode/.cache/ccache
 
-RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/docker-ccache \
-  if [ "$(ls -A ~/.cache/docker-ccache)" ]; then \
+RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/ccache \
+  if [ "$(ls -A ~/.cache/ccache)" ]; then \
     echo "Found ccache cache in the docker build cache, using it"; \
-    cp -r ~/.cache/docker-ccache /home/vscode/.cache/ccache; \
-    ls -A ~/.cache/ccache; \
+    ls -l ~/.cache/ccache; \
+    du -h ~/.cache/ccache; \
+    ccache -z; \
+    ccache -sv; \
   else \
     echo "ccache mount directory is empty"; \
   fi
 
 # Use cython cache (only for caching pyx to c conversion)
-RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/cython-ccache \
-  if [ "$(ls -A ~/.cache/cython-ccache)" ]; then \
+RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cython \
+  if [ "$(ls -A ~/.cython)" ]; then \
     echo "Found cython cache, using it"; \
-    cp -r ~/.cache/cython-ccache /home/vscode/.cython; \
-    ls -A ~/.cython; \
   else \
     echo "cython mount directory is empty"; \
   fi
@@ -61,6 +61,8 @@ WORKDIR /home/vscode/workspace/mc-rtc-superbuild
 # TODO: mount pip cache
 RUN --mount=type=cache,target=/var/cache/apt \
   --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/pip \
+  --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/ccache \
+  --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cython \
   cmake --preset relwithdebinfo-jammy
 
 # Build everything to populate cache:
@@ -68,29 +70,34 @@ RUN --mount=type=cache,target=/var/cache/apt \
 # - cython in ~/.cython
 RUN --mount=type=cache,target=/var/cache/apt \
   --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/pip \
+  --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/ccache \
+  --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cython \
   ccache -z \
   && cmake --build --preset relwithdebinfo-jammy \
-  && echo "Removing temporary build artefacts from the image" \
-  && rm -rf /home/vscode/workspace/mc-rtc-superbuild \
   && ccache -sv
 
 # Copy ccache/cython folder into the docker image's build cache.
 # This enables reuse on the next build of this image
-RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/docker-ccache \
+RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/ccache \
   ccache -z \
-  && echo "Copying ccache /home/vscode/.cache/ccache to the image folder /home/vscode/.cache/docker-ccache" \
-  && cp -r /home/vscode/.cache/ccache/* /home/vscode/.cache/docker-ccache
+  && echo "Copying ccache /home/vscode/.cache/ccache to the temporary image folder /home/vscode/.cache/docker-ccache" \
+  && cp -r /home/vscode/.cache/ccache /home/vscode/.cache/docker-ccache
 
-RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/cython-ccache \
-  if [ -d ~/.cython ]; then \
-    echo "Copying cython cache /home/vscode/.cython to the image folder /home/vscode/.cache/cython-cache"; \
-    cp -r /home/vscode/.cython/* /home/vscode/.cache/cython-ccache; \
-  else \
-    echo "cython cache not found"; \
-  fi
+RUN echo "Moving the generated ccache cache to the image folder /home/vscode/.cache/ccache so that it can be used at runtime" \
+  && mv /home/vscode/.cache/docker-ccache /home/vscode/.cache/ccache
 
-# Ask GPG key password in the terminal
-RUN echo "export GPG_TTY=$(tty)" >> /home/vscode/.bashrc
+RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cython \
+  echo "Copying cython cache /home/vscode/.cython to the temporary image folder /home/vscode/.cache/cython-cache" \
+  && cp -r /home/vscode/.cython /home/vscode/.cache/cython-cache
 
+RUN echo "Moving the generated cython cache to the image folder /home/vscode/.cache/cython so that it can be used at runtime" \
+  && mv /home/vscode/.cache/cython-cache /home/vscode/.cython
+
+RUN echo "Checking cache contents" \
+  && ls /home/vscode/.cache/ccache \
+  && ls /home/vscode/.cython
+
+RUN echo "Removing temporary build artefacts from the image" \
+  && rm -rf /home/vscode/workspace/mc-rtc-superbuild
 
 ENTRYPOINT ["/bin/bash", "-c"]
