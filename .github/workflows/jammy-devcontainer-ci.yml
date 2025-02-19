@@ -35,6 +35,8 @@ jobs:
     - name: Pre-build dev container image
       uses: devcontainers/ci@v0.3
       with:
+        # FIXME: use mc-rtc/mc-rtc-superbuild before merging
+        # Not supported to be pushed to from forks
         #imageName: ghcr.io/mc-rtc/mc-rtc-superbuild
         imageName: ghcr.io/arntanguy/mc-rtc-superbuild
         imageTag: jammy
