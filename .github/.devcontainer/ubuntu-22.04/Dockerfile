@@ -11,7 +11,7 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean
 
 # Install latest cmake version
 RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null \
- && echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ jammy main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null \
+ && echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ jammy main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null \
  && apt update \
  && rm /usr/share/keyrings/kitware-archive-keyring.gpg \
  && apt-get install -y --no-install-recommends kitware-archive-keyring \
@@ -63,7 +63,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
   --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/pip \
   --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/ccache \
   --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cython \
-  cmake --preset relwithdebinfo-jammy
+  cmake --preset relwithdebinfo-jammy && sudo rm -rf /var/lib/apt/lists/*
 
 # Build everything to populate cache:
 # - ccache in mounted cache ~/.cache/ccache
@@ -74,6 +74,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
   --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cython \
   ccache -z \
   && cmake --build --preset relwithdebinfo-jammy \
+  && echo "Removing temporary build artefacts from the image" \
+  && rm -rf /home/vscode/workspace/mc-rtc-superbuild \
   && ccache -sv
 
 # Copy ccache/cython folder into the docker image's build cache.
@@ -97,7 +99,8 @@ RUN echo "Checking cache contents" \
   && ls /home/vscode/.cache/ccache \
   && ls /home/vscode/.cython
 
-RUN echo "Removing temporary build artefacts from the image" \
-  && rm -rf /home/vscode/workspace/mc-rtc-superbuild
-
+LABEL org.opencontainers.image.source=https://github.com/mc-rtc/mc-rtc-superbuild
+LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild from source"
+LABEL org.opencontainers.image.licenses=BSD-2
 ENTRYPOINT ["/bin/bash", "-c"]
+
