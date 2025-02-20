@@ -13,12 +13,14 @@
   "mounts": [
     "type=bind,source=/home/${localEnv:USER}/.ssh,target=/home/vscode/.ssh,readonly",
     "type=bind,source=/home/${localEnv:USER}/.gnupg,target=/home/vscode/.gnupg",
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
   ],
 
   "runArgs": ["--network=host"],
 
   "containerEnv": {
     "UBUNTU_VERSION": "jammy"
+    "DISPLAY": "${localEnv:DISPLAY}",
   },
 
   "remoteUser": "vscode",
