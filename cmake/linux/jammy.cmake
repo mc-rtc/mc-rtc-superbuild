@@ -9,7 +9,6 @@ set(APT_DEPENDENCIES
   cmake
   build-essential
   gfortran
-  doxygen
   cython3
   python3-nose
   python3-pytest
@@ -18,8 +17,6 @@ set(APT_DEPENDENCIES
   python3-setuptools
   python3-pip
   libeigen3-dev
-  doxygen
-  doxygen-latex
   libboost-all-dev
   libtinyxml2-dev
   libgeos++-dev
@@ -37,6 +34,11 @@ set(APT_DEPENDENCIES
 )
 if(BUILD_BENCHMARKS)
   list(APPEND APT_DEPENDENCIES libbenchmark-dev)
+endif()
+if(INSTALL_DOCUMENTATION)
+  list(APPEND APT_DEPENDENCIES
+    doxygen
+    doxygen-latex)
 endif()
 
 function(mc_rtc_extra_steps)

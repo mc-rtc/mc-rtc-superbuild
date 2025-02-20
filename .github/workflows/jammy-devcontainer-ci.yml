@@ -40,7 +40,7 @@ jobs:
         #imageName: ghcr.io/mc-rtc/mc-rtc-superbuild
         imageName: ghcr.io/arntanguy/mc-rtc-superbuild
         imageTag: jammy
-        subFolder: .github/.devcontainer/ubuntu-22.04
-        configFile: .github/.devcontainer/ubuntu-22.04/devcontainer.json
+        subFolder: .github/devcontainer/ubuntu-22.04
+        configFile: .github/devcontainer/ubuntu-22.04/devcontainer.json
         cacheFrom: ghcr.io/arntanguy/mc-rtc-superbuild
         push: always

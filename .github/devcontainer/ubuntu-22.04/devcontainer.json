@@ -5,31 +5,19 @@
     "context": "../../.."
   },
 
-  "mounts": [
-    "type=bind,source=/home/${localEnv:USER}/.ssh,target=/home/vscode/.ssh,readonly",
-    "type=bind,source=/home/${localEnv:USER}/.gnupg,target=/home/vscode/.gnupg",
-  ],
-
-  "runArgs": ["--network=host"],
-
-  "postStartCommand": "/home/vscode/workspace/mc-rtc-superbuild/.devcontainer/entrypoint.sh",
-
   "containerEnv": {
     "UBUNTU_VERSION": "jammy"
   },
 
   "features":
   {
-    // "ghcr.io/duduribeiro/devcontainer-features/neovim:1": { "version": "latest" },
+    "ghcr.io/duduribeiro/devcontainer-features/neovim:1.0.1": {},
     "ghcr.io/devcontainers/features/github-cli": { "version": "latest" },
     "ghcr.io/georgofenbeck/features/lazygit-linuxbinary:1": { "version": "latest" }
   },
 
   // Configure tool-specific properties.
   "customizations": {
-      "devpod": {
-        "prebuildRepository": "ghcr.io/mc-rtc/mc-rtc-superbuild"
-      },
       "vscode": {
           "extensions": [
             "twxs.cmake",

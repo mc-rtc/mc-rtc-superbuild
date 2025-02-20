@@ -6,5 +6,4 @@ echo "To build, use one of the proposed cmake presets:"
 cd ~/workspace/mc-rtc-superbuild
 cmake --list-presets
 
-export GPG_TTY=$(tty) >> /home/vscode/.bashrc
 exec "$@"
