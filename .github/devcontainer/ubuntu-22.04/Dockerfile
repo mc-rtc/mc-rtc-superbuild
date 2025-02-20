@@ -14,10 +14,9 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean
 # Install sudo
 RUN  --mount=type=cache,target=/var/cache/apt \
   apt-get update \
- && apt-get install -y --no-install-recommends sudo ccache ripgrep \
+ && apt-get install -y --no-install-recommends sudo ccache ripgrep bash-completion \
  && rm -rf /var/lib/apt/lists/*
 
-RUN echo "Ubuntu?" && ls /home
 # Create ubuntu user with sudo privileges
 RUN useradd -ms /bin/bash vscode && \
     usermod -aG sudo vscode \
