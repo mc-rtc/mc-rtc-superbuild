@@ -29,6 +29,7 @@ USER vscode
 # Explicitely set ccache directory
 # This ensures that ccache will always look here even if tools change the default cache location with XDG_CACHE_HOME (e.g nvim-remote)
 ENV CCACHE_DIR=/home/vscode/.cache/ccache
+ENV CYTHON_CACHE_DIR=/home/vscode/.cache/.cython
 
 RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/ccache \
   if [ "$(ls -A ~/.cache/ccache)" ]; then \
@@ -101,7 +102,7 @@ RUN echo "Checking cache contents" \
   && ls /home/vscode/.cython
 
 # Make GPG ask for password in the terminal
-RUN echo 'export GPG_TTY=$(tty)' >> /home/vscode/.bashrc
+RUN echo 'source $HOME/workspace/mc-rtc-superbuild/.devcontainer/entrypoint.sh' >> /home/vscode/.bashrc
 
 FROM ubuntu:22.04
 COPY --from=build / /
