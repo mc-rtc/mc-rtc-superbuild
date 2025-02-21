@@ -26,7 +26,7 @@ if(WITH_UR10 OR WITH_UR5E)
   else() # ROS1
     AddCatkinProject(ur_description
       GITHUB ros-industrial/universal_robot
-      GIT_TAG melodic-devel/ur_description
+      GIT_TAG noetic-devel/ur_description
       WORKSPACE data_ws
     )
   endif()
