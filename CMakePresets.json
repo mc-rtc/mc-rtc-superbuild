@@ -1,64 +1,54 @@
 {
-  "version": 10,
-  "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
-
-  "configurePresets": [
-    {
-      "name": "relwithdebinfo-jammy",
-      "displayName": "RelWithDebInfo (jammy)",
-      "generator": "Unix Makefiles",
-      "binaryDir": "build/superbuild/relwithdebinfo-jammy",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "SOURCE_DESTINATION": "devel/jammy",
-        "BUILD_DESTINATION": "build/projects/relwithdebinfo-jammy",
-        "CMAKE_INSTALL_PREFIX": "install/relwithdebinfo-jammy",
-        "CMAKE_CXX_COMPILER_LAUNCHER": "ccache"
-      },
-      "condition":
-      {
-        "type": "equals",
-        "lhs": "$env{UBUNTU_VERSION}",
-        "rhs": "jammy"
-      },
-      "graphviz": "build/superbuild/relwithdebinfo-jammy/graphviz.dot"
-    },
-    {
-      "name": "relwithdebinfo-jammy-notests",
-      "displayName": "RelWithDebInfo (jammy, no tests)",
-      "generator": "Unix Makefiles",
-      "binaryDir": "build/superbuild/relwithdebinfo-jammy",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "SOURCE_DESTINATION": "devel/jammy",
-        "BUILD_DESTINATION": "build/projects/relwithdebinfo-jammy",
-        "CMAKE_INSTALL_PREFIX": "install/relwithdebinfo-jammy",
-        "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
-        "BUILD_TESTING": "OFF"
-      },
-      "condition":
-      {
-        "type": "equals",
-        "lhs": "$env{UBUNTU_VERSION}",
-        "rhs": "jammy"
-      },
-      "graphviz": "build/superbuild/relwithdebinfo-jammy/graphviz.dot"
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "relwithdebinfo-jammy",
-      "displayName": "RelWithDebInfo (jammy)",
-      "configurePreset": "relwithdebinfo-jammy",
-      "configuration": "RelWithDebInfo",
-      "targets": ["all"]
-    },
-    {
-      "name": "relwithdebinfo-jammy-notests",
-      "displayName": "RelWithDebInfo (jammy, no tests)",
-      "configurePreset": "relwithdebinfo-jammy-notests",
-      "configuration": "RelWithDebInfo",
-      "targets": ["all"]
-    }
-  ]
+    "version": 10,
+    "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
+    "configurePresets": [
+        {
+            "name": "relwithdebinfo-jammy",
+            "displayName": "RelWithDebInfo (jammy)",
+            "generator": "Unix Makefiles",
+            "binaryDir": "build/superbuild/relwithdebinfo-jammy",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "SOURCE_DESTINATION": "devel/jammy",
+                "BUILD_DESTINATION": "build/projects/relwithdebinfo-jammy",
+                "CMAKE_INSTALL_PREFIX": "install/relwithdebinfo-jammy",
+                "CMAKE_CXX_COMPILER_LAUNCHER": "ccache"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "$env{UBUNTU_VERSION}",
+                "rhs": "jammy"
+            }
+        },
+        {
+            "name": "relwithdebinfo-jammy-notests",
+            "displayName": "RelWithDebInfo (jammy, no tests)",
+            "inherits": [
+                "relwithdebinfo-jammy"
+            ],
+            "cacheVariables": {
+                "BUILD_TESTING": "OFF"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "relwithdebinfo-jammy",
+            "displayName": "RelWithDebInfo (jammy)",
+            "configurePreset": "relwithdebinfo-jammy",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "all"
+            ]
+        },
+        {
+            "name": "relwithdebinfo-jammy-notests",
+            "displayName": "RelWithDebInfo (jammy, no tests)",
+            "configurePreset": "relwithdebinfo-jammy-notests",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "all"
+            ]
+        }
+    ]
 }
