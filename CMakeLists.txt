@@ -55,7 +55,6 @@ if (CCACHE_PROGRAM)
       # Define a compiler launcher for cython
       # This is not supported by default, in our tools we will need to explicitely use it in cython's setup.py
       set(CYTHON_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
-      set(CYTHON_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
     endif()
 endif ()
 
