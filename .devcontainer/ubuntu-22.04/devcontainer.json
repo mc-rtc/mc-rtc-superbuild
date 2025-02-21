@@ -19,8 +19,8 @@
   "runArgs": ["--network=host"],
 
   "containerEnv": {
-    "UBUNTU_VERSION": "jammy"
-    "DISPLAY": "${localEnv:DISPLAY}",
+    "UBUNTU_VERSION": "jammy",
+    "DISPLAY": "${localEnv:DISPLAY}"
   },
 
   "remoteUser": "vscode",
