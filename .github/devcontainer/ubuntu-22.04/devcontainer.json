@@ -1,0 +1,48 @@
+{
+  "name": "mc-rtc-superbuild-jammy-build",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "../../.."
+  },
+
+  "containerEnv": {
+    "UBUNTU_VERSION": "jammy",
+    "DISPLAY": "${localEnv:DISPLAY}",
+  },
+
+  "mounts": [
+    "type=bind,source=/home/${localEnv:USER}/.ssh,target=/home/vscode/.ssh,readonly",
+    "type=bind,source=/home/${localEnv:USER}/.gnupg,target=/home/vscode/.gnupg",
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
+  ],
+
+  "features":
+  {
+    "ghcr.io/duduribeiro/devcontainer-features/neovim:1.0.1": {},
+    "ghcr.io/devcontainers/features/github-cli": { "version": "latest" },
+    "ghcr.io/georgofenbeck/features/lazygit-linuxbinary:1": { "version": "latest" }
+  },
+
+  // Configure tool-specific properties.
+  "customizations": {
+      "vscode": {
+          "extensions": [
+            "twxs.cmake",
+            "ms-vscode.cmake-tools",
+            "josetr.cmake-language-support-vscode",
+            "ms-vscode.cpptools",
+            "ms-vscode.docker",
+            "ms-vscode.cpptools-extension-pack",
+            "ms-vscode-remote.remote-containers",
+            "ms-python.python",
+            "GitHub.vscode-github-actions"
+          ]
+      }
+  },
+
+  "runArgs": ["--network=host"],
+
+  "remoteUser": "vscode",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/workspace/mc-rtc-superbuild,type=bind",
+  "workspaceFolder": "/home/vscode/workspace/mc-rtc-superbuild"
+}
