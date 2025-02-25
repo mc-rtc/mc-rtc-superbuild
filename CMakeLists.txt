@@ -183,8 +183,8 @@ This has already been set in your environment. Please open a new shell for the c
 endif()
 
 message("${FINAL_MESSAGE}")
-file(GENERATE OUTPUT ${CMAKE_BINARY_DIR}/setup_mc_rtc.sh
-  CONTENT ${FINAL_COMMAND})
+
+configure_file(cmake/setup_mc_rtc.in.sh ${CMAKE_BINARY_DIR}/setup_mc_rtc.sh @ONLY)
 
 install(FILES ${CMAKE_BINARY_DIR}/setup_mc_rtc.sh
   DESTINATION ${CMAKE_INSTALL_PREFIX})
@@ -196,4 +196,3 @@ install(CODE "message(\"** Installation done **\")")
 install(CODE "message(\"=======================\")")
 install(CODE "message(\"\")")
 install(CODE "message(\"${FINAL_MESSAGE}\")")
-
