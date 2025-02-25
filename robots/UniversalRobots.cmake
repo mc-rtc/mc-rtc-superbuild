@@ -1,20 +1,34 @@
-option(WITH_MC_RTDE "Build mc_rtde control interface for UR5E and UR10 support" OFF)
+option(WITH_MC_RTDE "Build mc_rtde control interface for UR5E and UR10 support (>=CB3)" OFF)
 option(WITH_UR5E "Build UR5E support" OFF)
 option(WITH_UR10 "Build UR10 support" OFF)
 
+function(AddAptRepository PPA)
+  execute_process(COMMAND bash -c "${SUDO_CMD} add-apt-repository ${PPA} -y && ${SUDO_CMD} apt-get update" RESULT_VARIABLE BASH_FAILED)
+  if(BASH_FAILED)
+    message(FATAL_ERROR "Failed to add ${PPA} mirror")
+  endif()
+endfunction()
+
 if(WITH_MC_RTDE)
-  AddGitSource(GITLAB_SDUROBOTICS git@gitlab.com:sdurobotics:)
-  AddProject(ur_rtde
-    GITLAB_SDUROBOTICS ur_rtde
-    GIT_TAG origin/v1.6.0
+  AptInstall(libcap2-bin) # For setcap
+
+  # For CB>=3 support
+  AddAptRepository("ppa:sdurobotics/ur-rtde")
+  AptInstall(librtde librtde-dev)
+
+  # For CB<=2 support
+  AddProject(ur_modern_driver
+    GITHUB jrl-umi3218/ur_modern_driver
+    GIT_TAG origin/main
   )
 
   AddProject(mc_rtde
     GITHUB isri-aist/mc_rtde 
-    GIT_TAG origin/main
-    DEPENDS mc_rtc ur_rtde 
+    GIT_TAG origin/topic/RealTimeControl
+    DEPENDS mc_rtc ur_modern_driver 
   )
 endif()
+
 
 if(WITH_UR10 OR WITH_UR5E)
   if(ROS_IS_ROS2)
