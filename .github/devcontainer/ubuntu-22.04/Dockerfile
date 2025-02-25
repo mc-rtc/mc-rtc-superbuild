@@ -14,7 +14,7 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean
 # Install sudo
 RUN  --mount=type=cache,target=/var/cache/apt \
   apt-get update \
- && apt-get install -y --no-install-recommends sudo ccache ripgrep bash-completion \
+ && apt-get install -y --no-install-recommends sudo ccache ripgrep bash-completion rsync curl wget \
  && rm -rf /var/lib/apt/lists/*
 
 # Create ubuntu user with sudo privileges
@@ -29,7 +29,7 @@ USER vscode
 # Explicitely set ccache directory
 # This ensures that ccache will always look here even if tools change the default cache location with XDG_CACHE_HOME (e.g nvim-remote)
 ENV CCACHE_DIR=/home/vscode/.cache/ccache
-ENV CYTHON_CACHE_DIR=/home/vscode/.cache/.cython
+ENV CYTHON_CACHE_DIR=/home/vscode/.cython
 
 RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/ccache \
   if [ "$(ls -A ~/.cache/ccache)" ]; then \
