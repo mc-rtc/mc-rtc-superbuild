@@ -1,7 +1,11 @@
 option(WITH_Panda "Build Franka Emika Panda support" OFF)
 option(WITH_PandaLIRMM "Build Panda support for LIRMM robots" OFF)
+option(WITH_MC_FRANKA "Build mc_franka control interface" OFF)
+
 if(WITH_PandaLIRMM AND NOT WITH_Panda)
-  message(FATAL_ERROR "Panda LIRMM support requires Panda support")
+  # PandaLIRMM module depends on Panda module
+  # If PandaLIRMM is explicitely selected, install both.
+  SET(WITH_Panda ON CACHE BOOL "" FORCE)
 endif()
 
 set(Panda_DEPENDENCIES_FROM_SOURCE_DEFAULT ON)
@@ -36,16 +40,20 @@ else()
   AptInstall(ros-${ROS_DISTRO}-libfranka ros-${ROS_DISTRO}-franka-description)
 endif()
 
+if(WITH_MC_FRANKA)
+  AptInstall(libcap2-bin) # for setcap
+  AddProject(mc_franka
+    GITHUB jrl-umi3218/mc_franka
+    GIT_TAG origin/master
+    DEPENDS mc_rtc mc_panda
+  )
+endif()
+
+
 AddProject(mc_panda
   GITHUB jrl-umi3218/mc_panda
   GIT_TAG origin/master
   DEPENDS mc_rtc ${mc_panda_DEPENDS}
-)
-
-AddProject(mc_franka
-  GITHUB jrl-umi3218/mc_franka
-  GIT_TAG origin/master
-  DEPENDS mc_rtc mc_panda
 )
 
 if(WITH_PandaLIRMM)
