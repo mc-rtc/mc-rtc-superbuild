@@ -12,7 +12,8 @@ echo ""
 
 # Makes GNUPG ask for password in the terminal
 export GPG_TTY=$(tty)
-# Ensure cache paths are the same as during docker build
-# See https://github.com/amitds1997/remote-nvim.nvim/issues/196 
-export CCACHE_DIR=$HOME/.cache/.ccache
-export CYTHON_CACHE_DIR=$HOME/.cache/.cython
+export CYTHON_CACHE_DIR=$HOME/.cython
+# Copy cache from the image to the local repository
+# This ensures that cache is kept between successive container runs
+rsync -av ~/.cache/ccache/ ~/workspace/mc-rtc-superbuild/.ccache --exclude=**.tmp.* --ignore-existing
+export CCACHE_DIR=$HOME/workspace/mc-rtc-superbuild/.ccache
