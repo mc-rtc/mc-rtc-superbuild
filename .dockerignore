@@ -1,6 +1,6 @@
 build/
 devel/
-install/
+.ccache/
 .devcontainer/
 .git/
 .gitignore/
