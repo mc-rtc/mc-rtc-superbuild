@@ -3,28 +3,23 @@
     "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
     "configurePresets": [
         {
-            "name": "relwithdebinfo-jammy",
-            "displayName": "RelWithDebInfo (jammy)",
+            "name": "relwithdebinfo",
+            "displayName": "RelWithDebInfo",
             "generator": "Unix Makefiles",
-            "binaryDir": "build/superbuild/relwithdebinfo-jammy",
+            "binaryDir": "build/relwithdebinfo/superbuild",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-                "SOURCE_DESTINATION": "devel/jammy",
-                "BUILD_DESTINATION": "build/projects/relwithdebinfo-jammy",
-                "CMAKE_INSTALL_PREFIX": "install/relwithdebinfo-jammy",
+                "SOURCE_DESTINATION": "devel",
+                "BUILD_DESTINATION": "build/relwithdebinfo/projects",
+                "CMAKE_INSTALL_PREFIX": "install/relwithdebinfo",
                 "CMAKE_CXX_COMPILER_LAUNCHER": "ccache"
-            },
-            "condition": {
-                "type": "equals",
-                "lhs": "$env{UBUNTU_VERSION}",
-                "rhs": "jammy"
             }
         },
         {
-            "name": "relwithdebinfo-jammy-notests",
-            "displayName": "RelWithDebInfo (jammy, no tests)",
+            "name": "relwithdebinfo-notests",
+            "displayName": "RelWithDebInfo (no tests)",
             "inherits": [
-                "relwithdebinfo-jammy"
+                "relwithdebinfo"
             ],
             "cacheVariables": {
                 "BUILD_TESTING": "OFF"
@@ -33,18 +28,18 @@
     ],
     "buildPresets": [
         {
-            "name": "relwithdebinfo-jammy",
-            "displayName": "RelWithDebInfo (jammy)",
-            "configurePreset": "relwithdebinfo-jammy",
+            "name": "relwithdebinfo",
+            "displayName": "RelWithDebInfo",
+            "configurePreset": "relwithdebinfo",
             "configuration": "RelWithDebInfo",
             "targets": [
                 "all"
             ]
         },
         {
-            "name": "relwithdebinfo-jammy-notests",
-            "displayName": "RelWithDebInfo (jammy, no tests)",
-            "configurePreset": "relwithdebinfo-jammy-notests",
+            "name": "relwithdebinfo-notests",
+            "displayName": "RelWithDebInfo (no tests)",
+            "configurePreset": "relwithdebinfo-notests",
             "configuration": "RelWithDebInfo",
             "targets": [
                 "all"

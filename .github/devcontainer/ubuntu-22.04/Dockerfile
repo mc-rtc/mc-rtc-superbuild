@@ -1,8 +1,6 @@
 FROM ubuntu:jammy as build
 ARG EMAIL="devcontainer@mc-rtc-superbuild.com"
 ARG NAME="mc_rtc devcontainer"
-ARG UBUNTU_VERSION="jammy"
-ARG BUILD_IN_DOCKER=true
 
 RUN export DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris
@@ -53,8 +51,8 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cython \
 # Note that in theory this could be copied into a separate directory as the runtime workspace
 # However due to generated config headers containing install source paths for mc_rtc
 # It is better to keep it in the same folder in order to increase ccache hit rate
-COPY --chown=vscode:vscode ../../.. /home/vscode/workspace/mc-rtc-superbuild
-WORKDIR /home/vscode/workspace/mc-rtc-superbuild
+COPY --chown=vscode:vscode ../../.. /home/vscode/superbuild
+WORKDIR /home/vscode/superbuild
 
 RUN --mount=type=cache,target=/var/cache/apt \
   ./utils/bootstrap-linux.sh \
@@ -71,10 +69,10 @@ RUN --mount=type=cache,target=/var/cache/apt \
   --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/ccache \
   --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cython \
   ccache -z \
-  && cmake --preset relwithdebinfo-jammy -DINSTALL_DOCUMENTATION=OFF \
-  && cmake --build --preset relwithdebinfo-jammy \
+  && cmake --preset relwithdebinfo \
+  && cmake --build --preset relwithdebinfo \
   && echo "Removing temporary build artefacts from the image" \
-  && rm -rf /home/vscode/workspace/mc-rtc-superbuild \
+  && rm -rf /home/vscode/superbuild \
   && ccache -sv \
   && sudo rm -rf /var/lib/apt/lists/*
 
@@ -102,7 +100,7 @@ RUN echo "Checking cache contents" \
   && ls /home/vscode/.cython
 
 # Make GPG ask for password in the terminal
-RUN echo 'source $HOME/workspace/mc-rtc-superbuild/.devcontainer/entrypoint.sh' >> /home/vscode/.bashrc
+RUN echo 'source $HOME/superbuild/.devcontainer/entrypoint.sh' >> /home/vscode/.bashrc
 
 FROM ubuntu:22.04
 COPY --from=build / /
