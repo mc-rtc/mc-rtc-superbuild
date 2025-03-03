@@ -6,12 +6,12 @@
             "name": "relwithdebinfo",
             "displayName": "RelWithDebInfo",
             "generator": "Unix Makefiles",
-            "binaryDir": "build/relwithdebinfo/superbuild",
+            "binaryDir": "${sourceDir}/build/relwithdebinfo/superbuild",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-                "SOURCE_DESTINATION": "devel",
-                "BUILD_DESTINATION": "build/relwithdebinfo/projects",
-                "CMAKE_INSTALL_PREFIX": "install/relwithdebinfo",
+                "SOURCE_DESTINATION": "${sourceDir}/devel",
+                "BUILD_DESTINATION": "${sourceDir}/build/relwithdebinfo/projects",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/install/relwithdebinfo",
                 "CMAKE_CXX_COMPILER_LAUNCHER": "ccache"
             }
         },
