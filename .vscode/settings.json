@@ -1,4 +1,5 @@
 {
     "cmake.allowCommentsInPresetsFile": true,
-    "cmake.allowUnsupportedPresetsVersions": true
+    "cmake.allowUnsupportedPresetsVersions": true,
+    "cmake.buildDirectory": "${workspaceFolder}",
 }
