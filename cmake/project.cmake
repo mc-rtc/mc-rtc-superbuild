@@ -161,7 +161,7 @@ This is likely a conflict between different extensions.")
         NOT "${PREVIOUS_GIT_TAG}" STREQUAL "${GIT_TAG}")
       # GIT_REPOSITORY and/or GIT_TAG have changed, we check if there was any local changes
       if(EXISTS "${SOURCE_DIR}/.git")
-        execute_process(COMMAND git diff-index --quiet ${PREVIOUS_GIT_TAG} --
+        execute_process(COMMAND git diff-index --quiet HEAD --
           WORKING_DIRECTORY "${SOURCE_DIR}"
           RESULT_VARIABLE GIT_HAS_ANY_CHANGES)
         if(GIT_HAS_ANY_CHANGES)
