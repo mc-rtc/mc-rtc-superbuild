@@ -1,0 +1,29 @@
+{
+    "version": 10,
+    "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
+    "configurePresets": [
+        {
+            "name": "hugo-notests",
+            "displayName": "Hugo RelWithDebInfo (no tests)",
+            "inherits": [
+                "relwithdebinfo-notests"
+            ],
+            "cacheVariables": {
+                "BUILD_TESTING": "OFF",
+                "WITH_RHPS1": "ON",
+                "WITH_HRP4": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "hugo-notests",
+            "displayName": "Hugo RelWithDebInfo (no tests)",
+            "configurePreset": "hugo-notests",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "all"
+            ]
+        }
+    ]
+}
