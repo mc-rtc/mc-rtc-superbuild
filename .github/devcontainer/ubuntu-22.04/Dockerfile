@@ -12,7 +12,7 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean
 # Install sudo
 RUN  --mount=type=cache,target=/var/cache/apt \
   apt-get update \
- && apt-get install -y --no-install-recommends sudo ccache ripgrep bash-completion rsync curl wget \
+ && apt-get install -y --no-install-recommends sudo ccache ripgrep bash-completion rsync curl wget zsh \
  && rm -rf /var/lib/apt/lists/*
 
 # Create ubuntu user with sudo privileges
@@ -99,13 +99,17 @@ RUN echo "Checking cache contents" \
   && ls /home/vscode/.cache/ccache \
   && ls /home/vscode/.cython
 
-# Make GPG ask for password in the terminal
-RUN echo 'source $HOME/superbuild/.devcontainer/entrypoint.sh' >> /home/vscode/.bashrc
+# oh-my-zsh & plugins
+# -p ssh-agent \
+RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
+    -t 'bira' \
+    -p git \
+    sudo chsh -s /usr/bin/zsh vscode
 
 FROM ubuntu:22.04
 COPY --from=build / /
 LABEL org.opencontainers.image.source=https://github.com/mc-rtc/mc-rtc-superbuild
 LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild from source"
 LABEL org.opencontainers.image.licenses=BSD-2
-ENTRYPOINT ["/bin/bash", "-c"]
+ENTRYPOINT ["/usr/bin/zsh", "-c"]
 
