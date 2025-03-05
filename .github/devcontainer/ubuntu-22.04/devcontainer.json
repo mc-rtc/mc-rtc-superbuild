@@ -1,13 +1,14 @@
 {
   "name": "mc-rtc-superbuild-jammy-build",
+  "remoteUser": "vscode",
+
   "build": {
     "dockerfile": "Dockerfile",
     "context": "../../.."
   },
 
   "containerEnv": {
-    "UBUNTU_VERSION": "jammy",
-    "DISPLAY": "${localEnv:DISPLAY}",
+    "DISPLAY": "${localEnv:DISPLAY}"
   },
 
   "mounts": [
@@ -40,12 +41,12 @@
       }
   },
 
+  "onCreateCommand": "sudo chsh -s /usr/bin/zsh $USER",
   "runArgs": [
     "--network=host",
     "--cap-add=sys_nice" // Grants the container the CAP_SYS_NICE capability, which allows the container to raise process nice values, set real-time scheduling policies, set CPU affinity, and other operations.
   ],
 
-  "remoteUser": "vscode",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/superbuild,type=bind",
   "workspaceFolder": "/home/vscode/superbuild"
 }
