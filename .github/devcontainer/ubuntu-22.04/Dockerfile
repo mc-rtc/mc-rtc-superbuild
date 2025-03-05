@@ -73,6 +73,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
   && cmake --build --preset relwithdebinfo \
   && echo "Removing temporary build artefacts from the image" \
   && rm -rf /home/vscode/superbuild \
+  && rm /home/vscode/.gitconfig \
   && ccache -sv \
   && sudo rm -rf /var/lib/apt/lists/*
 
@@ -100,11 +101,11 @@ RUN echo "Checking cache contents" \
   && ls /home/vscode/.cython
 
 # oh-my-zsh & plugins
-# -p ssh-agent \
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
     -t 'bira' \
     -p git \
-    sudo chsh -s /usr/bin/zsh vscode
+    && echo 'source $HOME/superbuild/.devcontainer/entrypoint.sh' >> /home/vscode/.zshrc \
+    && sudo chsh -s /usr/bin/zsh vscode
 
 FROM ubuntu:22.04
 COPY --from=build / /
