@@ -1,6 +1,5 @@
 {
-  "name": "mc-rtc-superbuild-jammy-build",
-  "remoteUser": "vscode",
+  "name": "mc-rtc-superbuild-noble-build",
 
   "build": {
     "dockerfile": "Dockerfile",
@@ -12,9 +11,9 @@
   },
 
   "mounts": [
-    "type=bind,source=/home/${localEnv:USER}/.ssh,target=/home/vscode/.ssh,readonly",
-    "type=bind,source=/home/${localEnv:USER}/.gnupg,target=/home/vscode/.gnupg",
-    "type=bind,source=/home/${localEnv:USER}/.gitconfig,target=/home/vscode/.gitconfig",
+    // "type=bind,source=/home/${localEnv:USER}/.ssh,target=/home/vscode/.ssh,readonly",
+    // "type=bind,source=/home/${localEnv:USER}/.gnupg,target=/home/vscode/.gnupg",
+    // "type=bind,source=/home/${localEnv:USER}/.gitconfig,target=/home/vscode/.gitconfig",
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
   ],
 
@@ -45,13 +44,14 @@
   "onCreateCommand": "sudo chsh -s /usr/bin/zsh $USER",
   "runArgs": [
     "--network=host",
-    "--cap-add=sys_nice", // Grants the container the CAP_SYS_NICE capability, which allows the container to raise process nice values, set real-time scheduling policies, set CPU affinity, and other operations.
-    "-v",
-    "${env:SSH_AUTH_SOCK}:/tmp/ssh-agent.socket",
-    "-e",
-    "SSH_AUTH_SOCK=/tmp/ssh-agent.socket"
+    "--cap-add=sys_nice" // Grants the container the CAP_SYS_NICE capability, which allows the container to raise process nice values, set real-time scheduling policies, set CPU affinity, and other operations.
+    // "-v",
+    // "${env:SSH_AUTH_SOCK}:/tmp/ssh-agent.socket",
+    // "-e",
+    // "SSH_AUTH_SOCK=/tmp/ssh-agent.socket"
   ],
 
+  "remoteUser": "vscode",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/superbuild,type=bind",
   "workspaceFolder": "/home/vscode/superbuild"
 }
