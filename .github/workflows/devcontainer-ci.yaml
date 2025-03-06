@@ -13,7 +13,11 @@ on:
 
 jobs:
   run:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [jammy, noble]
     steps:
     - name: Maximize build space
       shell: bash
@@ -39,8 +43,8 @@ jobs:
         # Not supported to be pushed to from forks
         #imageName: ghcr.io/mc-rtc/mc-rtc-superbuild
         imageName: ghcr.io/arntanguy/mc-rtc-superbuild
-        imageTag: jammy
-        subFolder: .github/devcontainer/ubuntu-22.04
-        configFile: .github/devcontainer/ubuntu-22.04/devcontainer.json
+        imageTag: ${{ matrix.os }}
+        subFolder: .github/devcontainer/${{ matrix.os }}
+        configFile: .github/devcontainer/${{ matrix.os }}/devcontainer.json
         cacheFrom: ghcr.io/arntanguy/mc-rtc-superbuild
         push: always
