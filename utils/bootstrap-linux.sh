@@ -20,6 +20,10 @@ fi
 
 ${SUDO} apt-get update
 ${SUDO} apt-get install -y --no-install-recommends wget apt-transport-https software-properties-common gnupg lsb-release build-essential gfortran curl git sudo cmake cmake-curses-gui python3-pip
+if [[ `lsb_release -cs` == "noble" ]]
+then
+  ${SUDO} apt-get install -y --no-install-recommends pipx
+fi
 
 if [[ `lsb_release -si` == "Ubuntu" ]]
 then
@@ -37,5 +41,10 @@ fi
 
 if [[ ! -f $HOME/.local/bin/pre-commit ]]
 then
-  /usr/bin/python3 -m pip install --user pre-commit
+  if [[ `lsb_release -cs` == "noble" ]]
+  then
+    pipx install pre-commit
+  else
+    /usr/bin/python3 -m pip install --user pre-commit
+  fi
 fi
