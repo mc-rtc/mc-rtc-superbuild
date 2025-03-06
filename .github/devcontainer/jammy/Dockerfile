@@ -16,7 +16,7 @@ RUN  --mount=type=cache,target=/var/cache/apt \
  && rm -rf /var/lib/apt/lists/*
 
 # Create ubuntu user with sudo privileges
-RUN useradd -ms /bin/bash vscode && \
+RUN useradd -ms /bin/zsh vscode && \
     usermod -aG sudo vscode \
     # New added for disable sudo password
     && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
@@ -104,8 +104,7 @@ RUN echo "Checking cache contents" \
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
     -t 'bira' \
     -p git \
-    && echo 'source $HOME/superbuild/.devcontainer/entrypoint.sh' >> /home/vscode/.zshrc \
-    && sudo chsh -s /usr/bin/zsh vscode
+    && echo 'source $HOME/superbuild/.devcontainer/entrypoint.sh' >> /home/vscode/.zshrc
 
 FROM ubuntu:22.04
 COPY --from=build / /
