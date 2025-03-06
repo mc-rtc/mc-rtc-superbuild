@@ -11,7 +11,7 @@
   "image": "ghcr.io/arntanguy/mc-rtc-superbuild:noble",
 
   "mounts": [
-    "type=bind,source=/home/${localEnv:USER}/.ssh,target=/home/vscode/.ssh,readonly",
+    "type=bind,source=/home/${localEnv:USER}/.ssh,target=/home/vscode/.ssh",
     "type=bind,source=/home/${localEnv:USER}/.gnupg,target=/home/vscode/.gnupg",
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
   ],
