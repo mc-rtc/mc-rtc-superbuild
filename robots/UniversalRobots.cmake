@@ -1,4 +1,5 @@
 option(WITH_MC_RTDE "Build mc_rtde control interface for UR5E and UR10 support (>=CB3)" OFF)
+option(WITH_UR3E "Build UR5E support" OFF)
 option(WITH_UR5E "Build UR5E support" OFF)
 option(WITH_UR10 "Build UR10 support" OFF)
 
@@ -30,7 +31,7 @@ if(WITH_MC_RTDE)
 endif()
 
 
-if(WITH_UR10 OR WITH_UR5E)
+if(WITH_UR10 OR WITH_UR5E OR WITH_UR3E)
   if(ROS_IS_ROS2)
     AddCatkinProject(ur_description
       GITHUB UniversalRobots/Universal_Robots_ROS2_Description
@@ -74,3 +75,16 @@ if(WITH_UR5E)
   )
 endif()
 
+if(WITH_UR3E)
+  AddCatkinProject(mc_ur3e_description
+    GITHUB isri-aist/mc_ur3e_description
+    GIT_TAG origin/main
+    DEPENDS ur_description
+    WORKSPACE data_ws
+  )
+  AddProject(mc_ur3e
+    GITHUB isri-aist/mc_ur3e
+    GIT_TAG origin/master
+    DEPENDS mc_ur3e_description mc_rtc
+  )
+endif()
