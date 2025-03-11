@@ -12,7 +12,6 @@
   },
 
   "mounts": [
-    "type=bind,source=/home/${localEnv:USER}/.gitconfig,target=/home/vscode/.gitconfig",
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
   ],
 
