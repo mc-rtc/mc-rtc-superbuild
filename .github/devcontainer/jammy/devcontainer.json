@@ -22,6 +22,8 @@
     "ghcr.io/georgofenbeck/features/lazygit-linuxbinary:1": { "version": "latest" }
   },
 
+  "postCreateCommand": "~/superbuild/.devcontainer/setupShell.sh",
+
   // Configure tool-specific properties.
   "customizations": {
       "vscode": {
