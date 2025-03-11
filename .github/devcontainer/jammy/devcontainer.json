@@ -15,7 +15,8 @@
     // "type=bind,source=/home/${localEnv:USER}/.ssh,target=/home/vscode/.ssh,readonly",
     // "type=bind,source=/home/${localEnv:USER}/.gnupg,target=/home/vscode/.gnupg",
     "type=bind,source=/home/${localEnv:USER}/.gitconfig,target=/home/vscode/.gitconfig",
-    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
+    "type=bind,source=/home/${localEnv:USER}/.Xauthority,target=/home/vscode/.Xauthority",
   ],
 
   "features":

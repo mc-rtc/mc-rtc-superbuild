@@ -1,5 +1,5 @@
 {
-  "name": "mc-rtc-superbuild-jammy",
+  "name": "mc-rtc-superbuild-jammy-image",
 
   // See .github/devcontainer/ubuntu-22.04/devcontainer.json to see how this image was built
   // This image contains:
@@ -11,10 +11,11 @@
   "image": "ghcr.io/arntanguy/mc-rtc-superbuild:jammy",
 
   "mounts": [
-    // "type=bind,source=/home/${localEnv:USER}/.ssh,target=/home/vscode/.ssh,readonly",
-    // "type=bind,source=/home/${localEnv:USER}/.gnupg,target=/home/vscode/.gnupg",
+    "type=bind,source=/home/${localEnv:USER}/.ssh,target=/home/vscode/.ssh,readonly",
+    "type=bind,source=/home/${localEnv:USER}/.gnupg,target=/home/vscode/.gnupg",
     "type=bind,source=/home/${localEnv:USER}/.gitconfig,target=/home/vscode/.gitconfig",
-    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
+    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached",
+    "type=bind,source=/home/${localEnv:USER}/.Xauthority,target=/home/vscode/.Xauthority",
   ],
 
   "features":
@@ -52,6 +53,6 @@
   },
 
   "remoteUser": "vscode",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/workspace/mc-rtc-superbuild,type=bind",
-  "workspaceFolder": "/home/vscode/workspace/mc-rtc-superbuild"
+  "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/superbuild,type=bind",
+  "workspaceFolder": "/home/vscode/superbuild"
 }
