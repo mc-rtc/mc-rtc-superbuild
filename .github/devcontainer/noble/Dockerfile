@@ -58,7 +58,7 @@ WORKDIR /home/vscode/superbuild
 RUN --mount=type=cache,target=/var/cache/apt \
   sudo chown -R vscode ~/.cache \
   && ./utils/bootstrap-linux.sh \
-  && sudo apt-get install -y --no-install-recommends ccache \
+  && sudo apt-get install -y --no-install-recommends ccache gdb \
   && git config --global user.email "${EMAIL}" && git config --global user.name "${NAME}" \
   && sudo rm -rf /var/lib/apt/lists/*
 
