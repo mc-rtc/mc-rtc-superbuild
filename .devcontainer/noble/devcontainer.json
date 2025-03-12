@@ -1,0 +1,53 @@
+{
+  "name": "mc-rtc-superbuild-noble-image",
+
+  // See .github/devcontainer/ubuntu-22.04/devcontainer.json to see how this image was built
+  // This image contains:
+  // - All of mc-rtc-superbuild dependencies
+  // - A ccache build cache built from the latest sources
+  // - A cython build cache built from the latest sources
+  // - All tools required to build the project
+  // - A sensible default configuration for vscode
+  "image": "ghcr.io/arntanguy/mc-rtc-superbuild:noble",
+
+  "mounts": [
+    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached"
+  ],
+
+  "features":
+  {
+    // "ghcr.io/duduribeiro/devcontainer-features/neovim:1.0.1": {},
+    "ghcr.io/devcontainers/features/github-cli": { "version": "latest" },
+    "ghcr.io/georgofenbeck/features/lazygit-linuxbinary:1": { "version": "latest" }
+  },
+
+  // Configure tool-specific properties.
+  "customizations": {
+      "vscode": {
+          "extensions": [
+            "twxs.cmake",
+            "ms-vscode.cmake-tools",
+            "josetr.cmake-language-support-vscode",
+            "ms-vscode.cpptools",
+            "ms-vscode.docker",
+            "ms-vscode.cpptools-extension-pack",
+            "ms-vscode-remote.remote-containers",
+            "ms-python.python",
+            "GitHub.vscode-github-actions"
+          ]
+      }
+  },
+
+  "runArgs": [
+    "--network=host",
+    "--cap-add=sys_nice" // Grants the container the CAP_SYS_NICE capability, which allows the container to raise process nice values, set real-time scheduling policies, set CPU affinity, and other operations.
+  ],
+
+  "containerEnv": {
+    "DISPLAY": "${localEnv:DISPLAY}"
+  },
+
+  "remoteUser": "vscode",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/superbuild,type=bind",
+  "workspaceFolder": "/home/vscode/superbuild"
+}

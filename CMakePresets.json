@@ -1,0 +1,49 @@
+{
+    "version": 10,
+    "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
+    "configurePresets": [
+        {
+            "name": "relwithdebinfo",
+            "displayName": "RelWithDebInfo",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/relwithdebinfo/superbuild",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "SOURCE_DESTINATION": "${sourceDir}/devel",
+                "BUILD_DESTINATION": "${sourceDir}/build/relwithdebinfo/projects",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/install/relwithdebinfo",
+                "CMAKE_CXX_COMPILER_LAUNCHER": "ccache"
+            }
+        },
+        {
+            "name": "relwithdebinfo-notests",
+            "displayName": "RelWithDebInfo (no tests)",
+            "inherits": [
+                "relwithdebinfo"
+            ],
+            "cacheVariables": {
+                "BUILD_TESTING": "OFF"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "relwithdebinfo",
+            "displayName": "RelWithDebInfo",
+            "configurePreset": "relwithdebinfo",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "all"
+            ]
+        },
+        {
+            "name": "relwithdebinfo-notests",
+            "displayName": "RelWithDebInfo (no tests)",
+            "configurePreset": "relwithdebinfo-notests",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "all"
+            ]
+        }
+    ]
+}
