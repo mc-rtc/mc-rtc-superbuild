@@ -1,3 +1,4 @@
+include(CMakeDependentOption)
 include(cmake/apt.cmake)
 include(cmake/download.cmake)
 include(cmake/extensions.cmake)
@@ -8,7 +9,6 @@ include(cmake/setup-source-monitor.cmake)
 include(cmake/sources.cmake)
 include(cmake/sudo.cmake)
 
-include(CMakeDependentOption)
 include(ExternalProject)
 
 add_custom_target(clone)
@@ -306,6 +306,9 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
   # -- Build command
   if(NOT ADD_PROJECT_ARGS_BUILD_COMMAND AND NOT BUILD_COMMAND IN_LIST ADD_PROJECT_ARGS_KEYWORDS_MISSING_VALUES)
     set(BUILD_COMMAND ${COMMAND_PREFIX} ${EMMAKE} ${CMAKE_COMMAND} --build ${BINARY_DIR} --config $<CONFIG>)
+    if(LIMIT_PARALLEL_JOBS)
+      set(BUILD_COMMAND "${BUILD_COMMAND}" --parallel ${PARALLEL_COMPILE_JOBS})
+    endif()
   else()
     if("${ADD_PROJECT_ARGS_BUILD_COMMAND}" STREQUAL "")
       set(BUILD_COMMAND ${CMAKE_COMMAND} -E true)
@@ -316,6 +319,9 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
   # -- Install command
   if(NOT ADD_PROJECT_ARGS_INSTALL_COMMAND AND NOT INSTALL_COMMAND IN_LIST ADD_PROJECT_ARGS_KEYWORDS_MISSING_VALUES)
     set(INSTALL_COMMAND ${COMMAND_PREFIX} ${EMMAKE} ${CMAKE_COMMAND} --build ${BINARY_DIR} --target install --config $<CONFIG>)
+    if(LIMIT_PARALLEL_JOBS)
+      set(INSTALL_COMMAND "${BUILD_COMMAND}" --parallel ${PARALLEL_COMPILE_JOBS})
+    endif()
   else()
     if("${ADD_PROJECT_ARGS_INSTALL_COMMAND}" STREQUAL "")
       set(INSTALL_COMMAND "")

@@ -22,6 +22,8 @@ endif()
 
 option(LINK_BUILD_AND_SRC "Create symbolic links to/from build and src folders" ON)
 option(LINK_COMPILE_COMMANDS "Create a symbolic to compile_commands.json in the source folder" ON)
+option(LIMIT_PARALLEL_JOBS "Limit the number of parallel jobs" ON)
+set(PARALLEL_COMPILE_JOBS "8" CACHE STRING "Number of parallel compile jobs (used if LIMIT_PARALLEL_JOBS is ON)")
 
 #########################
 # -- Python bindings -- #
