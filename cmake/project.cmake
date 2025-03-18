@@ -350,7 +350,7 @@ You have local changes in ${SOURCE_DIR} that would be overwritten by this change
     set(VERBOSE_OPTION "")
   endif()
   if(NOT ADD_PROJECT_ARGS_SKIP_TEST AND BUILD_TESTING)
-    set(TEST_STEP_OPTIONS TEST_AFTER_INSTALL TRUE TEST_COMMAND ${COMMAND_PREFIX} ctest -C $<CONFIG> ${VERBOSE_OPTION})
+    set(TEST_STEP_OPTIONS TEST_AFTER_INSTALL TRUE TEST_COMMAND ${COMMAND_PREFIX} ctest -C $<CONFIG> ${VERBOSE_OPTION} --rerun-failed --output-on-failure)
   endif()
   # -- Depends option
   if("${ADD_PROJECT_ARGS_DEPENDS}" STREQUAL "")
