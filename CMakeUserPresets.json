@@ -13,11 +13,10 @@
                 "WITH_Panda": "ON",
                 "WITH_PandaLIRMM": "ON",
                 "WITH_UR10": "ON",
-                "WITH_MC_RTDE": "ON",
-                "WITH_UR_MODERN_DRIVER": "ON",
-                "WITH_UR_RTDE": "ON",
-                "WITH_PANDA_BRACE": "ON",
-                "Panda_DEPENDENCIES_FROM_SOURCE": "OFF"
+                "WITH_MC_RTDE": "OFF",
+                "WITH_UR_MODERN_DRIVER": "OFF",
+                "WITH_UR_RTDE": "OFF",
+                "WITH_PANDA_BRACE": "ON"
             }
         },
         {
