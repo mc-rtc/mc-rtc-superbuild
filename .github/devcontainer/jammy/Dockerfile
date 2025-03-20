@@ -12,7 +12,7 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean
 # Install sudo
 RUN  --mount=type=cache,target=/var/cache/apt \
   apt-get update \
- && apt-get install -y --no-install-recommends sudo ccache ripgrep bash-completion rsync curl wget zsh gnupg2 gpg-agent \
+ && apt-get install -y --no-install-recommends sudo ccache ripgrep bash-completion rsync curl wget zsh gnupg2 gpg-agent python3.10-venv \
  && rm -rf /var/lib/apt/lists/*
 
 # Create ubuntu user with sudo privileges
