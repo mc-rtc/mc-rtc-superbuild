@@ -30,7 +30,7 @@ then
 else
   CMAKE_VERSION="3.22.1"
   CMAKE_VERSION_FULL="${CMAKE_VERSION}-linux-$(uname -m)"
-  wget -O /tmp/cmake-${CMAKE_VERSION_FULL}.sh https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION_FULL}.sh
+  wget -O /tmp/cmake-${CMAKE_VERSION_FULL} https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION_FULL}.sh
   chmod +x /tmp/cmake-${CMAKE_VERSION_FULL}
   ${SUDO} /tmp/cmake-${CMAKE_VERSION_FULL} --skip-license --prefix=/usr --exclude-subdir
 fi
