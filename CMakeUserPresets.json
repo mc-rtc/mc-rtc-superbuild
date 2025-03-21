@@ -13,6 +13,18 @@
                 "WITH_RHPS1": "ON",
                 "WITH_HRP4": "ON"
             }
+        },
+        {
+            "name": "hugo-tests",
+            "displayName": "Hugo RelWithDebInfo (with tests)",
+            "inherits": [
+                "relwithdebinfo"
+            ],
+            "cacheVariables": {
+                "BUILD_TESTING": "ON",
+                "WITH_RHPS1": "ON",
+                "WITH_HRP4": "ON"
+            }
         }
     ],
     "buildPresets": [
@@ -22,7 +34,16 @@
             "configurePreset": "hugo-notests",
             "configuration": "RelWithDebInfo",
             "targets": [
-                "all"
+                "install"
+            ]
+        },
+        {
+            "name": "hugo-tests",
+            "displayName": "Hugo RelWithDebInfo (with tests)",
+            "configurePreset": "hugo-tests",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
             ]
         }
     ]
