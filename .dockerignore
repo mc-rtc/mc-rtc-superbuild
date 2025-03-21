@@ -1,0 +1,10 @@
+build/
+devel/
+install/
+.github/
+.ccache/
+.devcontainer/
+.vscode/
+.git/
+.gitignore/
+.dockerignore
