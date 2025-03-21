@@ -33,7 +33,12 @@ endif()
 
 if(WITH_ROS_SUPPORT AND ROS_DISTRO)
   if(DPKG)
-    if("${ROS_DISTRO}" STREQUAL "kinetic" OR "${ROS_DISTRO}" STREQUAL "melodic")
+    if(${DISTRO} STREQUAL "buster")
+      # XXX: Temporarely install catkin_tools with PIP instead of APT due to
+      # https://robotics.stackexchange.com/questions/101172/cannot-install-catkin-tools-on-debian-buster-due-to-python-version-requirement
+      # set(PYTHON_CAKTIN_TOOLS catkin_tools)
+      execute_process(COMMAND pip install --user ${PIP_DEPENDENCIES})
+    elseif("${ROS_DISTRO}" STREQUAL "kinetic" OR "${ROS_DISTRO}" STREQUAL "melodic")
       set(PYTHON_CAKTIN_TOOLS python-catkin-tools)
     elseif(NOT ROS_IS_ROS2)
       set(PYTHON_CAKTIN_TOOLS python3-catkin-tools)
