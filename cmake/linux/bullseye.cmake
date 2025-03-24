@@ -4,25 +4,19 @@ set(ROS_IS_ROS2 ON)
 set(ROS_DISTRO humble)
 set(ROS_WORKSPACE_INSTALL_PYTHON_DESTINATION "lib/python3.10/site-packages")
 set(APT_DEPENDENCIES
+  curl
   wget
   cmake
   build-essential
   gfortran
   doxygen
-  cython
   cython3
-  python-pip
-  python3-pip
-  python-nose
   python3-nose
-  python-pytest
   python3-pytest
-  python-numpy
   python3-numpy
-  python-coverage
   python3-coverage
-  python-setuptools
   python3-setuptools
+  python3-pip
   libeigen3-dev
   doxygen
   doxygen-latex
@@ -32,13 +26,14 @@ set(APT_DEPENDENCIES
   libnanomsg-dev
   libyaml-cpp-dev
   libltdl-dev
-  python-git
-  python-pyqt5
-  qt5-default
   libqwt-qt5-dev
-  python-matplotlib
+  python3-matplotlib
+  python3-pyqt5
+  libspdlog-dev
   ninja-build
+  python-is-python3
   libnotify-dev
+  python3-git
 )
 if(BUILD_BENCHMARKS)
   list(APPEND APT_DEPENDENCIES libbenchmark-dev)
