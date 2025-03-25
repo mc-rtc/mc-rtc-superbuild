@@ -83,7 +83,6 @@ function(AddProject NAME)
         message(FATAL_ERROR "Multiple sources have been specified for ${NAME}")
       endif()
       get_property(GIT_REPOSITORY GLOBAL PROPERTY MC_RTC_SUPERBUILD_SOURCES_${SOURCE})
-      set(GIT_REPOSITORY "${GIT_REPOSITORY}${ADD_PROJECT_ARGS_${SOURCE}}")
       # Override the SOURCE if set
       if(MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_${SOURCE})
         set(GIT_REPOSITORY "${GIT_REPOSITORY}${MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_${SOURCE}}")
