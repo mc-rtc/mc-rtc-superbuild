@@ -87,8 +87,10 @@ function(AddProject NAME)
       if(MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_${SOURCE})
         set(GIT_REPOSITORY "${GIT_REPOSITORY}${MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_${SOURCE}}")
         message(
-          WARNING "Overriding ${SOURCE} property \"${ADD_PROJECT_ARGS_${SOURCE}}\" for project ${NAME} because MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_${SOURCE} is set to \"${MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_${SOURCE}}\".
-New git repository: \"${GIT_REPOSITORY}\"")
+          WARNING "Overriding ${SOURCE} property for project ${NAME} because MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_${SOURCE} is set:
+Previous      : ${SOURCE} \"${ADD_PROJECT_ARGS_${SOURCE}}\"
+Using         : ${SOURCE} \"${MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_${SOURCE}}\"
+Git repository: \"${GIT_REPOSITORY}\"")
       else()
         set(GIT_REPOSITORY "${GIT_REPOSITORY}${ADD_PROJECT_ARGS_${SOURCE}}")
       endif()
@@ -97,7 +99,9 @@ New git repository: \"${GIT_REPOSITORY}\"")
   # Handle GIT_TAG
   if(MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG)
     set(GIT_TAG "${MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG}")
-    message(WARNING "Overriding GIT_TAG property \"${GIT_TAG}\" for project ${NAME} because MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG is set to \"${MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG}\".")
+    message(WARNING "Overriding GIT_TAG property for project ${NAME} because MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG is set:
+Previous: GIT_TAG \"${ADD_PROJECT_ARGS_GIT_TAG}\"
+Using   : GIT_TAG \"${GIT_TAG}\"")
   elseif(ADD_PROJECT_ARGS_GIT_TAG)
     set(GIT_TAG "${ADD_PROJECT_ARGS_GIT_TAG}")
   else()
