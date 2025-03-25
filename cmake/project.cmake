@@ -40,6 +40,13 @@ add_custom_target(self-update
 #
 # - GLOBAL_DEPENDS those projects are added to every project dependencies
 #
+# Override variables
+# =================
+# The following global variables may be used to override default project configuration.
+# These are meant to be used by script (CI, etc) to install projects with a specific configuration (correct branch/remote, etc).
+#
+# * MC_RTC_SUPERBUILD_OVERRIDE_<NAME>_<SOURCE> overrides the SOURCE property
+# * MC_RTC_SUPERBUILD_OVERRIDE_<NAME>_GIT_TAG overrides the GIT_TAG property
 
 function(AddProject NAME)
   get_property(MC_RTC_SUPERBUILD_SOURCES GLOBAL PROPERTY MC_RTC_SUPERBUILD_SOURCES)
@@ -77,10 +84,22 @@ function(AddProject NAME)
       endif()
       get_property(GIT_REPOSITORY GLOBAL PROPERTY MC_RTC_SUPERBUILD_SOURCES_${SOURCE})
       set(GIT_REPOSITORY "${GIT_REPOSITORY}${ADD_PROJECT_ARGS_${SOURCE}}")
+      # Override the SOURCE if set
+      if(MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_${SOURCE})
+        set(GIT_REPOSITORY "${GIT_REPOSITORY}${MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_${SOURCE}}")
+        message(
+          WARNING "Overriding ${SOURCE} property \"${ADD_PROJECT_ARGS_${SOURCE}}\" for project ${NAME} because MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_${SOURCE} is set to \"${MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_${SOURCE}}\".
+New git repository: \"${GIT_REPOSITORY}\"")
+      else()
+        set(GIT_REPOSITORY "${GIT_REPOSITORY}${ADD_PROJECT_ARGS_${SOURCE}}")
+      endif()
     endif()
   endforeach()
   # Handle GIT_TAG
-  if(ADD_PROJECT_ARGS_GIT_TAG)
+  if(MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG)
+    set(GIT_TAG "${MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG}")
+    message(WARNING "Overriding GIT_TAG property \"${GIT_TAG}\" for project ${NAME} because MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG is set to \"${MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG}\".")
+  elseif(ADD_PROJECT_ARGS_GIT_TAG)
     set(GIT_TAG "${ADD_PROJECT_ARGS_GIT_TAG}")
   else()
     set(GIT_TAG "origin/main")
