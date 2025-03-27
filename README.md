@@ -3,7 +3,7 @@ mc_rtc superbuild
 
 This project is a superbuild project for mc_rtc and related projects.
 
-It will build all mc_rtc dependencies, mc_rtc itself and downstream projects. You can also extend the project locally or clone extensions to build your own projects.
+It will clone, update, build, install all of mc_rtc dependencies, mc_rtc itself and downstream projects. You can also extend the project locally or clone extensions to build your own projects.
 
 Requirements
 --
@@ -11,6 +11,12 @@ Requirements
 - [CMake >= 3.20](https://cmake.org/download/)
 - [Git](https://git-scm.com/)
 - [Visual Studio 2019 and later](https://visualstudio.microsoft.com/) (Windows)
+
+There are two ways to use the superbuild:
+- On your host machine. Note that system dependencies (apt, pip, ROS, etc.) will be installed globally on your machine.
+- Recommended: Within isolated devcontainers (docker images). This will leave your host system intact, and come with a convenient environment pre-configured to efficiently work with the framework.
+
+For building within devcontainers, please refer to [](doc/devcontainer.md)
 
 ### Installing the requirements (bootstraping)
 
