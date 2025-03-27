@@ -220,7 +220,7 @@ endif()
 AddProject(
   mc_rtc
   GITHUB Hugo-L3174/mc_rtc
-  GIT_TAG origin/master
+  GIT_TAG origin/topic/DynamicConstraint
   CMAKE_ARGS -DMC_LOG_UI_PYTHON_EXECUTABLE=${MC_LOG_UI_PYTHON_EXECUTABLE}
              ${MC_RTC_ROS_OPTION} ${MC_RTC_EXTRA_OPTIONS}
   DEPENDS ${mc_rtc_DEPENDS}
