@@ -20,7 +20,9 @@ Additionally, `mc-rtc-superbuild` comes with pre-configured `CMakePresets.json` 
 
 
 Available images can be pulled from `ghcr.io/arntanguy/mc-rtc-superbuild:<tag>`:
+
 | Image | Description |
+| ----- | ----------- |
 | jammy | Ubuntu 22.04 |
 | noble | Ubuntu 24.04 |
 | bookworm | Debian Bookworm |
@@ -31,16 +33,39 @@ You can take advantage of these devcontainers in the following ways:
 - By using [DevPod](https://devpod.sh/) to manage your devcontainers. This is the most flexible way as it allows to easily use the devcontainer from both the terminal/vscode/neovim/...
 - By using VSCode directly. This is slightly easier, but will only work from within VSCode.
 
+### General setup
+
+This section contains common instructions that are needed no matter how you intend to use the provided devcontainers.
+
+- Install docker from https://docs.docker.com/engine/install/ubuntu/
+- The devcontainers will automatically forward your ssh-agent socket to the devcontainer, so that you can use your ssh keys from within the devcontainer. For this to work, you need to add the following to your `~/.bashrc`:
+```bash
+# For ssh-forwarding, we need to 
+# - Run the ssh-agent
+# - Register the private key with the agent
+eval $(ssh-agent -s)
+ssh-add ~/.ssh/id_rsa # replace with the private key(s) you wish to share with the container
+```
+
 ### Using DevPod CLI 
 
 The easiest way to use the devcontainer from the terminal is to use [Devpod](https://devpod.sh/).
 
-- Install docker from https://docs.docker.com/engine/install/ubuntu/
 - [Install DevPod CLI](https://devpod.sh/docs/getting-started/install#install-devpod-cli)
 - Add docker to devpod providers:
   ```
   devpod provider add docker
   ```
+- If you intend to use signed commits within the container, then you also need to share your GNUPG key with the devcontainer. To do so, add the following to your `~/.devpod/config.yaml`
+```yaml
+contexts:
+  default:
+    defaultProvider: docker
+    options:
+      GPG_AGENT_FORWARDING:
+        userProvided: true
+        value: "true"
+```
 - Create you devpod workspace
   ```
   cd <mc-rtc-superbuild>
