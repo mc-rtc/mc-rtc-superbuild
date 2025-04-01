@@ -190,7 +190,7 @@ set(MC_STATE_OBSERVATION_OPTIONS "-DWITH_ROS_OBSERVERS=OFF")
 
 if(WITH_ROS_SUPPORT)
   AddProject(gram_savitzky_golay
-    GITHUB arntanguy/gram_savitzky_golay
+    GITHUB jrl-umi3218/gram_savitzky_golay
     GIT_TAG origin/master
     APT_PACKAGES libgram-savitzky-golay-dev
   )
