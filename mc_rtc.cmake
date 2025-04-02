@@ -1,6 +1,9 @@
 if(WITH_ROS_SUPPORT)
-  CreateCatkinWorkspace(ID data_ws DIR "catkin_data_ws" CATKIN_MAKE CATKIN_BUILD_ARGS -DCATKIN_ENABLE_TESTING:BOOL=OFF)
-  CreateCatkinWorkspace(ID mc_rtc_ws DIR "catkin_ws" CATKIN_BUILD)
+  # catkin_make generates CMakeLists.txt with version 3.0. Kitware upgraded its repository to cmake 4.0 which removes the support for cmake < 3.5
+  # The option -DCMAKE_POLICY_VERSION_MINIMUM=3.5 is a workaroound that forces the minimum cmake version to 3.5
+
+  CreateCatkinWorkspace(ID data_ws DIR "catkin_data_ws" CATKIN_MAKE CATKIN_BUILD_ARGS -DCATKIN_ENABLE_TESTING:BOOL=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5)
+  CreateCatkinWorkspace(ID mc_rtc_ws DIR "catkin_ws" CATKIN_BUILD CATKIN_BUILD_ARGS -DCMAKE_POLICY_VERSION_MINIMUM=3.5)
 endif()
 
 AddProject(ndcurves
