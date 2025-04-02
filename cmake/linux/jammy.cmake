@@ -46,7 +46,7 @@ function(mc_rtc_extra_steps)
 endfunction()
 
 AddProject(geos-cpp-inline
-  GITHUB gergondet/geos-cpp-inline-deb
+  GITHUB isri-aist/geos-cpp-inline-deb
   GIT_TAG origin/main
   INSTALL_PREFIX /usr
   SKIP_TEST
