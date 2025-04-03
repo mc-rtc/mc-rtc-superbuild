@@ -8,21 +8,14 @@ endif()
 
 AddCatkinProject(
   hrp5_p_description
-  GITHUB_PRIVATE
-  isri-aist/hrp5_p_description
-  GIT_TAG
-  origin/master
-  WORKSPACE
-  data_ws
+  GITHUB_PRIVATE isri-aist/hrp5_p_description
+  GIT_TAG origin/master
+  WORKSPACE data_ws
 )
 
 AddProject(
   mc_hrp5_p
-  GITHUB_PRIVATE
-  isri-aist/mc_hrp5_p
-  GIT_TAG
-  origin/master
-  DEPENDS
-  hrp5_p_description
-  mc_rtc
+  GITHUB_PRIVATE isri-aist/mc_hrp5_p
+  GIT_TAG origin/master
+  DEPENDS hrp5_p_description mc_rtc
 )

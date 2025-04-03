@@ -33,26 +33,24 @@ ProcessorCount(NCPU)
 
 AddProject(
   libf2c-emscripten
-  GITHUB
-  gergondet/libf2c-emscripten
-  CONFIGURE_COMMAND
-  ""
+  GITHUB gergondet/libf2c-emscripten
+  CONFIGURE_COMMAND ""
   BUILD_COMMAND
-  ${CMAKE_COMMAND}
-  -E
-  chdir
-  <SOURCE_DIR>
-  emmake
-  make
-  -j${NCPU}
+    ${CMAKE_COMMAND}
+    -E
+    chdir
+    <SOURCE_DIR>
+    emmake
+    make
+    -j${NCPU}
   INSTALL_COMMAND
-  ${CMAKE_COMMAND}
-  -E
-  chdir
-  <SOURCE_DIR>
-  emmake
-  make
-  install
+    ${CMAKE_COMMAND}
+    -E
+    chdir
+    <SOURCE_DIR>
+    emmake
+    make
+    install
 )
 list(APPEND GLOBAL_DEPENDS libf2c-emscripten)
 
@@ -88,72 +86,48 @@ set(b2_command
 )
 AddProject(
   boost
-  CONFIGURE_COMMAND
-  ""
-  SOURCE_DIR
-  "${BOOST_SOURCE_DIR}"
-  BINARY_DIR
-  "${BOOST_SOURCE_DIR}"
-  BUILD_COMMAND
-  ${b2_command}
-  stage
-  INSTALL_COMMAND
-  ${b2_command}
-  install
+  CONFIGURE_COMMAND "" SOURCE_DIR "${BOOST_SOURCE_DIR}" BINARY_DIR "${BOOST_SOURCE_DIR}"
+  BUILD_COMMAND ${b2_command} stage
+  INSTALL_COMMAND ${b2_command} install
 )
 list(APPEND GLOBAL_DEPENDS boost)
 
 AddProject(
   eigen
-  GITHUB
-  eigenteam/eigen-git-mirror
-  GIT_TAG
-  3.3.7
-  SKIP_TEST
-  CMAKE_ARGS
-  -DCMAKEPACKAGE_INSTALL_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/Eigen3
+  GITHUB eigenteam/eigen-git-mirror
+  GIT_TAG 3.3.7 SKIP_TEST
+  CMAKE_ARGS -DCMAKEPACKAGE_INSTALL_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/Eigen3
 )
 list(APPEND GLOBAL_DEPENDS eigen)
 
-AddProject(tinyxml2 GITHUB leethomason/tinyxml2 GIT_TAG 7.1.0 SKIP_TEST)
+AddProject(
+  tinyxml2
+  GITHUB leethomason/tinyxml2
+  GIT_TAG 7.1.0 SKIP_TEST
+)
 list(APPEND GLOBAL_DEPENDS tinyxml2)
 
 AddProject(
   geos
-  GITHUB
-  libgeos/geos
-  GIT_TAG
-  3.10.1
-  SKIP_TEST
-  CMAKE_ARGS
-  -DBUILD_DOCUMENTATION=OFF
-  -DBUILD_SHARED_LIBS=OFF
-  -DDISABLE_GEOS_INLINE=ON
+  GITHUB libgeos/geos
+  GIT_TAG 3.10.1 SKIP_TEST
+  CMAKE_ARGS -DBUILD_DOCUMENTATION=OFF -DBUILD_SHARED_LIBS=OFF -DDISABLE_GEOS_INLINE=ON
 )
 list(APPEND GLOBAL_DEPENDS geos)
 
 AddProject(
   yaml-cpp
-  GITHUB
-  jbeder/yaml-cpp
-  GIT_TAG
-  yaml-cpp-0.7.0
-  CMAKE_ARGS
-  -DYAML_CPP_BUILD_TESTS:BOOL=OFF
-  SKIP_TEST
+  GITHUB jbeder/yaml-cpp
+  GIT_TAG yaml-cpp-0.7.0
+  CMAKE_ARGS -DYAML_CPP_BUILD_TESTS:BOOL=OFF SKIP_TEST
 )
 list(APPEND GLOBAL_DEPENDS yaml-cpp)
 
 AddProject(
   spdlog
-  GITHUB
-  gabime/spdlog
-  GIT_TAG
-  v1.6.1
-  CMAKE_ARGS
-  -DSPDLOG_BUILD_TESTS=OFF
-  -DSPDLOG_BUILD_EXAMPLE:BOOL=OFF
-  -DSPDLOG_BUILD_SHARED:BOOL=OFF
-  SKIP_TEST
+  GITHUB gabime/spdlog
+  GIT_TAG v1.6.1
+  CMAKE_ARGS -DSPDLOG_BUILD_TESTS=OFF -DSPDLOG_BUILD_EXAMPLE:BOOL=OFF
+                                      -DSPDLOG_BUILD_SHARED:BOOL=OFF SKIP_TEST
 )
 list(APPEND GLOBAL_DEPENDS spdlog)

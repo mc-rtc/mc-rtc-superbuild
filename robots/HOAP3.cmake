@@ -6,21 +6,14 @@ endif()
 
 AddCatkinProject(
   hoap3_description
-  GITHUB_PRIVATE
-  jrl-umi3218/hoap3_description
-  GIT_TAG
-  origin/master
-  WORKSPACE
-  data_ws
+  GITHUB_PRIVATE jrl-umi3218/hoap3_description
+  GIT_TAG origin/master
+  WORKSPACE data_ws
 )
 
 AddProject(
   mc-hoap3
-  GITHUB_PRIVATE
-  jrl-umi3218/mc-hoap3
-  GIT_TAG
-  origin/main
-  DEPENDS
-  hoap3_description
-  mc_rtc
+  GITHUB_PRIVATE jrl-umi3218/mc-hoap3
+  GIT_TAG origin/main
+  DEPENDS hoap3_description mc_rtc
 )

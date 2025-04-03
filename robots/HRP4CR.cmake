@@ -7,9 +7,13 @@ if(NOT WITH_HRP4CR)
 endif()
 
 AddCatkinProject(
-  hrp4cr_description GITHUB_PRIVATE isri-aist/hrp4cr_description WORKSPACE data_ws
+  hrp4cr_description
+  GITHUB_PRIVATE isri-aist/hrp4cr_description
+  WORKSPACE data_ws
 )
 
 AddProject(
-  mc-hrp4cr GITHUB_PRIVATE isri-aist/mc_hrp4cr DEPENDS hrp4cr_description mc_rtc
+  mc-hrp4cr
+  GITHUB_PRIVATE isri-aist/mc_hrp4cr
+  DEPENDS hrp4cr_description mc_rtc
 )

@@ -5,9 +5,40 @@ with section("parse"):
 
   # Specify structure for custom cmake functions
   additional_commands = {
-    'AddCatkinProject': {},
+    'AddCatkinProject': {
+      'pargs': 1,
+      'kwargs': {
+        "APT_PACKAGES": "*",
+        "BUILD_COMMAND": "*",
+        "CMAKE_ARGS": 1,
+        "CONFIGURE_COMMAND": "*",
+        "DEPENDS": 1,
+        "GIT_REPOSITORY": 1,
+        "GITHUB": 1,
+        "GITHUB_PRIVATE": 1,
+        "GITE": 1,
+        "GIT_TAG": "*",
+        "INSTALL_COMMAND": "*",
+        "WORKSPACE": 1
+      }
+    },
     'AddGitSource': {},
-    'AddProject': {},
+    'AddProject': {
+      'pargs': 1,
+      'kwargs': {
+        "APT_PACKAGES": "*",
+        "BUILD_COMMAND": "*",
+        "CMAKE_ARGS": 1,
+        "CONFIGURE_COMMAND": "*",
+        "DEPENDS": 1,
+        "GIT_REPOSITORY": 1,
+        "GITHUB": 1,
+        "GITHUB_PRIVATE": 1,
+        "GITE": 1,
+        "GIT_TAG": "*",
+        "INSTALL_COMMAND": "*"
+      }
+    },
     'AddToPath': {},
     'AppendROSWorkspace': {},
     'AptInstall': {},

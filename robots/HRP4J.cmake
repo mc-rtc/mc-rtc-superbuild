@@ -8,21 +8,14 @@ endif()
 
 AddCatkinProject(
   hrp4j_description
-  GITE
-  mc-hrp4/hrp4j_description
-  GIT_TAG
-  origin/master
-  WORKSPACE
-  data_ws
+  GITE mc-hrp4/hrp4j_description
+  GIT_TAG origin/master
+  WORKSPACE data_ws
 )
 
 AddProject(
   mc_hrp4j
-  GITE
-  mc-hrp4/mc_hrp4j
-  GIT_TAG
-  origin/master
-  DEPENDS
-  hrp4j_description
-  mc_rtc
+  GITE mc-hrp4/mc_hrp4j
+  GIT_TAG origin/master
+  DEPENDS hrp4j_description mc_rtc
 )

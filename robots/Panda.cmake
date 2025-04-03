@@ -25,19 +25,19 @@ if(NOT WITH_Panda)
 endif()
 
 if(Panda_DEPENDENCIES_FROM_SOURCE)
-  AddProject(libfranka GITHUB frankaemika/libfranka GIT_TAG origin/0.8.0)
+  AddProject(
+    libfranka
+    GITHUB frankaemika/libfranka
+    GIT_TAG origin/0.8.0
+  )
   set(mc_panda_DEPENDS libfranka)
   if(WITH_ROS_SUPPORT)
     AddCatkinProject(
       franka_ros
-      GITHUB
-      frankaemika/franka_ros
-      GIT_TAG
-      origin/0.8.1
-      WORKSPACE
-      mc_rtc_ws
-      DEPENDS
-      libfranka
+      GITHUB frankaemika/franka_ros
+      GIT_TAG origin/0.8.1
+      WORKSPACE mc_rtc_ws
+      DEPENDS libfranka
     )
     list(APPEND mc_panda_DEPENDS franka_ros)
   endif()
@@ -55,35 +55,24 @@ if(WITH_MC_FRANKA)
   AptInstall(libcap2-bin) # for setcap
   AddProject(
     mc_franka
-    GITHUB
-    jrl-umi3218/mc_franka
-    GIT_TAG
-    origin/master
-    DEPENDS
-    mc_rtc
-    mc_panda
+    GITHUB jrl-umi3218/mc_franka
+    GIT_TAG origin/master
+    DEPENDS mc_rtc mc_panda
   )
 endif()
 
 AddProject(
   mc_panda
-  GITHUB
-  jrl-umi3218/mc_panda
-  GIT_TAG
-  origin/master
-  DEPENDS
-  mc_rtc
-  ${mc_panda_DEPENDS}
+  GITHUB jrl-umi3218/mc_panda
+  GIT_TAG origin/master
+  DEPENDS mc_rtc ${mc_panda_DEPENDS}
 )
 
 if(WITH_PandaLIRMM)
   AddProject(
     mc_panda_lirmm
-    GITHUB
-    jrl-umi3218/mc_panda_lirmm
-    GIT_TAG
-    origin/main
-    DEPENDS
-    mc_panda
+    GITHUB jrl-umi3218/mc_panda_lirmm
+    GIT_TAG origin/main
+    DEPENDS mc_panda
   )
 endif()

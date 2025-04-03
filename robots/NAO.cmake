@@ -6,21 +6,14 @@ endif()
 
 AddCatkinProject(
   nao_description
-  GITHUB
-  jrl-umi3218/nao_description
-  GIT_TAG
-  origin/master
-  WORKSPACE
-  data_ws
+  GITHUB jrl-umi3218/nao_description
+  GIT_TAG origin/master
+  WORKSPACE data_ws
 )
 
 AddProject(
   mc_nao
-  GITHUB
-  jrl-umi3218/mc_nao
-  GIT_TAG
-  origin/master
-  DEPENDS
-  nao_description
-  mc_rtc
+  GITHUB jrl-umi3218/mc_nao
+  GIT_TAG origin/master
+  DEPENDS nao_description mc_rtc
 )
