@@ -9,7 +9,7 @@ This can be useful if:
 - You wish to deploy multiple superbuild setups on-board the robot computer.
 - You wish to test on a different system than your host machine.
 
-All devcontainer images come pre-built in Github Container Registry: https://ghcr.io/jrl-umi3218/mc-rtc-superbuild.
+All devcontainer images come pre-built in Github Container Registry: https://ghcr.io/mc-rtc/mc-rtc-superbuild.
 All pre-built images contain:
 - Pre-installed dependencies for all default superbuild projects
 - A pre-generated ccache to speed up compilation. A fresh build of `mc-rtc-superbuild` should only take a few minutes.
@@ -19,13 +19,12 @@ All pre-built images contain:
 Additionally, `mc-rtc-superbuild` comes with pre-configured `CMakePresets.json` that make working with the superbuild easier (see [building](#building) section).
 
 
-Available images can be pulled from `ghcr.io/arntanguy/mc-rtc-superbuild:<tag>`:
+Available images can be pulled from `ghcr.io/mc-rtc/mc-rtc-superbuild:<tag>`:
 
-| Image | Description |
-| ----- | ----------- |
-| jammy | Ubuntu 22.04 |
-| noble | Ubuntu 24.04 |
-| bookworm | Debian Bookworm |
+| Image | Description | Image URI | I
+| ----- | ----------- | --------- |
+| jammy | Ubuntu 22.04 | ghcr.io/mc-rtc/mc-rtc-superbuild:jammy
+| noble | Ubuntu 24.04 | ghcr.io/mc-rtc/mc-rtc-superbuild:noble
 
 ## Setting up the devcontainer 
 
