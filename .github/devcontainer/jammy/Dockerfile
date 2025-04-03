@@ -112,4 +112,3 @@ LABEL org.opencontainers.image.source=https://github.com/mc-rtc/mc-rtc-superbuil
 LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild from source"
 LABEL org.opencontainers.image.licenses=BSD-2
 ENTRYPOINT ["/usr/bin/zsh", "-c"]
-

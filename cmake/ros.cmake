@@ -17,7 +17,9 @@ function(AppendROSWorkspace DEV_DIR SRC_DIR)
     set(ENV{ROS_VERSION} "2")
     set(ENV{AMENT_PREFIX_PATH} "${DEV_DIR}:$ENV{AMENT_PREFIX_PATH}")
     set(ENV{COLCON_PREFIX_PATH} "${DEV_DIR}:$ENV{COLCON_PREFIX_PATH}")
-    set(ENV{PYTHONPATH} "${DEV_DIR}/local/lib/python3.10/dist-packages:$ENV{PYTHONPATH}")
+    set(ENV{PYTHONPATH}
+        "${DEV_DIR}/local/lib/python3.10/dist-packages:$ENV{PYTHONPATH}"
+    )
   else()
     set(ENV{ROS_VERSION} "1")
     set(ENV{PKG_CONFIG_PATH} "${DEV_DIR}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
@@ -29,23 +31,25 @@ function(AppendROSWorkspace DEV_DIR SRC_DIR)
   else()
     set(ENV{LD_LIBRARY_PATH} "${DEV_DIR}/lib:$ENV{LD_LIBRARY_PATH}")
   endif()
-  set(ENV{PYTHONPATH} "${DEV_DIR}/${ROS_WORKSPACE_INSTALL_PYTHON_DESTINATION}:$ENV{PYTHONPATH}")
+  set(ENV{PYTHONPATH}
+      "${DEV_DIR}/${ROS_WORKSPACE_INSTALL_PYTHON_DESTINATION}:$ENV{PYTHONPATH}"
+  )
 endfunction()
 
 function(ConfigureSkipList ID)
   get_property(WKS_DIR GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_DIR)
   get_property(SKIPLIST_STAMP GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_SKIPLIST_STAMP)
   get_property(SKIPLIST_FILE GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_SKIPLIST_FILE)
-  get_property(SKIPLIST_FILE_CACHE GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_SKIPLIST_FILE_CACHE)
+  get_property(
+    SKIPLIST_FILE_CACHE GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_SKIPLIST_FILE_CACHE
+  )
   add_custom_command(
     OUTPUT "${SKIPLIST_STAMP}"
-    COMMAND "${CMAKE_COMMAND}"
-            -DWKS=${ID}
-            -DWKS_DIR=${WKS_DIR}
-            -DSKIPLIST_STAMP=${SKIPLIST_STAMP}
-            -DSKIPLIST_FILE=${SKIPLIST_FILE_CACHE}
-            -DROS_DISTRO=${ROS_DISTRO}
-            -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/catkin-configure-skiplist.cmake
+    COMMAND
+      "${CMAKE_COMMAND}" -DWKS=${ID} -DWKS_DIR=${WKS_DIR}
+      -DSKIPLIST_STAMP=${SKIPLIST_STAMP} -DSKIPLIST_FILE=${SKIPLIST_FILE_CACHE}
+      -DROS_DISTRO=${ROS_DISTRO} -P
+      ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/catkin-configure-skiplist.cmake
     DEPENDS "${SKIPLIST_FILE_CACHE}"
   )
 endfunction()
@@ -55,11 +59,11 @@ endfunction()
 # Options
 # =======
 #
-# - ID <ID> Unique ID for the workspace, must follow the CMake's target naming rule
-# - DIR <DIR> Folder where the workspace is created
-# - CATKIN_MAKE Init/Build the workspace for/with catkin_make
-# - CATKIN_BUILD Init/Build the workspace for/with catkin
-# - CATKIN_BUILD_ARGS <args...> Arguments for catkin build
+# * ID <ID> Unique ID for the workspace, must follow the CMake's target naming rule
+# * DIR <DIR> Folder where the workspace is created
+# * CATKIN_MAKE Init/Build the workspace for/with catkin_make
+# * CATKIN_BUILD Init/Build the workspace for/with catkin
+# * CATKIN_BUILD_ARGS <args...> Arguments for catkin build
 #
 # CATKIN_MAKE/CATKIN_BUILD are mutually exclusive
 #
@@ -67,9 +71,14 @@ function(CreateCatkinWorkspace)
   set(options CATKIN_MAKE CATKIN_BUILD)
   set(oneValueArgs ID DIR)
   set(multiValueArgs CATKIN_BUILD_ARGS)
-  cmake_parse_arguments(CC_WORKSPACE_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  cmake_parse_arguments(
+    CC_WORKSPACE_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}
+  )
   if(CC_WORKSPACE_ARGS_CATKIN_MAKE AND CC_WORKSPACE_ARGS_CATKIN_BUILD)
-    message(FATAL_ERROR "[CreateCatkinWorkspace] You must choose between CATKIN_MAKE AND CATKIN_BUILD")
+    message(
+      FATAL_ERROR
+        "[CreateCatkinWorkspace] You must choose between CATKIN_MAKE AND CATKIN_BUILD"
+    )
   endif()
   if(NOT CC_WORKSPACE_ARGS_ID)
     message(FATAL_ERROR "[CreateCatkinWorkspace] ID is required")
@@ -79,7 +88,9 @@ function(CreateCatkinWorkspace)
     message(FATAL_ERROR "[CreateCatkinWorkspace] DIR is required")
   endif()
   if(IS_ABSOLUTE "${CC_WORKSPACE_ARGS_DIR}")
-    message(FATAL_ERROR "[CreateCatkinWorkspace] DIR must be relative to SOURCE_DESTINATION")
+    message(
+      FATAL_ERROR "[CreateCatkinWorkspace] DIR must be relative to SOURCE_DESTINATION"
+    )
   endif()
   set(DIR "${SOURCE_DESTINATION}/${CC_WORKSPACE_ARGS_DIR}")
   set(WORKSPACE_TYPE "make")
@@ -95,12 +106,15 @@ function(CreateCatkinWorkspace)
     AppendROSWorkspace("${DIR}/devel" "${DIR}/src")
   endif()
   set(STAMP_DIR "${PROJECT_BINARY_DIR}/catkin-stamps/")
-  GetCommandPrefix(COMMAND_PREFIX "${STAMP_DIR}/cmake-prefix.cmake")
+  getcommandprefix(COMMAND_PREFIX "${STAMP_DIR}/cmake-prefix.cmake")
   file(MAKE_DIRECTORY "${STAMP_DIR}")
   set(STAMP_FILE "${STAMP_DIR}/${ID}.init.stamp")
   add_custom_command(
     OUTPUT "${STAMP_FILE}"
-    COMMAND ${COMMAND_PREFIX} "${CMAKE_COMMAND}" -DROS_IS_ROS2=${ROS_IS_ROS2} -DCATKIN_DIR=${DIR} -DWORKSPACE_TYPE=${WORKSPACE_TYPE} -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/init-catkin-workspace.cmake"
+    COMMAND
+      ${COMMAND_PREFIX} "${CMAKE_COMMAND}" -DROS_IS_ROS2=${ROS_IS_ROS2}
+      -DCATKIN_DIR=${DIR} -DWORKSPACE_TYPE=${WORKSPACE_TYPE} -P
+      "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/init-catkin-workspace.cmake"
     COMMAND "${CMAKE_COMMAND}" -E touch "${STAMP_FILE}"
     COMMENT "Initializing catkin workspace in ${DIR}"
   )
@@ -118,24 +132,38 @@ function(CreateCatkinWorkspace)
   handle_compiler_launcher(CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS)
 
   if(WORKSPACE_TYPE STREQUAL "make")
-    set(BUILD_COMMAND ${COMMAND_PREFIX} catkin_make -C "${DIR}" -DCMAKE_BUILD_TYPE=$<CONFIG> ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS})
+    set(BUILD_COMMAND
+        ${COMMAND_PREFIX} catkin_make -C "${DIR}" -DCMAKE_BUILD_TYPE=$<CONFIG>
+        ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS}
+    )
     set(BUILD_COMMAND_DEPENDS)
   elseif(WORKSPACE_TYPE STREQUAL "build")
-    set(BUILD_COMMAND ${COMMAND_PREFIX} "${CMAKE_COMMAND}" -E chdir "${DIR}" catkin build -DCMAKE_BUILD_TYPE=$<CONFIG> ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS})
+    set(BUILD_COMMAND
+        ${COMMAND_PREFIX} "${CMAKE_COMMAND}" -E chdir "${DIR}" catkin build
+        -DCMAKE_BUILD_TYPE=$<CONFIG> ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS}
+    )
 
     set(SKIPLIST_FILE "${STAMP_DIR}/${ID}-skiplist.txt")
-    set_property(GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_SKIPLIST_FILE "${SKIPLIST_FILE}")
+    set_property(
+      GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_SKIPLIST_FILE "${SKIPLIST_FILE}"
+    )
     file(REMOVE "${SKIPLIST_FILE}")
     file(TOUCH "${SKIPLIST_FILE}")
     set(SKIPLIST_FILE_CACHE "${STAMP_DIR}/${ID}-skiplist-cache.txt")
-    set_property(GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_SKIPLIST_FILE_CACHE "${SKIPLIST_FILE_CACHE}")
-    file(GENERATE
+    set_property(
+      GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_SKIPLIST_FILE_CACHE
+                      "${SKIPLIST_FILE_CACHE}"
+    )
+    file(
+      GENERATE
       OUTPUT "${SKIPLIST_FILE_CACHE}"
       INPUT "${SKIPLIST_FILE}"
     )
 
     set(SKIPLIST_STAMP_FILE "${STAMP_DIR}/${ID}-skiplist.stamp")
-    set_property(GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_SKIPLIST_STAMP "${SKIPLIST_STAMP_FILE}")
+    set_property(
+      GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_SKIPLIST_STAMP "${SKIPLIST_STAMP_FILE}"
+    )
 
     add_custom_target(catkin-config-skiplist-${ID} DEPENDS "${SKIPLIST_STAMP_FILE}")
     add_dependencies(catkin-config-skiplist-${ID} catkin-init-${ID})
@@ -143,8 +171,10 @@ function(CreateCatkinWorkspace)
   else()
     # FIXME Add support for skiplist
     set(BUILD_COMMAND
-      ${CMAKE_COMMAND} -E chdir ${DIR}
-      ${COMMAND_PREFIX} colcon build --merge-install --cmake-args -DCMAKE_BUILD_TYPE=$<CONFIG> ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS})
+        ${CMAKE_COMMAND} -E chdir ${DIR} ${COMMAND_PREFIX} colcon build --merge-install
+        --cmake-args -DCMAKE_BUILD_TYPE=$<CONFIG>
+        ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS}
+    )
   endif()
   set(STAMP_FILE "${STAMP_DIR}/${ID}.stamp")
   set_property(GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_STAMP "${STAMP_FILE}")
@@ -152,14 +182,15 @@ function(CreateCatkinWorkspace)
     OUTPUT "${STAMP_FILE}"
     COMMAND ${BUILD_COMMAND}
     COMMAND "${CMAKE_COMMAND}" -E touch "${STAMP_FILE}"
-    COMMENT "Build catkin workspace ${ID} at ${DIR}"
-    ${BUILD_COMMAND_DEPENDS}
+    COMMENT "Build catkin workspace ${ID} at ${DIR}" ${BUILD_COMMAND_DEPENDS}
   )
   add_custom_target(catkin-build-${ID} DEPENDS "${STAMP_FILE}")
   add_dependencies(catkin-build-${ID} catkin-init-${ID})
-  cmake_language(EVAL CODE "
+  cmake_language(
+    EVAL CODE "
     cmake_language(DEFER CALL FinalizeCatkinWorkspace [[${ID}]])
-  ")
+  "
+  )
 endfunction()
 
 function(EnsureValidCatkinWorkspace ID)
@@ -173,7 +204,7 @@ function(EnsureValidCatkinWorkspace ID)
 endfunction()
 
 function(AddPackageToCatkinSkiplist ID PKG)
-  EnsureValidCatkinWorkspace(${ID})
+  ensurevalidcatkinworkspace(${ID})
   if(NOT TARGET catkin-config-skiplist-${ID})
     message(FATAL_ERROR "${ID} must be a catkin build workspace to use this feature")
   endif()

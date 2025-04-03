@@ -25,15 +25,14 @@ execute_process(
   COMMAND git status --porcelain --ignored
   WORKING_DIRECTORY "${SOURCE_DIR}"
   OUTPUT_VARIABLE IGNORED_SOURCES
-  ERROR_QUIET
-  OUTPUT_STRIP_TRAILING_WHITESPACE
+  ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 execute_process(
-  COMMAND git submodule foreach --recursive "git status --porcelain --ignored |sed -e\"s@\\!\\! @\\!\\! $displaypath/@\""
+  COMMAND git submodule foreach --recursive
+          "git status --porcelain --ignored |sed -e\"s@\\!\\! @\\!\\! $displaypath/@\""
   WORKING_DIRECTORY "${SOURCE_DIR}"
   OUTPUT_VARIABLE IGNORED_SOURCES_SUBMODULE
-  ERROR_QUIET
-  OUTPUT_STRIP_TRAILING_WHITESPACE
+  ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 set(IGNORED_SOURCES "${IGNORED_SOURCES}\n${IGNORED_SOURCES_SUBMODULE}")
 string(REPLACE "\n" ";" IGNORED_SOURCES "${IGNORED_SOURCES}")
@@ -92,8 +91,7 @@ if(${SOURCES_LENGTH} EQUAL 0)
   return()
 endif()
 
-# At this point both SOURCES and PREVIOUS_SOURCES have files in them
-# Let's compare them
+# At this point both SOURCES and PREVIOUS_SOURCES have files in them Let's compare them
 if(NOT ${SOURCES_LENGTH} EQUAL ${PREVIOUS_SOURCES_LENGTH})
   # Remove the configure stamp because the list of sources has changed
   message("-- Will rebuild ${NAME} because the list of sources changed")
@@ -116,7 +114,9 @@ while(LIST_I LESS ${SOURCES_LENGTH})
   endif()
   file(TIMESTAMP "${SOURCE}" SOURCE_TIMESTAMP UTC)
   list(GET PREVIOUS_SOURCES_TIMESTAMP ${LIST_I} PREVIOUS_SOURCE_TIMESTAMP)
-  if("${SOURCE_TIMESTAMP}" STREQUAL "" OR "${SOURCE_TIMESTAMP}" STRGREATER "${PREVIOUS_SOURCE_TIMESTAMP}")
+  if("${SOURCE_TIMESTAMP}" STREQUAL "" OR "${SOURCE_TIMESTAMP}" STRGREATER
+                                          "${PREVIOUS_SOURCE_TIMESTAMP}"
+  )
     # Remove the configure stamp because a source has been updated"
     message("-- Will rebuild ${NAME} because ${SOURCE} was updated")
     file(REMOVE "${CONFIGURE_STAMP}")

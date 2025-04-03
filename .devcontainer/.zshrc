@@ -71,7 +71,7 @@ ZSH_THEME="bira"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=( 
+plugins=(
     git
     zsh-autosuggestions
     zsh-syntax-highlighting

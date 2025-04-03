@@ -1,10 +1,12 @@
 function(RequireExtension FOLDER)
   if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extensions/${FOLDER}")
     include(FetchContent)
-    FetchContent_Declare(${FOLDER} ${ARGN} SOURCE_DIR "${PROJECT_SOURCE_DIR}/extensions/${FOLDER}")
+    FetchContent_Declare(
+      ${FOLDER} ${ARGN} SOURCE_DIR "${PROJECT_SOURCE_DIR}/extensions/${FOLDER}"
+    )
     FetchContent_Populate(${FOLDER})
   endif()
-  AddExtension(${PROJECT_SOURCE_DIR}/extensions/${FOLDER})
+  addextension(${PROJECT_SOURCE_DIR}/extensions/${FOLDER})
 endfunction()
 
 function(AddExtension FOLDER)
@@ -17,14 +19,12 @@ function(AddExtension FOLDER)
     add_subdirectory(${FOLDER})
     if(EXISTS ${FOLDER}/.git)
       cmake_path(GET FOLDER FILENAME EXTENSION_NAME)
-      add_custom_target(self-update-extension-${EXTENSION_NAME}
-        COMMAND ${CMAKE_COMMAND}
-                  -DNAME=${EXTENSION_NAME}
-                  -DSOURCE_DIR=${FOLDER}
-                  -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/update-project.cmake
+      add_custom_target(
+        self-update-extension-${EXTENSION_NAME}
+        COMMAND ${CMAKE_COMMAND} -DNAME=${EXTENSION_NAME} -DSOURCE_DIR=${FOLDER} -P
+                ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/update-project.cmake
       )
       add_dependencies(self-update self-update-extension-${EXTENSION_NAME})
     endif()
   endif()
 endfunction()
-

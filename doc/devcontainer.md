@@ -27,7 +27,7 @@ Available images can be pulled from `ghcr.io/arntanguy/mc-rtc-superbuild:<tag>`:
 | noble | Ubuntu 24.04 |
 | bookworm | Debian Bookworm |
 
-## Setting up the devcontainer 
+## Setting up the devcontainer
 
 You can take advantage of these devcontainers in the following ways:
 - By using [DevPod](https://devpod.sh/) to manage your devcontainers. This is the most flexible way as it allows to easily use the devcontainer from both the terminal/vscode/neovim/...
@@ -40,14 +40,14 @@ This section contains common instructions that are needed no matter how you inte
 - Install docker from https://docs.docker.com/engine/install/ubuntu/
 - The devcontainers will automatically forward your ssh-agent socket to the devcontainer, so that you can use your ssh keys from within the devcontainer. For this to work, you need to add the following to your `~/.bashrc`:
 ```bash
-# For ssh-forwarding, we need to 
+# For ssh-forwarding, we need to
 # - Run the ssh-agent
 # - Register the private key with the agent
 eval $(ssh-agent -s)
 ssh-add ~/.ssh/id_rsa # replace with the private key(s) you wish to share with the container
 ```
 
-### Using DevPod CLI 
+### Using DevPod CLI
 
 The easiest way to use the devcontainer from the terminal is to use [Devpod](https://devpod.sh/).
 
@@ -91,9 +91,9 @@ For neovim users, you can use the [remote-nvim.nvim](https://github.com/amitds19
 - VSCode will re-open the workspace within the devcontainer. In the bottom left corner of VSCode window, you should see the name of the image you selected.
 
 
-## Working within the devcontainer 
+## Working within the devcontainer
 
-Once your devcontainer workspace has been created, be it with VSCode or Devpod, you can now work within the devcontainer as you would on your host system. 
+Once your devcontainer workspace has been created, be it with VSCode or Devpod, you can now work within the devcontainer as you would on your host system.
 
 ### Building
 
@@ -164,7 +164,7 @@ To make it persistent upon reboot, create a `/etc/sysctl.d/60-core-pattern.conf`
 kernel.core_pattern = core.%e
 ```
 
-One last thing, you need to increase the max file size that the system is allowed to generate. In /etc/security/limits.conf add: 
+One last thing, you need to increase the max file size that the system is allowed to generate. In /etc/security/limits.conf add:
 
 ```
 * soft core unlimited
@@ -188,5 +188,3 @@ You should now have a core.sleep file in your current directory. You can use thi
 ```
 gdb sleep core.sleep
 ```
-
-

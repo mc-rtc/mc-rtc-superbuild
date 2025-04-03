@@ -6,8 +6,8 @@ if(NOT EXISTS "${SOURCE_DIR}/.git")
   return()
 endif()
 
-# Skip update for fixed tags
-# It is technically possible to reposition a tag but we accept the risk
+# Skip update for fixed tags It is technically possible to reposition a tag but we
+# accept the risk
 if(DEFINED GIT_TAG AND NOT GIT_TAG MATCHES "^origin/(.*)")
   message("[SKIP] Update ${NAME}: fixed to ${GIT_TAG}")
   return()
@@ -42,7 +42,6 @@ if(git_diff_err)
   message("[SKIP] Update ${NAME}: uncommited changes")
   return()
 endif()
-
 
 # Find the current remote branch
 execute_process(
@@ -94,12 +93,14 @@ execute_process(
   OUTPUT_QUIET ERROR_QUIET
 )
 
-if(DEFINED PRE_COMMIT AND EXISTS "${SOURCE_DIR}/.pre-commit-config.yaml" AND EXISTS "${SOURCE_DIR}/.git")
+if(DEFINED PRE_COMMIT
+   AND EXISTS "${SOURCE_DIR}/.pre-commit-config.yaml"
+   AND EXISTS "${SOURCE_DIR}/.git"
+)
   execute_process(
     COMMAND ${PRE_COMMIT} install
     WORKING_DIRECTORY ${SOURCE_DIR}
-    OUTPUT_QUIET ERROR_QUIET
-    COMMAND_ERROR_IS_FATAL ANY
+    OUTPUT_QUIET ERROR_QUIET COMMAND_ERROR_IS_FATAL ANY
   )
 endif()
 
