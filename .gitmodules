@@ -1,0 +1,6 @@
+[submodule "extensions/rhps1-superbuild"]
+	path = extensions/rhps1-superbuild
+	url = git@github.com:isri-aist/rhps1-superbuild
+[submodule "extensions/drcutil-superbuild"]
+	path = extensions/drcutil-superbuild
+	url = git@github.com:isri-aist/drcutil-superbuild
