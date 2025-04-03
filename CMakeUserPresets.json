@@ -23,7 +23,8 @@
             "cacheVariables": {
                 "BUILD_TESTING": "ON",
                 "WITH_RHPS1": "ON",
-                "WITH_HRP4": "ON"
+                "WITH_HRP4": "ON",
+                "PYTHON_BINDING": "OFF"
             }
         }
     ],
