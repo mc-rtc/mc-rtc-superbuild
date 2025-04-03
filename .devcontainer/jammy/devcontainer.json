@@ -8,7 +8,7 @@
   // - A cython build cache built from the latest sources
   // - All tools required to build the project
   // - A sensible default configuration for vscode
-  "image": "ghcr.io/arntanguy/mc-rtc-superbuild:jammy",
+  "image": "ghcr.io/mc-rtc/mc-rtc-superbuild:jammy",
 
   "mounts": [
 //    "type=bind,source=/home/${localEnv:USER}/.gitconfig,target=/home/vscode/.gitconfig",
