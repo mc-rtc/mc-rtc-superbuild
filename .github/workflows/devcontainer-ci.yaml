@@ -37,6 +37,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Pre-build dev container image
+      if: github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild'
       uses: devcontainers/ci@v0.3
       with:
         imageName: ghcr.io/mc-rtc/mc-rtc-superbuild
