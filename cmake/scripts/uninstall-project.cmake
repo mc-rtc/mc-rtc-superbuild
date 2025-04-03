@@ -26,7 +26,10 @@ if(EXISTS "${BINARY_DIR}/install_manifest.txt")
         endif()
       endif()
     endforeach()
-    execute_process(COMMAND ${SUDO_CMD} ${CMAKE_COMMAND} -E rm -f "${BINARY_DIR}/install_manifest.txt")
+    execute_process(
+      COMMAND ${SUDO_CMD} ${CMAKE_COMMAND} -E rm -f
+              "${BINARY_DIR}/install_manifest.txt"
+    )
   endif()
   # Remove the install stamp
   execute_process(COMMAND ${CMAKE_COMMAND} -E rm -f "${INSTALL_STAMP}")

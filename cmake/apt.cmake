@@ -2,20 +2,26 @@ function(AptInstallNow)
   if(NOT DPKG)
     return()
   endif()
-  execute_process(COMMAND dpkg-query -W ${ARGV} OUTPUT_QUIET ERROR_QUIET RESULT_VARIABLE MISSING_DEPS)
+  execute_process(
+    COMMAND dpkg-query -W ${ARGV}
+    OUTPUT_QUIET ERROR_QUIET
+    RESULT_VARIABLE MISSING_DEPS
+  )
   if(MISSING_DEPS)
     message(STATUS "Install missing dependencies")
     execute_process(COMMAND sudo apt-get update RESULT_VARIABLE APT_FAILED)
     if(APT_FAILED)
       message(FATAL_ERROR "apt update failed, check the error and try again")
     endif()
-    execute_process(COMMAND sudo -E apt-get install -y --no-install-recommends ${ARGV} RESULT_VARIABLE APT_FAILED)
+    execute_process(
+      COMMAND sudo -E apt-get install -y --no-install-recommends ${ARGV}
+      RESULT_VARIABLE APT_FAILED
+    )
     if(APT_FAILED)
       message(FATAL_ERROR "apt install failed, check the error and try again")
     endif()
   endif()
 endfunction()
-
 
 set_property(GLOBAL PROPERTY APT_INSTALL_PACKAGES)
 

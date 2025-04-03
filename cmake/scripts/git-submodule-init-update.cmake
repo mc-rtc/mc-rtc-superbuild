@@ -22,18 +22,18 @@ if("${OPERATION}" STREQUAL "init")
   if(GIT_TAG_IS_TAG)
     set(BRANCH_OPTION)
   endif()
-  set(GIT_COMMAND git submodule add -f ${BRANCH_OPTION} ${GIT_REPOSITORY} "${TARGET_FOLDER}")
+  set(GIT_COMMAND git submodule add -f ${BRANCH_OPTION} ${GIT_REPOSITORY}
+                  "${TARGET_FOLDER}"
+  )
 elseif("${OPERATION}" STREQUAL "update")
-  execute_process(COMMAND
-    git submodule set-url ${TARGET_FOLDER} ${GIT_REPOSITORY}
-    WORKING_DIRECTORY "${SOURCE_DESTINATION}"
-    COMMAND_ERROR_IS_FATAL ANY
+  execute_process(
+    COMMAND git submodule set-url ${TARGET_FOLDER} ${GIT_REPOSITORY}
+    WORKING_DIRECTORY "${SOURCE_DESTINATION}" COMMAND_ERROR_IS_FATAL ANY
   )
   if(NOT GIT_TAG_IS_TAG)
-    execute_process(COMMAND
-      git submodule set-branch --branch ${GIT_TAG} "${TARGET_FOLDER}"
-      WORKING_DIRECTORY "${SOURCE_DESTINATION}"
-      COMMAND_ERROR_IS_FATAL ANY
+    execute_process(
+      COMMAND git submodule set-branch --branch ${GIT_TAG} "${TARGET_FOLDER}"
+      WORKING_DIRECTORY "${SOURCE_DESTINATION}" COMMAND_ERROR_IS_FATAL ANY
     )
   endif()
   set(GIT_COMMAND git submodule update --recursive --rebase "${TARGET_FOLDER}")
@@ -48,8 +48,7 @@ while(${RETRY_I} LESS_EQUAL ${RETRY_COUNT})
   execute_process(
     COMMAND ${GIT_COMMAND}
     WORKING_DIRECTORY "${SOURCE_DESTINATION}"
-    RESULT_VARIABLE GIT_SUBMODULE_FAILED
-    ${IS_FATAL}
+    RESULT_VARIABLE GIT_SUBMODULE_FAILED ${IS_FATAL}
   )
   if(${GIT_SUBMODULE_FAILED} EQUAL 0)
     break()
@@ -61,8 +60,7 @@ endwhile()
 
 execute_process(
   COMMAND git checkout ${GIT_TAG}
-  WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
-  COMMAND_ERROR_IS_FATAL ANY
+  WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}" COMMAND_ERROR_IS_FATAL ANY
 )
 
 if(NOT "${LINK_TO}" STREQUAL "")
@@ -85,8 +83,7 @@ while(${RETRY_I} LESS_EQUAL ${RETRY_COUNT})
   execute_process(
     COMMAND git submodule update --init --recursive
     WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
-    RESULT_VARIABLE GIT_SUBMODULE_FAILED
-    ${IS_FATAL}
+    RESULT_VARIABLE GIT_SUBMODULE_FAILED ${IS_FATAL}
   )
   if(${GIT_SUBMODULE_FAILED} EQUAL 0)
     break()
@@ -97,7 +94,10 @@ while(${RETRY_I} LESS_EQUAL ${RETRY_COUNT})
 endwhile()
 
 if(NOT "${LINK_TO}" STREQUAL "")
-  cmake_path(RELATIVE_PATH LINK_TO BASE_DIRECTORY "${SOURCE_DESTINATION}" OUTPUT_VARIABLE RELATIVE_LINK)
+  cmake_path(
+    RELATIVE_PATH LINK_TO BASE_DIRECTORY "${SOURCE_DESTINATION}" OUTPUT_VARIABLE
+    RELATIVE_LINK
+  )
   set(COMMIT_EXTRA_MSG "\n\nCloned to ${TARGET_FOLDER}")
   set(COMMIT_MSG "[${RELATIVE_LINK}] ")
 else()
@@ -122,12 +122,14 @@ execute_process(
   OUTPUT_QUIET ERROR_QUIET
 )
 
-if(DEFINED PRE_COMMIT AND EXISTS "${SOURCE_DIR}/.pre-commit-config.yaml" AND EXISTS "${SOURCE_DIR}/.git")
+if(DEFINED PRE_COMMIT
+   AND EXISTS "${SOURCE_DIR}/.pre-commit-config.yaml"
+   AND EXISTS "${SOURCE_DIR}/.git"
+)
   execute_process(
     COMMAND ${PRE_COMMIT} install
     WORKING_DIRECTORY ${SOURCE_DIR}
-    OUTPUT_QUIET ERROR_QUIET
-    COMMAND_ERROR_IS_FATAL ANY
+    OUTPUT_QUIET ERROR_QUIET COMMAND_ERROR_IS_FATAL ANY
   )
 endif()
 

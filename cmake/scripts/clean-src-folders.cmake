@@ -5,9 +5,15 @@ function(remove_if_empty DIR_VAR)
   if(NFILES EQUAL 0)
     file(REMOVE_RECURSE ${${DIR_VAR}})
     cmake_path(GET ${DIR_VAR} PARENT_PATH ${DIR_VAR})
-    set(${DIR_VAR} ${${DIR_VAR}} PARENT_SCOPE)
+    set(${DIR_VAR}
+        ${${DIR_VAR}}
+        PARENT_SCOPE
+    )
   else()
-    set(${DIR_VAR} ${SOURCE_DESTINATION} PARENT_SCOPE)
+    set(${DIR_VAR}
+        ${SOURCE_DESTINATION}
+        PARENT_SCOPE
+    )
   endif()
 endfunction()
 
