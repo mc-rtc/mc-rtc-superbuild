@@ -10,6 +10,7 @@ AddCatkinProject(
   hrp4cr_description
   GITHUB_PRIVATE isri-aist/hrp4cr_description
   WORKSPACE data_ws
+  CMAKE_ARGS ${MC_RTC_ROS_OPTION}
 )
 
 AddProject(

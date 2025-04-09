@@ -173,6 +173,7 @@ AddCatkinProject(
   GIT_TAG ${MC_RTC_ROS_BRANCH}
   WORKSPACE data_ws
   APT_PACKAGES mc-rtc-data ros-${ROS_DISTRO}-mc-rtc-data
+  CMAKE_ARGS ${MC_RTC_ROS_OPTION}
 )
 
 set(mc_rtc_DEPENDS tvm Tasks mc_rtc_data ndcurves state-observation)

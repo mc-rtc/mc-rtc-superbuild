@@ -11,6 +11,7 @@ AddCatkinProject(
   GITE mc-hrp4/hrp4j_description
   GIT_TAG origin/master
   WORKSPACE data_ws
+  CMAKE_ARGS ${MC_RTC_ROS_OPTION}
 )
 
 AddProject(
