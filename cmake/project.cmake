@@ -213,7 +213,7 @@ This is likely a conflict between different extensions."
       # changes
       if(EXISTS "${SOURCE_DIR}/.git")
         execute_process(
-          COMMAND git diff-index --quiet HEAD --
+          COMMAND git diff-index --quiet ${PREVIOUS_GIT_TAG} --
           WORKING_DIRECTORY "${SOURCE_DIR}"
           RESULT_VARIABLE GIT_HAS_ANY_CHANGES
         )
