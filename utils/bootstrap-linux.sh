@@ -19,7 +19,7 @@ then
 fi
 
 ${SUDO} apt-get update
-${SUDO} apt-get install -y --no-install-recommends wget apt-transport-https software-properties-common gnupg lsb-release build-essential gfortran curl git sudo cmake cmake-curses-gui python3-pip
+${SUDO} apt-get install -y --no-install-recommends wget apt-transport-https software-properties-common gnupg lsb-release build-essential gfortran curl git sudo cmake cmake-curses-gui python3-pip ccache
 if [[ `lsb_release -cs` == "noble" ]]
 then
   ${SUDO} apt-get install -y --no-install-recommends pipx
