@@ -43,7 +43,7 @@ Then configure and run the superbuild as follows:
 ```shell
 # Run the bootstrap script in mc-rtc-superbuild/utils folder if required
 cmake -S mc-rtc-superbuild -B mc-rtc-superbuild/build -DSOURCE_DESTINATION=${HOME}/devel/src -DBUILD_DESTINATION=${HOME}/devel/build
-cmake --build mc-rtc-superbuild/build --config RelWithDebInfo
+cmake --build mc-rtc-superbuild/build --target install --config RelWithDebInfo
 ```
 
 This will:
