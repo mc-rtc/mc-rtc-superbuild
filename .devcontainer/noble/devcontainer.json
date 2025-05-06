@@ -11,7 +11,8 @@
   "image": "ghcr.io/mc-rtc/mc-rtc-superbuild:noble",
 
   "mounts": [
-    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached"
+    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/nanobind-superbuild-ws,target=/home/vscode/workspace,type=bind,consistency=cached"
   ],
 
   "features":

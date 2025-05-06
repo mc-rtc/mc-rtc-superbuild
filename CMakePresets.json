@@ -6,12 +6,12 @@
             "name": "relwithdebinfo",
             "displayName": "RelWithDebInfo",
             "generator": "Unix Makefiles",
-            "binaryDir": "${sourceDir}/build/relwithdebinfo/superbuild",
+            "binaryDir": "${sourceDir}/build/superbuild",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-                "SOURCE_DESTINATION": "${sourceDir}/devel",
-                "BUILD_DESTINATION": "${sourceDir}/build/relwithdebinfo/projects",
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/install/relwithdebinfo",
+                "SOURCE_DESTINATION": "${sourceDir}/../workspace/devel",
+                "BUILD_DESTINATION": "${sourceDir}/build/projects",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/../workspace/install",
                 "CMAKE_CXX_COMPILER_LAUNCHER": "ccache"
             }
         },
@@ -23,6 +23,18 @@
             ],
             "cacheVariables": {
                 "BUILD_TESTING": "OFF"
+            }
+        },
+        {
+            "name": "nanobind",
+            "displayName": "RelWithDebInfo (nanobind)",
+            "inherits": [
+                "relwithdebinfo"
+            ],
+            "cacheVariables": {
+                "PYTHON_BINDING": "OFF",
+		"NANOBIND_BINDINGS": "ON",
+		"WITH_ROS_SUPPORT": "OFF"
             }
         }
     ],
@@ -43,6 +55,15 @@
             "configuration": "RelWithDebInfo",
             "targets": [
                 "all"
+            ]
+        },
+        {
+            "name": "nanobind",
+            "displayName": "RelWithDebInfo (nanobind)",
+            "configurePreset": "nanobind",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
             ]
         }
     ]

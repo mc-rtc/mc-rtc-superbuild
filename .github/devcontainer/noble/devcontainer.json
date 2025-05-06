@@ -11,11 +11,13 @@
   },
 
   "mounts": [
-    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached"
+    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/nanobind-superbuild-ws,target=/home/vscode/workspace,type=bind,consistency=cached"
   ],
 
   "features":
   {
+    "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/duduribeiro/devcontainer-features/neovim:1.0.1": {},
     "ghcr.io/devcontainers/features/github-cli": { "version": "latest" },
     "ghcr.io/georgofenbeck/features/lazygit-linuxbinary:1": { "version": "latest" }
