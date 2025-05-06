@@ -41,39 +41,46 @@ if(${CMAKE_GENERATOR} STREQUAL "Ninja")
   set(CMAKE_JOB_POOL_COMPILE no_parallel)
 endif()
 
-# For ccache >= 4.8
 find_program(CCACHE_PROGRAM ccache)
+# For ccache < 4.8
 if(CCACHE_PROGRAM)
   message(NOTICE "Selected CCache: ${CCACHE_PROGRAM}")
-  # set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM} base_dir=${PROJECT_SOURCE_DIR}
-  # hash_dir=false) set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM}
-  # base_dir=${PROJECT_SOURCE_DIR} hash_dir=false)
-  cmake_path(GET PROJECT_SOURCE_DIR PARENT_PATH PARENT_DIR)
-  set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM} base_dir=${PARENT_DIR} hash_dir=false)
-  set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM} base_dir=${PARENT_DIR}
-                                  hash_dir=false
+  # path is $HOME/workspace/devel, rewrite relative to $HOME
+  get_filename_component(CCACHE_BASE_DIR "${SOURCE_DESTINATION}/../.." REALPATH)
+  set(ccacheEnv
+      # Rewrite all absolute paths that contain the CCACHE_BASEDIR into relative paths
+      # This is done to ensure that the cache will be used even if the project is pulled
+      # in a different tree location
+      # than the one used for generating the cache (e.g docker workspace path, other
+      # user's machine, etc)
+      # See https://ccache.dev/manual/4.10.2.html#_compiling_in_different_directories
+      CCACHE_BASEDIR=${CCACHE_BASE_DIR}
+      # locale and umask are important for docker containers: if either differs, the
+      # cache won't be used. no_hash_dir useful?
+      CCACHE_SLOPPINESS="umask,locale,no_hash_dir,pch_defines,file_macro,include_file_ctime"
+      CCACHE_NOHASHDIR=true
   )
-else()
-  message(WARNING "Could not find ccache, skipping!")
+  set(CMAKE_C_COMPILER_LAUNCHER ${CMAKE_COMMAND} -E env ${ccacheEnv} ${CCACHE_PROGRAM})
+  set(CMAKE_CXX_COMPILER_LAUNCHER ${CMAKE_COMMAND} -E env ${ccacheEnv}
+                                  ${CCACHE_PROGRAM}
+  )
+  if(${CYTHON_USE_CCACHE})
+    # Define a compiler launcher for cython This is not supported by default, in our
+    # tools we will need to explicitely use it in cython's setup.py
+    set(CYTHON_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+  endif()
 endif()
-
-# For ccache < 4.8, does not work when directory structure is different
-# find_program(CCACHE_PROGRAM ccache) if(CCACHE_PROGRAM) message(NOTICE "Selected
-# CCache: ${CCACHE_PROGRAM}") cmake_path(GET PROJECT_SOURCE_DIR PARENT_PATH PARENT_DIR)
-# set(ccacheEnv # Rewrite all absolute paths that contain the CCACHE_BASEDIR into
-# relative paths # This is done to ensure that the cache will be used even if the
-# project is pulled # in a different tree location # than the one used for generating
-# the cache (e.g docker workspace path, other # user's machine, etc) # See
-# https://ccache.dev/manual/4.10.2.html#_compiling_in_different_directories
-# CCACHE_BASEDIR=${PARENT_DIR} # locale and umask are important for docker containers:
-# if either differs, the # cache won't be used. no_hash_dir useful?
-# CCACHE_SLOPPINESS="umask,locale,no_hash_dir,pch_defines,file_macro,include_file_ctime"
-# CCACHE_NOHASHDIR=true ) set(CMAKE_C_COMPILER_LAUNCHER ${CMAKE_COMMAND} -E env
-# ${ccacheEnv} ${CCACHE_PROGRAM}) set(CMAKE_CXX_COMPILER_LAUNCHER ${CMAKE_COMMAND} -E
-# env ${ccacheEnv} ${CCACHE_PROGRAM} ) if(${CYTHON_USE_CCACHE}) # Define a compiler
-# launcher for cython This is not supported by default, in our # tools we will need to
-# explicitely use it in cython's setup.py set(CYTHON_C_COMPILER_LAUNCHER
-# ${CCACHE_PROGRAM}) endif() endif()
+# For ccache >= 4.8 (from ubuntu noble) cmake-format off if(CCACHE_PROGRAM)
+# message(NOTICE "Selected CCache: ${CCACHE_PROGRAM}") # path is
+# /home/vscode/workspace/devel, rewrite as /home/vscode
+# get_filename_component(CCACHE_BASE_DIR "${SOURCE_DESTINATION}/../.." REALPATH)
+# message(STATUS "ccache base_dir is: ${CCACHE_BASE_DIR}") set(CMAKE_C_COMPILER_LAUNCHER
+# ${CCACHE_PROGRAM} base_dir=${CCACHE_BASE_DIR} hash_dir=false
+# sloppiness="umask,locale,no_hash_dir,pch_defines,file_macro,include_file_ctime" )
+# set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM} base_dir=${CCACHE_BASE_DIR}
+# hash_dir=false
+# sloppiness="umask,locale,no_hash_dir,pch_defines,file_macro,include_file_ctime" )
+# endif() cmake-format on
 
 if(NOT CMAKE_BUILD_TYPE
    AND NOT CMAKE_CONFIGURATION_TYPES

@@ -47,8 +47,8 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
 
 # Add mc-rtc-superbuild to the build context
 # It is better to keep it in the same folder in order to increase ccache hit rate
-COPY --chown=vscode:vscode ../../.. ~/superbuild
-WORKDIR ~/superbuild
+COPY --chown=vscode:vscode ../../.. /home/vscode/superbuild
+WORKDIR /home/vscode/superbuild
 
 RUN --mount=type=cache,target=/var/cache/apt \
   ./utils/bootstrap-linux.sh \

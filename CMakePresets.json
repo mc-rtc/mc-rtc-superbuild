@@ -11,8 +11,7 @@
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo",
                 "SOURCE_DESTINATION": "${sourceDir}/../workspace/devel",
                 "BUILD_DESTINATION": "${sourceDir}/../workspace/build/projects",
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/../workspace/install",
-                "CMAKE_CXX_COMPILER_LAUNCHER": "ccache"
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/../workspace/install"
             }
         },
         {
