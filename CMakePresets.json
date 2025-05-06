@@ -6,11 +6,11 @@
             "name": "relwithdebinfo",
             "displayName": "RelWithDebInfo",
             "generator": "Unix Makefiles",
-            "binaryDir": "${sourceDir}/build/superbuild",
+            "binaryDir": "${sourceDir}/../workspace/build/superbuild",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo",
                 "SOURCE_DESTINATION": "${sourceDir}/../workspace/devel",
-                "BUILD_DESTINATION": "${sourceDir}/build/projects",
+                "BUILD_DESTINATION": "${sourceDir}/../workspace/build/projects",
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/../workspace/install",
                 "CMAKE_CXX_COMPILER_LAUNCHER": "ccache"
             }
@@ -26,15 +26,19 @@
             }
         },
         {
-            "name": "nanobind",
-            "displayName": "RelWithDebInfo (nanobind)",
+            "name": "relwithdebinfo-noble",
+            "displayName": "RelWithDebInfo (noble, no ROS, no Python)",
             "inherits": [
                 "relwithdebinfo"
             ],
             "cacheVariables": {
                 "PYTHON_BINDING": "OFF",
-		"NANOBIND_BINDINGS": "ON",
 		"WITH_ROS_SUPPORT": "OFF"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "$env{UBUNTU_VERSION}",
+                "rhs": "noble"
             }
         }
     ],
@@ -45,7 +49,7 @@
             "configurePreset": "relwithdebinfo",
             "configuration": "RelWithDebInfo",
             "targets": [
-                "all"
+                "install"
             ]
         },
         {
@@ -54,13 +58,13 @@
             "configurePreset": "relwithdebinfo-notests",
             "configuration": "RelWithDebInfo",
             "targets": [
-                "all"
+                "install"
             ]
         },
         {
-            "name": "nanobind",
-            "displayName": "RelWithDebInfo (nanobind)",
-            "configurePreset": "nanobind",
+            "name": "relwithdebinfo-noble",
+            "displayName": "RelWithDebInfo (ubuntu noble)",
+            "configurePreset": "relwithdebinfo-noble",
             "configuration": "RelWithDebInfo",
             "targets": [
                 "install"

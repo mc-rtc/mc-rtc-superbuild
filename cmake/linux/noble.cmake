@@ -10,11 +10,7 @@ set(APT_DEPENDENCIES
     build-essential
     gfortran
     cython3
-    # python3-nose
-    # python3-pytest
-    # python3-numpy
-    # python3-coverage
-    # python3-setuptools
+    # python3-nose python3-pytest python3-numpy python3-coverage python3-setuptools
     # python3-pip
     libeigen3-dev
     libboost-all-dev
@@ -24,8 +20,7 @@ set(APT_DEPENDENCIES
     libyaml-cpp-dev
     libltdl-dev
     libqwt-qt5-dev
-    # python3-matplotlib
-    # python3-pyqt5
+    # python3-matplotlib python3-pyqt5
     libspdlog-dev
     ninja-build
     # python-is-python3

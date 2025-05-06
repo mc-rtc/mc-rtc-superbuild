@@ -12,7 +12,7 @@
 
   "mounts": [
     "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached",
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/nanobind-superbuild-ws,target=/home/vscode/workspace,type=bind,consistency=cached"
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/noble,target=/home/vscode/workspace,type=bind,consistency=cached"
   ],
 
   "features":
@@ -45,10 +45,6 @@
   "runArgs": [
     "--network=host",
     "--cap-add=sys_nice" // Grants the container the CAP_SYS_NICE capability, which allows the container to raise process nice values, set real-time scheduling policies, set CPU affinity, and other operations.
-    // "-v",
-    // "${env:SSH_AUTH_SOCK}:/tmp/ssh-agent.socket",
-    // "-e",
-    // "SSH_AUTH_SOCK=/tmp/ssh-agent.socket"
   ],
 
   "remoteUser": "vscode",
