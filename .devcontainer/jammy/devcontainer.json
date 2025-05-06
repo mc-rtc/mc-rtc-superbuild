@@ -1,5 +1,5 @@
 {
-  "name": "mc-rtc-superbuild-jammy-image",
+  "name": "nanobind-superbuild-ws",
 
   // See .github/devcontainer/ubuntu-22.04/devcontainer.json to see how this image was built
   // This image contains:
@@ -12,7 +12,8 @@
 
   "mounts": [
 //    "type=bind,source=/home/${localEnv:USER}/.gitconfig,target=/home/vscode/.gitconfig",
-    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached"
+    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/nanobind-superbuild-ws,target=/home/vscode/workspace,type=bind,consistency=cached"
   ],
 
   "features":

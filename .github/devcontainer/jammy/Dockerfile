@@ -12,7 +12,7 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean
 # Install sudo
 RUN  --mount=type=cache,target=/var/cache/apt \
   apt-get update \
- && apt-get install -y --no-install-recommends sudo ccache ripgrep rsync curl wget zsh gnupg2 gpg-agent python3.10-venv clangd \
+ && apt-get install -y --no-install-recommends sudo ripgrep rsync curl wget zsh gnupg2 gpg-agent python3.10-venv clangd xz-utils \
  && rm -rf /var/lib/apt/lists/*
 
 # Create ubuntu user with sudo privileges
@@ -21,6 +21,11 @@ RUN useradd -ms /bin/zsh vscode && \
     # New added for disable sudo password
     && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
     && echo "User vscode (uid=`id -u vscode`:gid=`id -g vscode`) created with passwordless sudo privileges"
+
+# Install latest ccache
+ADD https://github.com/ccache/ccache/releases/download/v4.11.2/ccache-4.11.2-linux-x86_64.tar.xz /tmp
+RUN tar xf /tmp/ccache-4.11.2-linux-x86_64.tar.xz -C /tmp && cp /tmp/ccache-4.11.2-linux-x86_64/ccache /usr/bin
+RUN ccache --version
 
 USER vscode
 
@@ -52,11 +57,12 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cython \
 # However due to generated config headers containing install source paths for mc_rtc
 # It is better to keep it in the same folder in order to increase ccache hit rate
 COPY --chown=vscode:vscode ../../.. /home/vscode/superbuild
+RUN mkdir /home/vscode/workspace
 WORKDIR /home/vscode/superbuild
 
 RUN --mount=type=cache,target=/var/cache/apt \
   ./utils/bootstrap-linux.sh \
-  && sudo apt-get install -y --no-install-recommends ccache gdb \
+  && sudo apt-get install -y --no-install-recommends gdb \
   && git config --global user.email "${EMAIL}" && git config --global user.name "${NAME}" \
   && sudo rm -rf /var/lib/apt/lists/*
 
@@ -69,6 +75,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
   --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/ccache \
   --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cython \
   ccache -z \
+  ccache --version \
   && cmake --preset relwithdebinfo \
   && cmake --build --preset relwithdebinfo \
   && echo "Removing temporary build artefacts from the image" \

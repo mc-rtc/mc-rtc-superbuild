@@ -12,7 +12,8 @@
   },
 
   "mounts": [
-    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/nanobind-superbuild-ws,target=/home/vscode/workspace,type=bind,consistency=cached"
   ],
 
   "features":
