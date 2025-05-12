@@ -1,6 +1,7 @@
 FROM ubuntu:jammy as build
 ARG EMAIL="devcontainer@mc-rtc-superbuild.com"
 ARG NAME="mc_rtc devcontainer"
+ENV UBUNTU_VERSION="jammy"
 
 RUN export DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris
@@ -12,7 +13,7 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean
 # Install sudo
 RUN  --mount=type=cache,target=/var/cache/apt \
   apt-get update \
- && apt-get install -y --no-install-recommends sudo ccache ripgrep rsync curl wget zsh gnupg2 gpg-agent python3.10-venv clangd \
+ && apt-get install -y --no-install-recommends sudo ccache ripgrep rsync curl wget zsh gnupg2 gpg-agent openssh-server clangd \
  && rm -rf /var/lib/apt/lists/*
 
 # Create ubuntu user with sudo privileges
@@ -22,34 +23,26 @@ RUN useradd -ms /bin/zsh vscode && \
     && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
     && echo "User vscode (uid=`id -u vscode`:gid=`id -g vscode`) created with passwordless sudo privileges"
 
-USER vscode
+# Build time cache directory to speed up sucessive rebuilds of this image
+ENV CCACHE_BUILD_DIR=/tmp/ccache
+# The ccache cache generated in CCACHE_BUILD_DIR is copied to the CCACHE_IMAGE_DIR for fast initial build times
+# when using this image
+ENV CCACHE_IMAGE_DIR=/home/vscode/.cache/ccache
 
-# Explicitely set ccache directory
-# This ensures that ccache will always look here even if tools change the default cache location with XDG_CACHE_HOME (e.g nvim-remote)
-ENV CCACHE_DIR=/home/vscode/.cache/ccache
-ENV CYTHON_CACHE_DIR=/home/vscode/.cython
+# Use build time ccache directory (mounted in docker build cache)
+ENV CCACHE_DIR=${CCACHE_BUILD_DIR}
 
-RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/ccache \
-  if [ "$(ls -A ~/.cache/ccache)" ]; then \
+RUN --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
+  if [ "$(ls -A ${CCACHE_BUILD_DIR})" ]; then \
     echo "Found ccache cache in the docker build cache, using it"; \
-    du -h ~/.cache/ccache; \
+    du -h ${CCACHE_BUILD_DIR}; \
     ccache -z; \
     ccache -sv; \
   else \
-    echo "ccache mount directory is empty"; \
-  fi
-
-# Use cython cache (only for caching pyx to c conversion)
-RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cython \
-  if [ "$(ls -A ~/.cython)" ]; then \
-    echo "Found cython cache, using it"; \
-  else \
-    echo "cython mount directory is empty"; \
+    echo "ccache mount directory is empty, it will be populated during the superbuild build step"; \
   fi
 
 # Add mc-rtc-superbuild to the build context
-# Note that in theory this could be copied into a separate directory as the runtime workspace
-# However due to generated config headers containing install source paths for mc_rtc
 # It is better to keep it in the same folder in order to increase ccache hit rate
 COPY --chown=vscode:vscode ../../.. /home/vscode/superbuild
 WORKDIR /home/vscode/superbuild
@@ -60,55 +53,44 @@ RUN --mount=type=cache,target=/var/cache/apt \
   && git config --global user.email "${EMAIL}" && git config --global user.name "${NAME}" \
   && sudo rm -rf /var/lib/apt/lists/*
 
-# Configure CMake will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)
-# Build everything to populate cache:
-# - ccache in mounted cache ~/.cache/ccache
-# - cython in ~/.cython
+RUN echo 'kill cache'
+# CMake configure will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)
 RUN --mount=type=cache,target=/var/cache/apt \
-  --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/pip \
-  --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/ccache \
-  --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cython \
+  --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
   ccache -z \
   && cmake --preset relwithdebinfo \
   && cmake --build --preset relwithdebinfo \
-  && echo "Removing temporary build artefacts from the image" \
-  && rm -rf /home/vscode/superbuild \
-  && rm /home/vscode/.gitconfig \
+  && echo "Checking ccache:" \
   && ccache -sv \
+  && echo "Removing temporary build artefacts from the image" \
+  && rm -rf ~/superbuild \
+  && rm ~/.gitconfig \
   && sudo rm -rf /var/lib/apt/lists/*
 
-# Copy ccache/cython folder into the docker image's build cache.
-# This enables reuse on the next build of this image
-RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cache/ccache \
-  ccache -z \
-  && echo "Copying ccache /home/vscode/.cache/ccache to the temporary image folder /home/vscode/.cache/docker-ccache" \
-  && cp -r /home/vscode/.cache/ccache /tmp/ccache
+RUN --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
+  echo "Moving the generated ccache cache to the image folder ${CCACHE_IMAGE_DIR} so that it can be used at runtime" \
+  && mkdir -p ${CCACHE_IMAGE_DIR} \
+  && cp -r ${CCACHE_BUILD_DIR}/* ${CCACHE_IMAGE_DIR}
 
-RUN echo "Moving the generated ccache cache to the image folder /home/vscode/.cache/ccache so that it can be used at runtime" \
-  && sudo chown -R vscode ~/.cache \
-  && ls -al ~/.cache \
-  && mv /tmp/ccache /home/vscode/.cache/ccache
-
-RUN --mount=type=cache,uid=1000,gid=1000,target=/home/vscode/.cython \
-  echo "Copying cython cache /home/vscode/.cython to the temporary image folder /home/vscode/.cache/cython-cache" \
-  && cp -r /home/vscode/.cython /home/vscode/.cache/cython-cache
-
-RUN echo "Moving the generated cython cache to the image folder /home/vscode/.cache/cython so that it can be used at runtime" \
-  && mv /home/vscode/.cache/cython-cache /home/vscode/.cython
-
+ENV CCACHE_DIR=${CCACHE_IMAGE_DIR}
 RUN echo "Checking cache contents" \
-  && ls /home/vscode/.cache/ccache \
-  && ls /home/vscode/.cython
+  && ccache -sv
 
+# Switch back to the official remote when https://github.com/deluan/zsh-in-docker/pull/28 is merged
 # oh-my-zsh & plugins
-RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
+RUN sh -c "$(curl -L https://raw.githubusercontent.com/balancedscorpion/zsh-in-docker/new_user/zsh-in-docker.sh)" -- \
     -t 'bira' \
     -p git \
-    && echo 'source $HOME/superbuild/.devcontainer/entrypoint.sh' >> /home/vscode/.zshrc
+    -u vscode \
+    && echo 'source $HOME/superbuild/.devcontainer/entrypoint.sh' >> ~/.zshrc
 
-FROM ubuntu:22.04
+FROM ubuntu:jammy
 COPY --from=build / /
 LABEL org.opencontainers.image.source=https://github.com/mc-rtc/mc-rtc-superbuild
-LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild from source"
+LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild from source (ubuntu jammy)"
 LABEL org.opencontainers.image.licenses=BSD-2
+# entrypoint.sh will sync this default image cache with the local folder cache upon starting the container
+# This is done to allow updating the cache while working within the container
+ENV CCACHE_DIR="/home/vscode/workspace/.ccache"
+ENV UBUNTU_VERSION="jammy"
 ENTRYPOINT ["/usr/bin/zsh", "-c"]

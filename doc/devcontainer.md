@@ -21,23 +21,27 @@ Additionally, `mc-rtc-superbuild` comes with pre-configured `CMakePresets.json` 
 
 Available images can be pulled from `ghcr.io/mc-rtc/mc-rtc-superbuild:<tag>`:
 
-| Image | Description | Image URI | I
-| ----- | ----------- | --------- |
-| jammy | Ubuntu 22.04 | ghcr.io/mc-rtc/mc-rtc-superbuild:jammy
-| noble | Ubuntu 24.04 | ghcr.io/mc-rtc/mc-rtc-superbuild:noble
+| Image | Description | Image URI | Local mount folder | Mounts to (devcontainer) |
+| :--- | :--- | :--- | :--- | :--- |
+| jammy | Ubuntu 22.04 | ghcr.io/mc-rtc/mc-rtc-superbuild:jammy | `$HOME/docker-ws/mc-rtc-superbuild-jammy` | `$HOME/workspace` |
+| noble | Ubuntu 24.04 | ghcr.io/mc-rtc/mc-rtc-superbuild:noble | `$HOME/docker-ws/mc-rtc-superbuild-noble` | `$HOME/workspace` |
+
+By default the devcontainer will attempt to mount the "local mount folder" path specified above to store all files that need to persist after the container has been stopped. In particular, this is where all source code will be stored.
 
 ## Setting up the devcontainer
 
 You can take advantage of these devcontainers in the following ways:
-- By using [DevPod](https://devpod.sh/) to manage your devcontainers. This is the most flexible way as it allows to easily use the devcontainer from both the terminal/vscode/neovim/...
-- By using VSCode directly. This is slightly easier, but will only work from within VSCode.
+- By using VSCode with the devcontainer extension. If you are already used to using VSCode, this is by far the easiest option.
+- Manually by using [DevPod](https://devpod.sh/) or [devcontainer cli](https://github.com/devcontainers/cli) to manage your devcontainers. This is the most flexible way as it allows to easily use the devcontainer from both the terminal/vscode/neovim/...
 
 ### General setup
 
 This section contains common instructions that are needed no matter how you intend to use the provided devcontainers.
 
 - Install docker from https://docs.docker.com/engine/install/ubuntu/
-- The devcontainers will automatically forward your ssh-agent socket to the devcontainer, so that you can use your ssh keys from within the devcontainer. For this to work, you need to add the following to your `~/.bashrc`:
+- Adjust the devcontainer settings to your liking in `.devcontainer/<distro>/devcontainer.json`. In general the default settings will be sufficient. If you wish to do so, you can select a different mount point in the `mounts` property.
+- The devcontainers are configured to automatically forward your `ssh-agent`/`gpg-agent` socket to the devcontainer, so that you can use your ssh keys from within the devcontainer. For this to work, you need to add the following to your `~/.bashrc`:
+
 ```bash
 # For ssh-forwarding, we need to
 # - Run the ssh-agent
@@ -46,9 +50,28 @@ eval $(ssh-agent -s)
 ssh-add ~/.ssh/id_rsa # replace with the private key(s) you wish to share with the container
 ```
 
+### VSCode
+
+<details>
+  <summary>If you wish to use the provided devcontainers within VSCode, please read this section:</summary>
+
+Using devcontainers in vscode is simple.
+
+- Clone `mc-rtc-superbuild`
+- Open the cloned folder in VSCode
+- VSCode will prompt you to install recommended extensions, in particular the `Devcontainer` extension
+- Once done, VSCode will prompt you to re-open the current folder in a devcontainer, select the image you wish.
+- VSCode will install a vscode server within the docker environment, then re-open the workspace within the devcontainer. In the bottom left corner of VSCode window, you should see the name of the image you selected. Note that from this point on, any file you modify is either a file of the container itself (that will be deleted once the container stops) or one in the specified mount folder(s) (by default
+
+To go further, please read [Developing inside a Container](https://code.visualstudio.com/docs/devcontainers/containers) from the official VSCode documenation.
+</details>
+
 ### Using DevPod CLI
 
-The easiest way to use the devcontainer from the terminal is to use [Devpod](https://devpod.sh/).
+<details>
+<summary>If you wish to use the provided devcontainers from the CLI, please follow this section:</summary>
+
+To use the provided devcontainers from the terminal, you can use [Devpod CLI](https://devpod.sh/).
 
 - [Install DevPod CLI](https://devpod.sh/docs/getting-started/install#install-devpod-cli)
 - Add docker to devpod providers:
@@ -77,46 +100,109 @@ contexts:
 
 Note that using devpod, you can also take advantage of VSCode by using `--ide=vscode`. When working with multiple devcontainers, you can use the `--id` flag to specify a name.
 
+</details>
+
+
 #### Neovim
 
-For neovim users, you can use the [remote-nvim.nvim](https://github.com/amitds1997/remote-nvim.nvim) plugin.
+<details>
+  <summary>If you wish to use the provided devcontainers within Neovim, please read this section:</summary>
 
-### VSCode
-
-- Clone `mc-rtc-superbuild`
-- Open the cloned folder in VSCode
-- VSCode will prompt you to install recommended extensions, in particular the `Devcontainer` extension
-- Once done, VSCode will prompt you to re-open the current folder in a devcontainer, select the image you wish.
-- VSCode will re-open the workspace within the devcontainer. In the bottom left corner of VSCode window, you should see the name of the image you selected.
-
+  For neovim users, you can use the [remote-nvim.nvim](https://github.com/amitds1997/remote-nvim.nvim) plugin.
+</details>
 
 ## Working within the devcontainer
 
 Once your devcontainer workspace has been created, be it with VSCode or Devpod, you can now work within the devcontainer as you would on your host system.
 
-### Building
+### Mounted folders
 
-You can now build from the terminal, or use VSCode's "CMake Tools" extension to select your desired build preset.
-Note that default presets will:
-- clone all projects in `./devel`
-- build all projects in `./build/<build type>`
-- install all projects in `./install/<build type>`
+By default the following folders are mounted within the container:
+- `/home/vscode/superbuild` : A mount point for the local `mc-rtc-superbuild` folder from which you created the container
+- `/home/vscode/workspace` : A mount point to a local developement workspace. By default `$HOME/docker-ws/mc-rtc-superbuild-<distro>`. Within this folder mc-rtc-superbuild will create:
+  - `devel/` : all source code managed by `mc-rtc-superbuild`
+  - `build/projects` : a build directory for each project managed by `mc-rtc-superbuild`
+  - `build/superbuild` : the build directory of `mc-rtc-superbuild` itself. This is used to track which projects need to be cloned/updated/built
+  - `.ccache/` : A pre-populated compilation cache is included within the docker image. Upon startup of the container, this cache is copied to the `.ccache/` folder. `mc-rtc-superbuild` configures `cmake` to make use of this cache to speed up compilation. Since the cache is now stored on your local machine, any subsequent changes to the code will benefit from this cache.
 
-```bash
-# Setup cmake and install all dependencies if necessary
-cmake --preset relwithdebinfo
-```
 
-Note that all default dependencies of mc-rtc-superbuild come pre-installed in the container images, so this will install nothing.
+### Building with `mc-rtc-superbuild`
 
-```bash
-# Build all projects
-cmake --build --preset relwithdebinfo
-```
+`mc-rtc-superbuild` is mounted to the `/home/vscode/superbuild` folder within the container. To simplify building`CMakePresets.json` are provided. The default preset `relwithdebinfo` will:
+- Clone all projects to `/home/vscode/workspace/devel`
+- Configure: since all dependencies have already been installed within the container this will simply set-up cmake build files (in `/home/vscode/workspace/build`)
+- Build: The default build preset will build all projects (build folder: `/home/vscode/workspace/build/<project>`). Since ccache compilation cache has been pre-populated from the container image, this will only take a few minutes. All projects are installed in `/home/vscode/workspace/install`.
 
-Since the container images come with a pre-generated [ccache](https://ccache.dev/), this will be fairly quick (a few minutes).
+<details>
+  <summary>Build with vscode</summary>
+  To build within vscode simply select one of the provided presets (`relwithdebinfo`) within the `CMakeTools` extensions in your leftmost vertical panel. Then configure and build the project.
+</details>
 
-## Running
+<details>
+  <summary>Build within the terminal<summary>
+  You can now build from the terminal, or use VSCode's "CMake Tools" extension to select your desired build preset.
+  Note that default presets will:
+  - clone all projects in `./devel`
+  - build all projects in `./build/<build type>`
+  - install all projects in `./install/<build type>`
+
+  ```bash
+  # Setup cmake and install all dependencies if necessary
+  cmake --preset relwithdebinfo
+  ```
+
+  Note that all default dependencies of mc-rtc-superbuild come pre-installed in the container images, so this will install nothing.
+
+  ```bash
+  # Build all projects
+  cmake --build --preset relwithdebinfo
+  ```
+
+  Since the container images come with a pre-generated [ccache](https://ccache.dev/), this will be fairly quick (a few minutes).
+</details>
+
+<details>
+  <summary>Cutom build</summary>
+
+  To customize the build process, create a `CMakeUserPresets.json` file that inherits from one of the default presets, and set up your preferred build options (build folders, cmake arguments, build type, etc)
+
+  For example:
+  ```json
+  {
+    "version": 10,
+    "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
+    "configurePresets": [
+        {
+            "name": "nanobind",
+            "displayName": "RelWithDebInfo (nanobind/noble)",
+            "inherits": [
+                "relwithdebinfo-noble"
+            ],
+            "cacheVariables": {
+                "PYTHON_BINDING": "OFF",
+                "NANOBIND_BINDINGS": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "nanobind",
+            "displayName": "RelWithDebInfo (nanobind)",
+            "configurePreset": "nanobind",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        }
+    ]
+  }
+  ```
+
+  As always, you can also add additional projects to the superbuild in the `extensions/` folder.
+</details>
+
+
+### Running
 
 To use `mc_rtc`, you need to setup the environment variables for the local installation of `mc_rtc`.
 This can be done by sourcing the following file:
