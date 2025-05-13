@@ -66,6 +66,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
   && ccache -sv \
   && echo "Removing temporary build artefacts from the image" \
   && rm -rf ~/superbuild \
+  && rm -rf ~/workspace \
   && rm ~/.gitconfig \
   && sudo rm -rf /var/lib/apt/lists/*
 
