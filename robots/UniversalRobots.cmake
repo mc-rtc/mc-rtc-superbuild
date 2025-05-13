@@ -1,7 +1,7 @@
 option(WITH_MC_RTDE "Build mc_rtde control interface for UR5E and UR10 support (>=CB3)"
        OFF
 )
-option(WITH_UR3E "Build UR5E support" OFF)
+option(WITH_UR3E "Build UR3E support" OFF)
 option(WITH_UR5E "Build UR5E support" OFF)
 option(WITH_UR10 "Build UR10 support" OFF)
 
@@ -33,7 +33,7 @@ if(WITH_MC_RTDE)
   AddProject(
     mc_rtde
     GITHUB isri-aist/mc_rtde
-    GIT_TAG origin/topic/RealTimeControl
+    GIT_TAG origin/main
     DEPENDS mc_rtc ur_modern_driver
   )
 endif()
