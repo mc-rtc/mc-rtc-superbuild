@@ -71,6 +71,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 RUN --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
   echo "Moving the generated ccache cache to the image folder ${CCACHE_IMAGE_DIR} so that it can be used at runtime" \
   && mkdir -p ${CCACHE_IMAGE_DIR} \
+  && sudo chown vscode ${CCACHE_IMAGE_DIR} \
   && cp -r ${CCACHE_BUILD_DIR}/* ${CCACHE_IMAGE_DIR}
 
 ENV CCACHE_DIR=${CCACHE_IMAGE_DIR}
