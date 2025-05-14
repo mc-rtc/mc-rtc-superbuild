@@ -11,7 +11,20 @@
             "cacheVariables": {
                 "BUILD_TESTING": "OFF",
                 "WITH_RHPS1": "ON",
-                "WITH_HRP4": "ON"
+                "WITH_HRP4": "ON",
+                "WITH_ROS_SUPPORT": "OFF",
+                "PYTHON_BINDING": "OFF"
+            }
+        },
+        {
+            "name": "hugo-notests-minimal",
+            "displayName": "Hugo RelWithDebInfo (no tests, no ros, no python)",
+            "inherits": [
+                "hugo-notests"
+            ],
+            "cacheVariables": {
+                "WITH_ROS_SUPPORT": "OFF",
+                "PYTHON_BINDING": "OFF"
             }
         },
         {
@@ -24,6 +37,17 @@
                 "BUILD_TESTING": "ON",
                 "WITH_RHPS1": "ON",
                 "WITH_HRP4": "ON",
+                "PYTHON_BINDING": "OFF"
+            }
+        },
+        {
+            "name": "hugo-tests-minimal",
+            "displayName": "Hugo RelWithDebInfo (with tests, no ros, no python)",
+            "inherits": [
+                "hugo-tests"
+            ],
+            "cacheVariables": {
+                "WITH_ROS_SUPPORT": "OFF",
                 "PYTHON_BINDING": "OFF"
             }
         }
@@ -39,9 +63,27 @@
             ]
         },
         {
+            "name": "hugo-notests-minimal",
+            "displayName": "Hugo RelWithDebInfo (no tests, no ros, no python)",
+            "configurePreset": "hugo-notests-minimal",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
             "name": "hugo-tests",
             "displayName": "Hugo RelWithDebInfo (with tests)",
             "configurePreset": "hugo-tests",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "hugo-tests-minimal",
+            "displayName": "Hugo RelWithDebInfo (with tests, no ros, no python)",
+            "configurePreset": "hugo-tests-minimal",
             "configuration": "RelWithDebInfo",
             "targets": [
                 "install"
