@@ -27,6 +27,7 @@ with section("parse"):
       'pargs': 1,
       'kwargs': {
         "APT_PACKAGES": "*",
+        "APT_DEPENDENCIES": "*",
         "BUILD_COMMAND": "*",
         "CMAKE_ARGS": 1,
         "CONFIGURE_COMMAND": "*",
@@ -203,7 +204,7 @@ with section("markup"):
   canonicalize_hashrulers = True
 
   # enable comment markup parsing and reflow
-  enable_markup = True
+  enable_markup = False
 
 # ----------------------------
 # Options affecting the linter

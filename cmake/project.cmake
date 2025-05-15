@@ -35,6 +35,10 @@ add_custom_target(
 # * NO_NINJA Indicate that the project is not compatible with the Ninja generator
 # * SUBFOLDER <folder> sub-folder of SOURCE_DESTINATION where to clone the project (also
 #   used as a sub-folder of BUILD_DESTINATION)
+# * APT_PACKAGES provide a list of packages to be installed instead of building from
+#   source when USE_MC_RTC_APT_MIRROR=ON
+# * APT_DEPENDENCIES external apt dependencies to be installed (from all available
+#   system-wide package repositories)
 #
 # Variables
 # =========
@@ -64,13 +68,32 @@ function(AddProject NAME)
       SOURCE_SUBDIR
       INSTALL_PREFIX
   )
-  set(multiValueArgs CMAKE_ARGS BUILD_COMMAND CONFIGURE_COMMAND INSTALL_COMMAND DEPENDS
-                     APT_PACKAGES
+  set(multiValueArgs
+      CMAKE_ARGS
+      BUILD_COMMAND
+      CONFIGURE_COMMAND
+      INSTALL_COMMAND
+      DEPENDS
+      APT_PACKAGES
+      APT_DEPENDENCIES
   )
   cmake_parse_arguments(
     ADD_PROJECT_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}
   )
   list(APPEND ADD_PROJECT_ARGS_DEPENDS ${GLOBAL_DEPENDS})
+
+  # Handle external dependencies
+  # XXX: we should provide a way to install some tool
+  # packages from mc_rtc apt repository (such as mesh_sampling) without having to
+  # install mc_rtc itself from packages
+  if(NOT USE_MC_RTC_APT_MIRROR AND ADD_PROJECT_ARGS_APT_DEPENDENCIES)
+    set(APT_DEPENDENCIES)
+    foreach(PKG ${ADD_PROJECT_ARGS_APT_DEPENDENCIES})
+      list(APPEND APT_DEPENDENCIES ${PKG})
+    endforeach()
+    AptInstall(${APT_DEPENDENCIES})
+  endif()
+
   if(USE_MC_RTC_APT_MIRROR AND ADD_PROJECT_ARGS_APT_PACKAGES)
     set(APT_PACKAGES)
     foreach(PKG ${ADD_PROJECT_ARGS_APT_PACKAGES})
