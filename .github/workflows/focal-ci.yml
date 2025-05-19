@@ -16,15 +16,7 @@ on:
 
 jobs:
   run:
-    strategy:
-      fail-fast: false
-      matrix:
-        use-mc-rtc-apt-mirror: [ON, OFF]
-        use-mc-rtc-apt-mirror-stable: [ON, OFF]
-        exclude:
-          - use-mc-rtc-apt-mirror: OFF
-            use-mc-rtc-apt-mirror-stable: ON
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Maximize build space
       shell: bash
@@ -47,7 +39,7 @@ jobs:
       shell: bash
       run: |
         mkdir -p ${TMPDIR-/tmp}/build-mc-rtc
-        cmake -S ${GITHUB_WORKSPACE} -B ${TMPDIR-/tmp}/build-mc-rtc -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVERBOSE_TEST_OUTPUT=ON -DUSE_MC_RTC_APT_MIRROR=${{ matrix.use-mc-rtc-apt-mirror }} -DUSE_MC_RTC_APT_MIRROR_STABLE=${{ matrix.use-mc-rtc-apt-mirror-stable }}
+        cmake -S ${GITHUB_WORKSPACE} -B ${TMPDIR-/tmp}/build-mc-rtc -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVERBOSE_TEST_OUTPUT=ON
     - name: Install mc_rtc and related projects
       shell: bash
       run: |
