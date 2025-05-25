@@ -20,8 +20,11 @@ if(WITH_MC_RTDE)
   AptInstall(libcap2-bin) # For setcap
 
   # For CB>=3 support
-  addaptrepository("ppa:sdurobotics/ur-rtde")
-  AptInstall(librtde librtde-dev)
+  find_package(ur_rtde QUIET)
+  if(NOT ${rtde_FOUND})
+    addaptrepository("ppa:sdurobotics/ur-rtde")
+    AptInstall(librtde librtde-dev)
+  endif()
 
   # For CB<=2 support
   AddProject(
