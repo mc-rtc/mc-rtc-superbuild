@@ -204,8 +204,9 @@ if(WITH_ROS_SUPPORT)
     get_property(DIR GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_DIR)
     if(ROS_IS_ROS2)
       set(ROS_SETUP_PATH "${DIR}/install/setup${RC_EXT}")
-      set(FINAL_COMMAND "${FINAL_COMMAND} 
-export ROS_LOCALHOST_ONLY=1")
+      set(FINAL_COMMAND "${FINAL_COMMAND}
+export ROS_LOCALHOST_ONLY=1"
+      )
     else()
       set(ROS_SETUP_PATH "${DIR}/devel/setup${RC_EXT}")
     endif()
