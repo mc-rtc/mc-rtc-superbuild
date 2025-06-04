@@ -1,0 +1,3 @@
+[submodule "extensions/superbuild-extensions"]
+	path = extensions/superbuild-extensions
+	url = git@github.com:mc-rtc/superbuild-extensions.git

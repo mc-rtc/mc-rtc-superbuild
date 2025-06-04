@@ -1,0 +1,64 @@
+name: CI Ubuntu Jammy (Devcontainer)
+
+on:
+  repository_dispatch:
+    types:
+    - build-jammy
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  run:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        containerName: [cdadance-dev, cdadance-release]
+    steps:
+    # - name: Maximize build space
+    #   shell: bash
+    #   run: |
+    #     sudo rm -rf /usr/share/dotnet
+    #     sudo rm -rf /opt/ghc
+    #     sudo docker image prune --all --force
+    #     echo "===== AVAILABLE DISK SPACE ====="
+    #     df -h
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        # this might remove tools that are actually needed,
+        # if set to "true" but frees about 6 GB
+        tool-cache: true
+        # all of these default to true, but feel free to set to
+        # "false" if necessary for your workflow
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: true
+        swap-storage: true
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    # Publish cdadance-dev and cdadance-release docker images
+    - name: Pre-build dev container image (main branch of official repository)
+      if: github.ref == 'refs/heads/demo/CDADance' && github.repository == 'mc-rtc/mc-rtc-superbuild'
+      uses: devcontainers/ci@v0.3
+      with:
+        imageName: ghcr.io/mc-rtc/${{ matrix.containerName }}
+        imageTag: latest
+        subFolder: .github/devcontainer/${{ matrix.containerName }}
+        configFile: .github/devcontainer/${{ matrix.containerName }}/devcontainer.json
+        push: always

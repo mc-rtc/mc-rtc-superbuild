@@ -1,0 +1,30 @@
+{
+  "name": "demo-cdadance-superbuild-jammy",
+  "image": "ghcr.io/mc-rtc/cdadance-dev:latest",
+
+  "mounts": [
+//    "type=bind,source=/home/${localEnv:USER}/.gitconfig,target=/home/vscode/.gitconfig",
+    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/demo-cdadance-superbuild-jammy,target=/home/vscode/workspace,type=bind,consistency=cached"
+  ],
+
+  "runArgs": [
+    "--network=host",
+    "--cap-add=sys_nice", // Grants the container the CAP_SYS_NICE capability, which allows the container to raise process nice values, set real-time scheduling policies, set CPU affinity, and other operations.
+    "--security-opt", // allow core dumps
+    "seccomp=unconfined", // allow core dumps
+    // Uncomment for containers requiring use of nvidia GPUs
+    // You will need to install NVIDIA Container Toolkit first
+    // "--runtime=nvidia",
+    // "--gpus=all",
+  ],
+
+  "containerEnv": {
+    "UBUNTU_VERSION": "jammy",
+    "DISPLAY": "${localEnv:DISPLAY}"
+  },
+
+  "remoteUser": "vscode",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/superbuild,type=bind",
+  "workspaceFolder": "/home/vscode/superbuild"
+}
