@@ -4,6 +4,10 @@
   "build": {
     "dockerfile": "Dockerfile",
     "context": "../../..",
+    "args":
+    {
+      "CMAKE_PRESET": "cdadance-demo"
+    }
     // See https://github.com/devcontainers/cli/issues/1020
     // "options": [
     //   "--ssh default"

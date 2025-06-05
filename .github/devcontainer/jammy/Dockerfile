@@ -23,6 +23,8 @@ RUN useradd -ms /bin/zsh vscode && \
     && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
     && echo "User vscode (uid=`id -u vscode`:gid=`id -g vscode`) created with passwordless sudo privileges"
 
+USER vscode
+
 # Build time cache directory to speed up sucessive rebuilds of this image
 ENV CCACHE_BUILD_DIR=/tmp/ccache
 # The ccache cache generated in CCACHE_BUILD_DIR is copied to the CCACHE_IMAGE_DIR for fast initial build times
