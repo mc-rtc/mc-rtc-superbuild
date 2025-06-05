@@ -8,7 +8,7 @@
             "inherits": "relwithdebinfo",
             "cacheVariables": {
                 "BUILD_TESTING": "OFF",
-                "WITH_ROS_SUPPORT": "OFF", // only needed for AutonomousInteraction state in CDADance
+                "WITH_ROS_SUPPORT": "ON", // only needed for AutonomousInteraction state in CDADance
                 "PYTHON_BINDING": "OFF",
                 "WITH_HRP4": "ON",
                 "WITH_XSENS_STREAMING": "OFF"

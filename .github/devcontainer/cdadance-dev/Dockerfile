@@ -58,8 +58,8 @@ RUN echo 'kill cache'
 RUN --mount=type=cache,target=/var/cache/apt \
   --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
   ccache -z \
-  && cmake --preset relwithdebinfo \
-  && cmake --build --preset relwithdebinfo \
+  && cmake --preset cdadance-demo \
+  && cmake --build --preset cdadance-demo \
   && echo "Checking ccache:" \
   && ccache -sv \
   && echo "Removing temporary build artefacts from the image" \
