@@ -6,12 +6,13 @@
     "context": "../../..",
     "args":
     {
-      "CMAKE_PRESET": "cdadance-demo"
-    }
+      "CMAKE_PRESET": "cdadance-demo",
+      "BUILD_VERSION": "devcontainer"
+    },
     // See https://github.com/devcontainers/cli/issues/1020
-    // "options": [
-    //   "--ssh default"
-    // ]
+    "options": [
+      "--ssh=default"
+    ]
   },
 
   "containerEnv": {
@@ -20,7 +21,7 @@
 
   "mounts": [
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/mc-rtc-superbuild-jammy,target=/home/vscode/workspace,type=bind,consistency=cached"
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/sandbox/cdadance-release-devcontainer,target=/home/vscode/workspace,type=bind,consistency=cached"
   ],
 
   "features":
