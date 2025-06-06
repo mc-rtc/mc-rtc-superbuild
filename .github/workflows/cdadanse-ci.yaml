@@ -61,7 +61,7 @@ jobs:
       run: |
         cat .github/devcontainer/${{ matrix.containerName }}/Dockerfile
         echo "SSH_AUTH_SOCK = ${{ env.SSH_AUTH_SOCK }}"
-        docker build . -f .github/devcontainer/${{ matrix.containerName }}/Dockerfile --ssh default --tag ghcr.io/mc-rtc/${{ matrix.containerName }}:standalone-latest --build-arg CMAKE_PRESET=cdadance-demo
+        docker build . -f .github/devcontainer/${{ matrix.containerName }}/Dockerfile --ssh default --tag ghcr.io/mc-rtc/${{ matrix.containerName }}:standalone-latest --build-arg CMAKE_PRESET=cdadance-demo --build-arg BUILD_VERSION=standalone
         docker push ghcr.io/mc-rtc/${{ matrix.containerName }}:standalone-latest
 
 
