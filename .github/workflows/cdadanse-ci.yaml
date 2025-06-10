@@ -19,6 +19,7 @@ jobs:
       matrix:
         # containerName: [cdadance-dev, cdadance-release]
         containerName: [cdadance-release]
+        buildPreset: [cdadance-demo-auto, cdadance-demo-manual, cdadance-simu-auto, cdadance-simu-manual]
     steps:
     - name: Configure ssh-agent 
       uses: webfactory/ssh-agent@v0.9.0
@@ -56,28 +57,33 @@ jobs:
       with:
         submodules: recursive
 
-    - name: 'Build Standalone Release Docker Version'
+    - name: 'Docker: Build Standalone Release'
       shell: bash
       run: |
         cat .github/devcontainer/${{ matrix.containerName }}/Dockerfile
         echo "SSH_AUTH_SOCK = ${{ env.SSH_AUTH_SOCK }}"
-        docker build . -f .github/devcontainer/${{ matrix.containerName }}/Dockerfile --ssh default --tag ghcr.io/mc-rtc/${{ matrix.containerName }}:standalone-latest --build-arg CMAKE_PRESET=cdadance-demo --build-arg BUILD_VERSION=standalone
-        docker push ghcr.io/mc-rtc/${{ matrix.containerName }}:standalone-latest
+        CONTAINER_NAME=ghcr.io/mc-rtc/cdadance
+        CONTAINER_TAG=${{ matrix.buildPreset }}-standalone-latest
+        echo "CONTAINER_NAME=${CONTAINER_NAME}" >> $GITHUB_ENV
+        echo "CONTAINER_TAG=${CONTAINER_TAG}" >> $GITHUB_ENV
+
+        docker build . -f .github/devcontainer/${{ matrix.containerName }}/Dockerfile --ssh default --tag ${CONTAINER_NAME}:${CONTAINER_TAG} --build-arg CMAKE_PRESET=${{ matrix.buildPreset }} --build-arg BUILD_VERSION=${BUILD_VERSION}
+        docker push ${CONTAINER_NAME}:${CONTAINER_TAG}
 
 
-    - name: "Prepare Dockerfile for Devcontainer Release Version"
+    - name: "Devcontainer: Prepare Dockerfile for Devcontainer Release Version"
       shell: bash
       run: |
-          echo "FROM ghcr.io/mc-rtc/${{ matrix.containerName }}:standalone-latest" > .github/devcontainer/${{ matrix.containerName }}/Dockerfile
+          echo "FROM ${CONTAINER_NAME}:${CONTAINER_TAG}" > .github/devcontainer/${{ matrix.containerName }}/Dockerfile
           cat .github/devcontainer/${{ matrix.containerName }}/Dockerfile
 
     # Publish cdadance-dev and cdadance-release docker images
-    - name: Build Devcontainer Release Version (main branch of official repository)
+    - name: "Devcontainer: Build Release Version (main branch of official repository)"
       if: github.ref == 'refs/heads/demo/CDADance' && github.repository == 'mc-rtc/mc-rtc-superbuild'
       uses: devcontainers/ci@v0.3
       with:
-        imageName: ghcr.io/mc-rtc/${{ matrix.containerName }}
-        imageTag: devcontainer-latest
+        imageName: ghcr.io/mc-rtc/cdadance
+        imageTag: ${{ matrix.buildPreset }}-devcontainer-latest
         subFolder: .github/devcontainer/${{ matrix.containerName }}
         configFile: .github/devcontainer/${{ matrix.containerName }}/devcontainer.json
         push: always
