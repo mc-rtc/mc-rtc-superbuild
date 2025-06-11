@@ -2,7 +2,7 @@
   "name": "mc-rtc-superbuild-noble-build",
 
   "build": {
-    "dockerfile": "Dockerfile",
+    "dockerfile": "../Dockerfile",
     "context": "../../.."
   },
 
@@ -11,8 +11,8 @@
   },
 
   "mounts": [
-    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached",
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/mc-rtc-superbuild-noble,target=/home/vscode/workspace,type=bind,consistency=cached"
+    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached"
+    // "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/mc-rtc-superbuild-noble,target=/home/vscode/workspace,type=bind,consistency=cached"
   ],
 
   "features":

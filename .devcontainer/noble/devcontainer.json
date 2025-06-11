@@ -8,11 +8,11 @@
   // - A cython build cache built from the latest sources
   // - All tools required to build the project
   // - A sensible default configuration for vscode
-  "image": "ghcr.io/mc-rtc/mc-rtc-superbuild:noble",
+  "image": "ghcr.io/mc-rtc/mc-rtc-superbuild:noble-devcontainer-latest",
 
   "mounts": [
-    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached",
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/mc-rtc-superbuild-noble,target=/home/vscode/workspace,type=bind,consistency=cached"
+    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached"
+    // "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/mc-rtc-superbuild-noble,target=/home/vscode/workspace,type=bind,consistency=cached"
   ],
 
   "runArgs": [

@@ -1,4 +1,4 @@
-name: CI Ubuntu Jammy (Devcontainer)
+name: Package Devcontainers
 
 on:
   repository_dispatch:
@@ -18,29 +18,27 @@ jobs:
       fail-fast: false
       matrix:
         os: [jammy, noble]
+
     steps:
-    # - name: Maximize build space
-    #   shell: bash
-    #   run: |
-    #     sudo rm -rf /usr/share/dotnet
-    #     sudo rm -rf /opt/ghc
-    #     sudo docker image prune --all --force
-    #     echo "===== AVAILABLE DISK SPACE ====="
-    #     df -h
+    # Configures ssh-agent if SSH_KEY secret exists
+    - name: Configure ssh-agent
+      env:
+        SSH_KEY: ${{ secrets.ssh_key }}
+      if: ${{ env.SSH_KEY != '' }}
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_KEY }}
+
+    - name: Check ssh-agent
+      if: ${{ env.SSH_KEY != '' }}
+      shell: bash
+      run: |
+          echo "SSH_AUTH_SOCK = ${{ env.SSH_AUTH_SOCK }}"
+          ssh-add -l
+
     - name: Free Disk Space (Ubuntu)
       uses: jlumbroso/free-disk-space@main
-      with:
-        # this might remove tools that are actually needed,
-        # if set to "true" but frees about 6 GB
-        tool-cache: true
-        # all of these default to true, but feel free to set to
-        # "false" if necessary for your workflow
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: true
-        docker-images: true
-        swap-storage: true
+
     - uses: actions/checkout@v3
       with:
         submodules: recursive
@@ -51,6 +49,34 @@ jobs:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 'Docker: Build Standalone Release'
+      env:
+        CONTAINER_NAME: ghcr.io/mc-rtc/mc-rtc-superbuild
+        CONTAINER_TAG: ${{ matrix.os }}-standalone-latest
+        SSH_OPT: ""
+      shell: bash
+      run: |
+        CMAKE_PRESET="relwithdebinfo"
+        if [ "${{ matrix.os }}" = "noble" ]; then
+          echo "os is noble"
+          CMAKE_PRESET=relwithdebinfo-noble
+        else
+          echo "os is not noble"
+        fi
+        echo "CMAKE_PRESET: $CMAKE_PRESET"
+
+        if [ ${{ env.SSH_KEY }} != '' ]; then
+          echo "SSH_OPT='--ssh default'" >> $GITHUB_ENV;
+        fi
+        cat .github/devcontainer/Dockerfile
+        docker build . -f .github/devcontainer/Dockerfile $SSH_OPT --tag ${CONTAINER_NAME}:${CONTAINER_TAG} --build-arg CMAKE_PRESET=$CMAKE_PRESET --build-arg BUILD_VERSION=standalone --build-arg UBUNTU_VERSION="${{ matrix.os }}"
+
+    - name: 'Docker: Push Standalone Release (public repositories)'
+      if: github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild'
+      shell: bash
+      run: |
+        docker push ${CONTAINER_NAME}:${CONTAINER_TAG}
 
     # This workflow tests building the image but does not push it to github container registry
     - name: Pre-build dev container image (branches and forks)
@@ -68,7 +94,7 @@ jobs:
       with:
         # cacheFrom: ghcr.io/arntanguy/mc-rtc-superbuild
         imageName: ghcr.io/mc-rtc/mc-rtc-superbuild
-        imageTag: ${{ matrix.os }}
+        imageTag: ${{ matrix.os }}-devcontainer-latest
         subFolder: .github/devcontainer/${{ matrix.os }}
         configFile: .github/devcontainer/${{ matrix.os }}/devcontainer.json
         push: always
