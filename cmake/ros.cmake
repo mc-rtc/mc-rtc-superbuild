@@ -172,8 +172,8 @@ function(CreateCatkinWorkspace)
     # FIXME Add support for skiplist
     set(BUILD_COMMAND
         ${CMAKE_COMMAND} -E chdir ${DIR} ${COMMAND_PREFIX} colcon build --merge-install
-        --cmake-args -DCMAKE_BUILD_TYPE=$<CONFIG> -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON
-        ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS}
+        --cmake-args -DCMAKE_BUILD_TYPE=$<CONFIG>
+        -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS}
     )
   endif()
   set(STAMP_FILE "${STAMP_DIR}/${ID}.stamp")
