@@ -172,20 +172,50 @@ function(CreateCatkinWorkspace)
     # FIXME Add support for skiplist
     set(BUILD_COMMAND
         ${CMAKE_COMMAND} -E chdir ${DIR} ${COMMAND_PREFIX} colcon build --merge-install
-        --cmake-args -DCMAKE_BUILD_TYPE=$<CONFIG>
+        --cmake-args -DCMAKE_BUILD_TYPE=$<CONFIG> -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON
         ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS}
     )
   endif()
   set(STAMP_FILE "${STAMP_DIR}/${ID}.stamp")
   set_property(GLOBAL PROPERTY CATKIN_WORKSPACE_${ID}_STAMP "${STAMP_FILE}")
+  # create workspace-level symlink for compile_commands.json
+  if(LINK_COMPILE_COMMANDS)
+    set(OPTIONAL_LINK_COMPILE_COMMANDS
+        ${CMAKE_COMMAND} -DSOURCE_DIR=${DIR} -DBINARY_DIR="${DIR}/build" -P
+        ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-compile-commands.cmake
+    )
+  else()
+    set(OPTIONAL_LINK_COMPILE_COMMANDS "")
+  endif()
   add_custom_command(
     OUTPUT "${STAMP_FILE}"
     COMMAND ${BUILD_COMMAND}
+    COMMAND ${OPTIONAL_LINK_COMPILE_COMMANDS}
     COMMAND "${CMAKE_COMMAND}" -E touch "${STAMP_FILE}"
     COMMENT "Build catkin workspace ${ID} at ${DIR}" ${BUILD_COMMAND_DEPENDS}
   )
   add_custom_target(catkin-build-${ID} DEPENDS "${STAMP_FILE}")
   add_dependencies(catkin-build-${ID} catkin-init-${ID})
+
+  add_custom_target(
+    catkin-link-compile-commands-${ID}
+    DEPENDS "${STAMP_FILE}"
+    COMMAND echo "Finalizing catkin workspace ${ID}"
+  )
+  add_dependencies(catkin-link-compile-commands-${ID} catkin-build-${ID})
+  # if(LINK_COMPILE_COMMANDS)
+  # message(STATUS "LINK_COMPILE_COMMANDS is set, colcon will link compile_commands.json to ${DIR}/compile_commands.json")
+  # add_custom_command(
+  #     OUTPUT ${DIR}/compile_commands.json
+  #     COMMAND
+  #       ${CMAKE_COMMAND} -DSOURCE_DIR=${DIR} -DBINARY_DIR="${DIR}/build" -P
+  #       ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/link-compile-commands.cmake
+  #     DEPENDS "${STAMP_FILE}"
+  #     COMMENT "Link compile_commands.json for ${ID} at ${DIR}"
+  #   )
+  #   add_custom_target(catkin-link-compile-commands-${ID} DEPENDS ${DIR}/compile_commands.json)
+  #   add_dependencies(catkin-link-compile-commands-${ID} catkin-build-${ID})
+  # endif()
   cmake_language(
     EVAL CODE "
     cmake_language(DEFER CALL FinalizeCatkinWorkspace [[${ID}]])
