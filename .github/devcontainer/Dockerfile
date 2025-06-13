@@ -9,8 +9,8 @@ ARG BUILD_VERSION="devcontainer"
 ARG CMAKE_PRESET="relwithdebinfo"
 ARG ZSH_THEME="bira"
 
-ARG APT_PACKAGES_STANDALONE="sudo gnupg2 gpg-agent openssh-server openssh-client wget curl ca-certificates git"
-ARG APT_PACKAGES_DEVCONTAINER="sudo gnupg2 gpg-agent openssh-server wget curl ca-certificates ccache ripgrep rsync clangd git"
+ARG APT_PACKAGES_STANDALONE="sudo gnupg2 gpg-agent openssh-server openssh-client wget curl ca-certificates git ccache"
+ARG APT_PACKAGES_DEVCONTAINER="sudo gnupg2 gpg-agent openssh-server wget curl ca-certificates ccache ripgrep rsync clangd git ccache"
 ARG EMAIL="devcontainer@mc-rtc-superbuild.com"
 ARG NAME="mc_rtc devcontainer"
 
@@ -37,6 +37,14 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt-get install -y --no-install-recommends ${APT_PACKAGES_DEVCONTAINER}; \
   else \
     apt-get install -y --no-install-recommends ${APT_PACKAGES_STANDALONE}; \
+  fi
+
+# Workaround screeen refresh issues with neovim/ncurses
+RUN \
+  if [ "$UBUNTU_VERSION" = "noble" ]; then \
+    apt install --no-install-recommends -y libtinfo6; \
+  else \
+    apt install --no-install-recommends -y libtinfo5; \
   fi
 
 
