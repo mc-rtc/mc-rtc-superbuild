@@ -1,0 +1,55 @@
+{
+  "name": "mc-rtc-superbuild-jammy-build",
+  "remoteUser": "vscode",
+
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "../../..",
+    "args": {
+      "KEEP_INSTALL": true
+    }
+  },
+
+  "containerEnv": {
+    "DISPLAY": "${localEnv:DISPLAY}"
+  },
+
+  "mounts": [
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
+  ],
+
+  "features":
+  {
+    "ghcr.io/duduribeiro/devcontainer-features/neovim:1.0.1": {},
+    "ghcr.io/devcontainers/features/github-cli": { "version": "latest" },
+    "ghcr.io/georgofenbeck/features/lazygit-linuxbinary:1": { "version": "latest" }
+  },
+
+  "postCreateCommand": "~/superbuild/.devcontainer/setupShell.sh",
+
+  // Configure tool-specific properties.
+  "customizations": {
+      "vscode": {
+          "extensions": [
+            "twxs.cmake",
+            "ms-vscode.cmake-tools",
+            "josetr.cmake-language-support-vscode",
+            "ms-vscode.cpptools",
+            "ms-vscode.docker",
+            "ms-vscode.cpptools-extension-pack",
+            "ms-vscode-remote.remote-containers",
+            "ms-python.python",
+            "GitHub.vscode-github-actions"
+          ]
+      }
+  },
+
+
+  "runArgs": [
+    "--network=host",
+    "--cap-add=sys_nice" // Grants the container the CAP_SYS_NICE capability, which allows the container to raise process nice values, set real-time scheduling policies, set CPU affinity, and other operations.
+  ],
+
+  "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/superbuild,type=bind",
+  "workspaceFolder": "/home/vscode/superbuild"
+}
