@@ -235,22 +235,40 @@ This is likely a conflict between different extensions."
       # GIT_REPOSITORY and/or GIT_TAG have changed, we check if there was any local
       # changes
       if(EXISTS "${SOURCE_DIR}/.git")
+        # Check if the previous tag exists on the previous remote
         execute_process(
-          COMMAND git diff-index --quiet ${PREVIOUS_GIT_TAG} --
+          COMMAND git ls-remote --exit-code --heads origin ${PREVIOUS_GIT_TAG}
           WORKING_DIRECTORY "${SOURCE_DIR}"
-          RESULT_VARIABLE GIT_HAS_ANY_CHANGES
+          RESULT_VARIABLE GIT_PREVIOUS_GIT_TAG_EXISTS
         )
-        if(GIT_HAS_ANY_CHANGES)
+        if(NOT GIT_PREVIOUS_GIT_TAG_EXISTS EQUAL 0)
           message(
-            FATAL_ERROR
-              "The repository for ${NAME} changed.
+            WARNING
+              "The previous remote ${PREVIOUS_GIT_REPOSITORY} does not have branch ${PREVIOUS_GIT_TAG}"
+          )
+        else()
+          # If the previous tag exists on the remote, check if we have differences between the local tag and the remote tag
+          set(GIT_DIFF_INDEX_OUTPUT "")
+          execute_process(
+            COMMAND git diff-index --quiet ${PREVIOUS_GIT_TAG} --
+            WORKING_DIRECTORY "${SOURCE_DIR}"
+            OUTPUT_VARIABLE GIT_DIFF_INDEX_OUTPUT
+            ERROR_VARIABLE GIT_DIFF_INDEX_OUTPUT
+            RESULT_VARIABLE GIT_HAS_ANY_CHANGES
+          )
+          if(GIT_HAS_ANY_CHANGES)
+            message(
+              FATAL_ERROR
+                "The repository for ${NAME} changed.
 From
   ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG}
 To
   ${GIT_REPOSITORY}#${GIT_TAG}
 
-You have local changes in ${SOURCE_DIR} that would be overwritten by this change. Save your work before continuing"
-          )
+You have local changes in ${SOURCE_DIR} that would be overwritten by this change. Save your work before continuing.
+Changes are:\n${GIT_DIFF_INDEX_OUTPUT}"
+            )
+          endif()
         endif()
       endif()
       set(GIT_COMMIT_EXTRA_MSG

@@ -45,9 +45,14 @@ while(${RETRY_I} LESS_EQUAL ${RETRY_COUNT})
   if(${RETRY_I} EQUAL ${RETRY_COUNT})
     set(IS_FATAL COMMAND_ERROR_IS_FATAL ANY)
   endif()
+  set(GIT_COMMAND_STDOUT "")
+  set(GIT_COMMAND_STDERR "")
   execute_process(
+    COMMAND git submodule sync
     COMMAND ${GIT_COMMAND}
     WORKING_DIRECTORY "${SOURCE_DESTINATION}"
+    OUTPUT_VARIABLE GIT_COMMAND_STDOUT
+    ERROR_VARIABLE GIT_COMMAND_STDERR
     RESULT_VARIABLE GIT_SUBMODULE_FAILED ${IS_FATAL}
   )
   if(${GIT_SUBMODULE_FAILED} EQUAL 0)
@@ -55,7 +60,10 @@ while(${RETRY_I} LESS_EQUAL ${RETRY_COUNT})
   endif()
   math(EXPR RETRY_I "${RETRY_I} + 1")
   execute_process(COMMAND "${CMAKE_COMMAND}" -E sleep ${RETRY_WAIT})
-  message("git submodule operation failed, try ${RETRY_I} out of ${RETRY_COUNT}")
+  message(
+    WARNING "git submodule operation failed, try ${RETRY_I} out of ${RETRY_COUNT}"
+  )
+  message(WARNING "details:\n${GIT_COMMAND_STDOUT}\n${GIT_COMMAND_STDERR}")
 endwhile()
 
 execute_process(
