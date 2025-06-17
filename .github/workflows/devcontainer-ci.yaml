@@ -72,6 +72,9 @@ jobs:
         cat .github/devcontainer/Dockerfile
         docker build . -f .github/devcontainer/Dockerfile $SSH_OPT --tag ${CONTAINER_NAME}:${CONTAINER_TAG} --build-arg CMAKE_PRESET=$CMAKE_PRESET --build-arg BUILD_VERSION=standalone --build-arg UBUNTU_VERSION="${{ matrix.os }}"
 
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+
     - name: 'Docker: Push Standalone Release (public repositories)'
       if: github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild'
       shell: bash
