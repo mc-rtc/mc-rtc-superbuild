@@ -3,23 +3,25 @@
     "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
     "configurePresets": [
         {
-            "name": "alix",
-            "displayName": "Alix RelWithDebInfo (with tests)",
+            "name": "choreonoid-system",
+            "displayName": "Choreonoid RelWithDebInfo (with tests)",
             "inherits": [
                 "relwithdebinfo"
             ],
             "cacheVariables": {
                 "WITH_ROS_SUPPORT": "ON",
                 "BUILD_TESTING": "ON",
-                "WITH_RHPS1": "ON"
+                "WITH_RHPS1": "ON",
+                "WITH_HRP5P": "ON",
+                "WITH_HRP4CR": "ON"
             }
         }
     ],
     "buildPresets": [
         {
-            "name": "alix",
-            "displayName": "Alix RelWithDebInfo (with tests)",
-            "configurePreset": "alix",
+            "name": "choreonoid-system",
+            "displayName": "Choreonoid RelWithDebInfo (with tests)",
+            "configurePreset": "choreonoid-system",
             "configuration": "RelWithDebInfo",
             "targets": [
                 "install"
