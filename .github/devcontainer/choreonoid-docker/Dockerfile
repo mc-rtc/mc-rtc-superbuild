@@ -5,6 +5,27 @@ RUN export DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+
+# Configure ssh-forwarding
+# NOTE: to use ssh-forwarding you need to use
+# RUN --mount=type=ssh,uid=1000 \
+RUN \
+  apt-get update && apt-get install -y --no-install-recommends openssh-client openssh-server \
+  && mkdir -p ~/.ssh \
+  && echo "\nHost github.com\n    ForwardAgent yes\nHost gite.lirmm.fr\n    ForwardAgent yes" >> ~/.ssh/config \
+  && ssh-keyscan github.com >> ~/.ssh/known_hosts \
+  && ssh-keyscan gite.lirmm.fr >> ~/.ssh/known_hosts \
+  && cat ~/.ssh/config;
+
+# Check ssh-agent forwarding
+RUN --mount=type=ssh \
+  echo "Check ssh agent forwarding"; \
+  if [ -n "$SSH_AUTH_SOCK" ]; then \
+    echo "ssh-forwarding is not available"; \
+  else \
+    ssh-add -l; \
+  fi
+
 # Add mc-rtc-superbuild to the build context
 COPY ../../../ /root/superbuild
 WORKDIR /root/superbuild
@@ -17,7 +38,6 @@ RUN ./utils/bootstrap-linux.sh \
   && git config --global user.email "${EMAIL}" && git config --global user.name "${NAME}" \
   && sudo rm -rf /var/lib/apt/lists/*
 
-RUN ssh-keyscan github.com > /etc/ssh/ssh_known_hosts
 
 RUN --mount=type=ssh cmake --preset choreonoid-system \
   && cmake --build --preset choreonoid-system \
