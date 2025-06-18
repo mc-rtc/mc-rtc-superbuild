@@ -20,10 +20,16 @@ jobs:
         os: [jammy, noble]
 
     steps:
+    - name: Dump github context
+      run:   echo "$GITHUB_CONTEXT"
+      shell: bash
+      env:
+       GITHUB_CONTEXT: ${{ toJson(github) }}
+
     # Configures ssh-agent if SSH_KEY secret exists
     - name: Configure ssh-agent
       env:
-        SSH_KEY: ${{ secrets.ssh_key }}
+        SSH_KEY: ${{ secrets.SSH_KEY }}
       if: ${{ env.SSH_KEY != '' }}
       uses: webfactory/ssh-agent@v0.9.0
       with:
@@ -57,6 +63,7 @@ jobs:
         SSH_OPT: ""
       shell: bash
       run: |
+        echo "::group::Prepare docker"
         CMAKE_PRESET="relwithdebinfo"
         if [ "${{ matrix.os }}" = "noble" ]; then
           echo "os is noble"
@@ -69,17 +76,28 @@ jobs:
         if [ ${{ env.SSH_KEY }} != '' ]; then
           echo "SSH_OPT='--ssh default'" >> $GITHUB_ENV;
         fi
-        cat .github/devcontainer/Dockerfile
-        docker build . -f .github/devcontainer/Dockerfile $SSH_OPT --tag ${CONTAINER_NAME}:${CONTAINER_TAG} --build-arg CMAKE_PRESET=$CMAKE_PRESET --build-arg BUILD_VERSION=standalone --build-arg UBUNTU_VERSION="${{ matrix.os }}"
+        echo "::endgroup::"
 
-    - name: Free Disk Space (Ubuntu)
-      uses: jlumbroso/free-disk-space@main
+        echo "::group::Print Dockerfile"
+        cat .github/devcontainer/Dockerfile
+        echo "::endgroup::"
+
+        echo "::group::Build Dockerfile"
+        docker build . -f .github/devcontainer/Dockerfile $SSH_OPT --tag ${CONTAINER_NAME}:${CONTAINER_TAG} --build-arg CMAKE_PRESET=$CMAKE_PRESET --build-arg BUILD_VERSION=standalone --build-arg UBUNTU_VERSION="${{ matrix.os }}"
+        echo "::endgroup::"
+
+        echo "::group::Check docker image size"
+        docker inspect -f "{{ .Size }}" ${CONTAINER_NAME}:${CONTAINER_TAG} | numfmt --to=si
+        echo "::endgroup::"
 
     - name: 'Docker: Push Standalone Release (public repositories)'
       if: github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild'
       shell: bash
       run: |
         docker push ${CONTAINER_NAME}:${CONTAINER_TAG}
+
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
 
     # This workflow tests building the image but does not push it to github container registry
     - name: Pre-build dev container image (branches and forks)
@@ -101,3 +119,10 @@ jobs:
         subFolder: .github/devcontainer/${{ matrix.os }}
         configFile: .github/devcontainer/${{ matrix.os }}/devcontainer.json
         push: always
+
+    - name: 'Docker: Check devcontainer size'
+      shell: bash
+      run: |
+        echo "::group::Check devcontainer's docker image size"
+        docker inspect -f "{{ .Size }}" ${CONTAINER_NAME}:${{matrix.os}}-devcontainer-latest | numfmt --to=si
+        echo "::endgroup::"
