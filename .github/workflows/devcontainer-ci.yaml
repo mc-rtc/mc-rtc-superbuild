@@ -124,5 +124,5 @@ jobs:
       shell: bash
       run: |
         echo "::group::Check devcontainer's docker image size"
-        docker inspect -f "{{ .Size }}" ${CONTAINER_NAME}:${{matrix.os}}-devcontainer-latest | numfmt --to=si
+        docker inspect -f "{{ .Size }}" ghcr.io/mc-rtc/mc-rtc-superbuild:${{matrix.os}}-devcontainer-latest | numfmt --to=si
         echo "::endgroup::"

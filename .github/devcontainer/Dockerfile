@@ -13,12 +13,21 @@ ARG CMAKE_PRESET="relwithdebinfo"
 ARG KEEP_SOURCES=""
 # Same as KEEP_SOURCES but for the build folder
 ARG KEEP_BUILD=""
+ARG KEEP_CCACHE=""
 # Same as KEEP_SOURCES but for the install folder
 ARG KEEP_INSTALL=""
+# Build time cache directory to speed up sucessive rebuilds of this image
+# This is kept into the docker cache
+ARG CCACHE_BUILD_DIR=/tmp/ccache
+# When KEEP_CCACHE=true, the ccache cache generated in CCACHE_BUILD_DIR is copied to the CCACHE_IMAGE_DIR for fast initial build times when using this image
+ARG CCACHE_IMAGE_DIR=/home/vscode/.cache/ccache
+# During build phase, use build time ccache directory (mounted in docker build cache)
+ENV CCACHE_DIR=${CCACHE_BUILD_DIR}
 ARG ZSH_THEME="bira"
 
+
 ARG APT_PACKAGES_STANDALONE="sudo gnupg2 gpg-agent openssh-server openssh-client wget curl ca-certificates git ccache"
-ARG APT_PACKAGES_DEVCONTAINER="sudo gnupg2 gpg-agent openssh-server wget curl ca-certificates ccache ripgrep rsync clangd git ccache"
+ARG APT_PACKAGES_DEVCONTAINER="sudo gnupg2 gpg-agent openssh-server wget curl ca-certificates ripgrep rsync clangd git ccache"
 ARG EMAIL="devcontainer@mc-rtc-superbuild.com"
 ARG NAME="mc_rtc devcontainer"
 
@@ -34,6 +43,7 @@ RUN echo "Building with ARGS:" \
  && echo "CMAKE_PRESET=$CMAKE_PRESET" \
  && echo "KEEP_SOURCES=$KEEP_SOURCES" \
  && echo "KEEP_BUILD=$KEEP_BUILD" \
+ && echo "KEEP_CCACHE=$KEEP_CCACHE" \
  && echo "KEEP_INSTALL=$KEEP_INSTALL" \
  && echo "UBUNTU_VERSION=$UBUNTU_VERSION" \
  && echo "APT_PACKAGES_STANDALONE=$APT_PACKAGES_STANDALONE" \
@@ -103,28 +113,24 @@ RUN mkdir -p ~/.ssh \
   && ssh-keyscan gite.lirmm.fr >> ~/.ssh/known_hosts \
   && cat ~/.ssh/config;
 
-# Build time cache directory to speed up sucessive rebuilds of this image
-ENV CCACHE_BUILD_DIR=/tmp/ccache
-# The ccache cache generated in CCACHE_BUILD_DIR is copied to the CCACHE_IMAGE_DIR for fast initial build times when using this image
-ENV CCACHE_IMAGE_DIR=/home/vscode/.cache/ccache
-
-# Use build time ccache directory (mounted in docker build cache)
-ENV CCACHE_DIR=${CCACHE_BUILD_DIR}
-
 # Check ccache
 RUN --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
   if [ "$(ls -A ${CCACHE_BUILD_DIR})" ]; then \
-    echo "Found existing ccache cache in the docker build cache, using it"; \
+    echo "CCACHE: Found existing ccache cache in the docker build cache, using it"; \
     ccache -z; \
     ccache -sv; \
   else \
-    echo "ccache mount directory is empty, it will be populated during the superbuild build step"; \
+    echo "CCACHE: ccache mount directory is empty, it will be populated during the superbuild build step"; \
   fi
 
 # Add mc-rtc-superbuild to the build context
 # It is better to keep it in the same folder in order to increase ccache hit rate
 COPY --chown=vscode:vscode ../../.. /home/vscode/superbuild
 WORKDIR /home/vscode/superbuild
+
+# Copy entrypoint into the image
+RUN \
+  cp ~/superbuild/.devcontainer/docker-entrypoint.sh ~/.docker-entrypoint.sh
 
 RUN --mount=type=cache,target=/var/cache/apt \
   ./utils/bootstrap-linux.sh \
@@ -133,9 +139,19 @@ RUN --mount=type=cache,target=/var/cache/apt \
 
 # CMake configure will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)
 RUN --mount=type=cache,target=/var/cache/apt \
-  --mount=type=ssh,uid=1000 \
-  cmake --preset $CMAKE_PRESET \
+    --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
+    --mount=type=ssh,uid=1000 \
+  # Check if there is an existing ccache from a previous build
+  echo "CCACHE: Checking ccache:" \
+  && ccache -sv \
+  # Configure the chosen superbuild preset
+  echo "SUPERBUILD: Configuring superbuild with preset $CMAKE_PRESET" \
+  && cmake --preset $CMAKE_PRESET \
+  # Clone repositories into the image first (fail early if a repository fails to clone)
+  echo "SUPERBUILD: Cloning all dependencies specified in the superbuild" \
   && cmake --build --preset $CMAKE_PRESET --target clone \
+  # Build the whole superbuild
+  echo "SUPERBUILD: Building the superbuild" \
   && cmake --build --preset $CMAKE_PRESET; \
   # Cleanup files to leave in the container
   # Set default values for IS_KEEP_* depending on BUILD_VERSION
@@ -143,42 +159,40 @@ RUN --mount=type=cache,target=/var/cache/apt \
     IS_KEEP_SOURCES="${KEEP_SOURCES:-false}"; \
     IS_KEEP_BUILD="${KEEP_BUILD:-false}"; \
     IS_KEEP_INSTALL="${KEEP_INSTALL:-false}"; \
+    IS_KEEP_CCACHE="${KEEP_CCACHE:-true}"; \
   else \
     IS_KEEP_SOURCES="${KEEP_SOURCES:-false}"; \
     IS_KEEP_BUILD="${KEEP_BUILD:-false}"; \
     IS_KEEP_INSTALL="${KEEP_INSTALL:-true}"; \
+    IS_KEEP_CCACHE="${KEEP_CCACHE:-false}"; \
   fi; \
   if [ "$IS_KEEP_SOURCES" = "false" ]; then \
-    echo "Removing sources in ~/workspace/devel" \
+    echo "CLEAN: Removing sources in ~/workspace/devel" \
     && rm -rf ~/workspace/devel; \
   fi; \
   if [ "$IS_KEEP_BUILD" = "false" ]; then \
-    echo "Removing build in ~/workspace/build" \
+    echo "CLEAN: Removing build in ~/workspace/build" \
     && rm -rf ~/workspace/build; \
   fi; \
   if [ "$IS_KEEP_INSTALL" = "false" ]; then \
-    echo "Removing install in ~/workspace/build" \
+    echo "CLEAN: Removing install in ~/workspace/build" \
     && rm -rf ~/workspace/install; \
   fi; \
   if [ -d "~/workspace" ]; then \
-    rmdir ~/workspace; \
+    echo "CLEAN: Removing the empty ~/workspace folder" \
+    && rmdir ~/workspace; \
   fi; \
-  rm ~/.gitconfig \
-  && sudo rm -rf /var/lib/apt/lists/*;
-
-RUN --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
-  if [ "BUILD_VERSION" = "devcontainer" ]; then \
-    echo "Moving the generated ccache cache to the image folder $CCACHE_IMAGE_DIR so that it can be used at runtime" \
+  echo "CCACHE: Checking ccache contents after build:" \
+  && ccache -sv; \
+  if [ "$IS_KEEP_CCACHE" = "true" ]; then \
+    echo "CCACHE: Moving the generated ccache cache to the image folder $CCACHE_IMAGE_DIR so that it can be used at runtime" \
     && mkdir -p $CCACHE_IMAGE_DIR \
     && sudo chown vscode $CCACHE_IMAGE_DIR \
     && cp -r $CCACHE_BUILD_DIR/* $CCACHE_IMAGE_DIR; \
-  fi
-
-ENV CCACHE_DIR=$CCACHE_IMAGE_DIR
-RUN if [ "$BUILD_VERSION" = "devcontainer" ]; then \
-    echo "Checking cache contents"; \
-    ccache -sv; \
-  fi
+  fi; \
+  # Further cleanup
+  rm ~/.gitconfig \
+  && sudo rm -rf /var/lib/apt/lists/*;
 
 # oh-my-zsh & plugins
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
@@ -195,4 +209,7 @@ LABEL org.opencontainers.image.licenses=BSD-2
 # entrypoint.sh will sync this default image cache with the mounted local folder cache upon starting the container
 # This is done to allow updating the cache while working within the container
 ENV UBUNTU_VERSION="$UBUNTU_VERSION"
-ENTRYPOINT ["/home/vscode/.devcontainer/docker-entrypoint.sh", "-c"]
+ENV BUILD_VERSION=$BUILD_VERSION
+# Change CCACHE_DIR to its final location in the image
+ENV CCACHE_DIR=$CCACHE_IMAGE_DIR
+ENTRYPOINT ["/home/vscode/.docker-entrypoint.sh", "-c"]
