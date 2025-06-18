@@ -1,3 +1,47 @@
+# Copyright 2025 CNRS-UM LIRMM, CNRS-AIST JRL
+#
+# This Dockerfile is responsible for creating standalone/devcontainer docker images from a mc-rtc-superbuild repository.
+#
+# There are two main build-modes, controlled by BUILD_VERSION argument:
+# - devcontainer:
+#     contains the tools needed to work with mc-rtc, pre-builds the whole superbuild to generate a ccache compilation
+#     cache that can then be used at runtime to speed up compilation (a few minutes for the first full build).
+#     This is intended to be built by a devcontainer.json file to add additional tools into the image
+#
+# - standalone:
+#     this mode installs mc-rtc-superbuild and keeps only the install folder in the image.
+#     this is intended for releases, and the user will typically provide his own entrypoint.sh script to run
+#     a specific controller/simulator/tool upon execution. The default entrypoint is meant as an interactive zsh terminal
+#
+# In addition to these two default modes, it is possible to override some arguments to influence what is generated in the final image.
+# For instance one can create a standalone version that keeps the sources/build/install folder within the image
+# $ podman build --ssh default . \
+#        --file .github/devcontainer/Dockerfile \
+#        --build-args BUILD_VERSION=devcontainer \
+#        --build-args KEEP_SOURCES=true \
+#        --build-args KEEP_BUILD=true \
+#        --build-args KEEP_INSTALL=true \
+#        --build-args KEEP_SOURCES=true \
+#        --build-args KEEP_CCACHE=true \
+#        -t mc-rtc-superbuild-snapshot-devcontainer
+
+# This will generate a very large image (~20Gb) that contains a snapshot of the full environment needed to reproduce the superbuild.
+#
+# For a standard standalone release:
+# $ podman build --ssh default . \
+#        --file .github/devcontainer/Dockerfile \
+#        --build-args BUILD_VERSION=standalone \
+#        --build-args CUSTOM_ENTRYPOINT=</path/to/an/entrypoint/file> \ # the entrypoint file should be in the build context
+#        -t mc-rtc-superbuild-standalone
+#
+# To build private repositories, you need to have ssh-agent forwarding configured. You can add the following to your bashrc:
+# # Run the ssh-agent
+# eval $(ssh-agent -s)
+# # Register the private key with the agent
+# ssh-add ~/.ssh/id_rsa
+#
+# and you need to provide '--ssh default' argument to podman/docker when building the image
+
 ARG UBUNTU_VERSION="jammy"
 
 # First stage build mc-rtc-superbuild and generates ccache
@@ -16,6 +60,7 @@ ARG KEEP_BUILD=""
 ARG KEEP_CCACHE=""
 # Same as KEEP_SOURCES but for the install folder
 ARG KEEP_INSTALL=""
+ARG SSH_KNOWN_HOSTS="github.com gite.lirmm.fr"
 # Build time cache directory to speed up sucessive rebuilds of this image
 # This is kept into the docker cache
 ARG CCACHE_BUILD_DIR=/tmp/ccache
@@ -32,6 +77,11 @@ ARG EMAIL="devcontainer@mc-rtc-superbuild.com"
 ARG NAME="mc_rtc devcontainer"
 
 ENV UBUNTU_VERSION="$UBUNTU_VERSION"
+ENV SUPERBUILD_DIR="/home/vscode/superbuild"
+ENV WORKSPACE_DIR="/home/vscode/workspace"
+ENV WORKSPACE_INSTALL_DIR="/home/vscode/workspace/install"
+ENV WORKSPACE_DEVEL_DIR="/home/vscode/workspace/devel"
+ENV WORKSPACE_BUILD_DIR="/home/vscode/workspace/build"
 
 RUN export DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris
@@ -40,7 +90,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone;
 
 RUN echo "Building with ARGS:" \
  && echo "CMAKE_PRESET=$CMAKE_PRESET" \
- && echo "CMAKE_PRESET=$CMAKE_PRESET" \
+ && echo "BUILD_VERSION=$BUILD_VERSION" \
  && echo "KEEP_SOURCES=$KEEP_SOURCES" \
  && echo "KEEP_BUILD=$KEEP_BUILD" \
  && echo "KEEP_CCACHE=$KEEP_CCACHE" \
@@ -107,11 +157,12 @@ RUN --mount=type=ssh,uid=1000 \
 # Configure ssh-forwarding
 # NOTE: to use ssh-forwarding you need to use
 # RUN --mount=type=ssh,uid=1000 \
-RUN mkdir -p ~/.ssh \
-  && echo "\nHost github.com\n    ForwardAgent yes\nHost gite.lirmm.fr\n    ForwardAgent yes" >> ~/.ssh/config \
-  && ssh-keyscan github.com >> ~/.ssh/known_hosts \
-  && ssh-keyscan gite.lirmm.fr >> ~/.ssh/known_hosts \
-  && cat ~/.ssh/config;
+RUN mkdir -p ~/.ssh; \
+  for host in $SSH_KNOWN_HOSTS; do \
+    echo "\nHost $host\n    ForwardAgent yes" >> ~/.ssh/config \
+    && ssh-keyscan $host >> ~/.ssh/known_hosts; \
+  done; \
+  cat ~/.ssh/config;
 
 # Check ccache
 RUN --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
@@ -125,12 +176,12 @@ RUN --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
 
 # Add mc-rtc-superbuild to the build context
 # It is better to keep it in the same folder in order to increase ccache hit rate
-COPY --chown=vscode:vscode ../../.. /home/vscode/superbuild
-WORKDIR /home/vscode/superbuild
+COPY --chown=vscode:vscode ../../.. ${SUPERBUILD_DIR}
+WORKDIR ${SUPERBUILD_DIR}
 
 # Copy entrypoint into the image
 RUN \
-  cp ~/superbuild/.devcontainer/docker-entrypoint.sh ~/.docker-entrypoint.sh
+  cp $SUPERBUILD_DIR/.devcontainer/docker-entrypoint.sh ~/.docker-entrypoint.sh
 
 RUN --mount=type=cache,target=/var/cache/apt \
   ./utils/bootstrap-linux.sh \
@@ -142,16 +193,20 @@ RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
     --mount=type=ssh,uid=1000 \
   # Check if there is an existing ccache from a previous build
-  echo "CCACHE: Checking ccache:" \
+  echo "CCACHE: Clean stats" \
+  && ccache -z \
+  && echo "CCACHE: Checking ccache stats:" \
   && ccache -sv \
+  && echo "CCACHE: Checking ccache size:" \
+  && du -hs $CCACHE_DIR \
   # Configure the chosen superbuild preset
-  echo "SUPERBUILD: Configuring superbuild with preset $CMAKE_PRESET" \
+  && echo "SUPERBUILD: Configuring superbuild with preset $CMAKE_PRESET" \
   && cmake --preset $CMAKE_PRESET \
   # Clone repositories into the image first (fail early if a repository fails to clone)
-  echo "SUPERBUILD: Cloning all dependencies specified in the superbuild" \
+  && echo "SUPERBUILD: Cloning all dependencies specified in the superbuild" \
   && cmake --build --preset $CMAKE_PRESET --target clone \
   # Build the whole superbuild
-  echo "SUPERBUILD: Building the superbuild" \
+  && echo "SUPERBUILD: Building the superbuild" \
   && cmake --build --preset $CMAKE_PRESET; \
   # Cleanup files to leave in the container
   # Set default values for IS_KEEP_* depending on BUILD_VERSION
@@ -167,20 +222,22 @@ RUN --mount=type=cache,target=/var/cache/apt \
     IS_KEEP_CCACHE="${KEEP_CCACHE:-false}"; \
   fi; \
   if [ "$IS_KEEP_SOURCES" = "false" ]; then \
-    echo "CLEAN: Removing sources in ~/workspace/devel" \
-    && rm -rf ~/workspace/devel; \
+    echo "CLEAN: Removing sources in ${WORKSPACE_DEVEL_DIR}" \
+    && rm -rf ${WORKSPACE_DEVEL_DIR}; \
+    echo "CLEAN: Removing superbuild in ${SUPERBUILD_DIR}" \
+    && rm -rf ${SUPERBUILD_DIR}; \
   fi; \
   if [ "$IS_KEEP_BUILD" = "false" ]; then \
-    echo "CLEAN: Removing build in ~/workspace/build" \
-    && rm -rf ~/workspace/build; \
+    echo "CLEAN: Removing build in ${WORKSPACE_BUILD_DIR}" \
+    && rm -rf ${WORKSPACE_BUILD_DIR}; \
   fi; \
   if [ "$IS_KEEP_INSTALL" = "false" ]; then \
-    echo "CLEAN: Removing install in ~/workspace/build" \
-    && rm -rf ~/workspace/install; \
+    echo "CLEAN: Removing install in ${WORKSPACE_INSTALL_DIR}" \
+    && rm -rf ${WORKSPACE_INSTALL_DIR}; \
   fi; \
-  if [ -d "~/workspace" ]; then \
-    echo "CLEAN: Removing the empty ~/workspace folder" \
-    && rmdir ~/workspace; \
+  if [ -z "$(ls -A $WORKSPACE_DIR)" ]; then \
+    echo "CLEAN: Removing the empty $WORKSPACE_DIR folder" \
+    && rmdir $WORKSPACE_DIR; \
   fi; \
   echo "CCACHE: Checking ccache contents after build:" \
   && ccache -sv; \
@@ -197,19 +254,37 @@ RUN --mount=type=cache,target=/var/cache/apt \
 # oh-my-zsh & plugins
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
     -t $ZSH_THEME \
-    -p git \
-    && echo 'source $HOME/superbuild/.devcontainer/entrypoint.sh' >> ~/.zshrc \
-    && echo 'source $HOME/workspace/install/setup_mc_rtc.sh.sh' >> ~/.zshrc;
+    -p git;
 
-FROM ubuntu:$UBUNTU_VERSION
+# Second stage: copy final files generated in the 'build' stage
+FROM ubuntu:$UBUNTU_VERSION as final
 COPY --from=build / /
 LABEL org.opencontainers.image.source=https://github.com/mc-rtc/mc-rtc-superbuild
 LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild (ubuntu $UBUNTU_VERSION, preset $CMAKE_PRESET, $BUILD_VERSION)"
 LABEL org.opencontainers.image.licenses=BSD-2
+ARG CUSTOM_ENTRYPOINT=""
+ARG BUILD_VERSION
+ARG CCACHE_IMAGE_DIR
 # entrypoint.sh will sync this default image cache with the mounted local folder cache upon starting the container
 # This is done to allow updating the cache while working within the container
 ENV UBUNTU_VERSION="$UBUNTU_VERSION"
 ENV BUILD_VERSION=$BUILD_VERSION
 # Change CCACHE_DIR to its final location in the image
 ENV CCACHE_DIR=$CCACHE_IMAGE_DIR
-ENTRYPOINT ["/home/vscode/.docker-entrypoint.sh", "-c"]
+
+USER vscode
+WORKDIR /home/vscode
+
+RUN echo "Building with args:" \
+ && echo "CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT"; \
+ echo "Building with env:" \
+ && export
+
+COPY --chown=vscode:vscode ${CUSTOM_ENTRYPOINT} /home/vscode/.docker-custom-entrypoint.sh
+RUN \
+  if [ -f "~/.docker-custom-entrypoint.sh" ]; then \
+    echo "ENTRYPOINT: Using custom entrypoint: $CUSTOM_ENTRYPOINT located in ~/.docker-custom-entrypoint.sh"; \
+    # && cp $CUSTOM_ENTRYPOINT ~/.docker-custom-entrypoint.sh; \
+  fi
+
+ENTRYPOINT ["/home/vscode/.docker-entrypoint.sh"]

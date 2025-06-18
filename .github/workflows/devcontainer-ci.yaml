@@ -76,6 +76,8 @@ jobs:
         if [ ${{ env.SSH_KEY }} != '' ]; then
           echo "SSH_OPT='--ssh default'" >> $GITHUB_ENV;
         fi
+        CONTAINER_FULL_NAME=$CONTAINER_NAME:$CONTAINER_TAG
+        echo "CONTAINER_FULL_NAME=$CONTAINER_FULL_NAME" >> $GITHUB_ENV
         echo "::endgroup::"
 
         echo "::group::Print Dockerfile"
@@ -83,18 +85,18 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Build Dockerfile"
-        docker build . -f .github/devcontainer/Dockerfile $SSH_OPT --tag ${CONTAINER_NAME}:${CONTAINER_TAG} --build-arg CMAKE_PRESET=$CMAKE_PRESET --build-arg BUILD_VERSION=standalone --build-arg UBUNTU_VERSION="${{ matrix.os }}"
+        docker build . -f .github/devcontainer/Dockerfile $SSH_OPT --tag $CONTAINER_FULL_NAME --build-arg CMAKE_PRESET=$CMAKE_PRESET --build-arg BUILD_VERSION=standalone --build-arg UBUNTU_VERSION="${{ matrix.os }}"
         echo "::endgroup::"
 
         echo "::group::Check docker image size"
-        docker inspect -f "{{ .Size }}" ${CONTAINER_NAME}:${CONTAINER_TAG} | numfmt --to=si
+        docker inspect -f "{{ .Size }}" $CONTAINER_FULL_NAME | numfmt --to=si
         echo "::endgroup::"
 
     - name: 'Docker: Push Standalone Release (public repositories)'
       if: github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild'
       shell: bash
       run: |
-        docker push ${CONTAINER_NAME}:${CONTAINER_TAG}
+        docker push $CONTAINER_FULL_NAME
 
     - name: Free Disk Space (Ubuntu)
       uses: jlumbroso/free-disk-space@main
@@ -111,11 +113,14 @@ jobs:
     # Main workflow builds and pushes
     - name: Pre-build dev container image (main branch of official repository)
       if: github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild'
+      env:
+        DEVCONTAINER_TAG: ${{ matrix.os }}-devcontainer-latest
+        DEVCONTAINER_FULL_NAME: $CONTAINER_NAME:${{ matrix.os }}-devcontainer-latest
       uses: devcontainers/ci@v0.3
       with:
         # cacheFrom: ghcr.io/arntanguy/mc-rtc-superbuild
-        imageName: ghcr.io/mc-rtc/mc-rtc-superbuild
-        imageTag: ${{ matrix.os }}-devcontainer-latest
+        imageName: $CONTAINER_NAME
+        imageTag: $DEVCONTAINER_TAG
         subFolder: .github/devcontainer/${{ matrix.os }}
         configFile: .github/devcontainer/${{ matrix.os }}/devcontainer.json
         push: always
@@ -123,6 +128,8 @@ jobs:
     - name: 'Docker: Check devcontainer size'
       shell: bash
       run: |
-        echo "::group::Check devcontainer's docker image size"
-        docker inspect -f "{{ .Size }}" ghcr.io/mc-rtc/mc-rtc-superbuild:${{matrix.os}}-devcontainer-latest | numfmt --to=si
+        echo "::group::Check devcontainer's docker image size $DEVCONTAINER_FULL_NAME"
+        docker images
+        docker ps
+        docker inspect -f "{{ .Size }}" $DEVCONTAINER_FULL_NAME | numfmt --to=si
         echo "::endgroup::"
