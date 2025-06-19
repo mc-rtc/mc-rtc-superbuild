@@ -1,0 +1,25 @@
+name: Package Devcontainers Reusable
+
+on:
+  repository_dispatch:
+    types:
+    - build-jammy
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  # test2
+  package-devcontainers:
+    uses: arntanguy/github-actions/.github/workflows/superbuild-devcontainer.yml@topic/devcontainer
+    with:
+      runner: ubuntu-24.04
+      free-disk-space: true
+      # preset: relwithdebinfo
+      # repository:
+      # branch:
+      container-repository: ghcr.io/arntanguy/mc-rtc-superbuild
+      push: true

@@ -3,10 +3,7 @@
 
   "build": {
     "dockerfile": "../Dockerfile",
-    "context": "../../..",
-     "options": [
-       "--ssh=default"
-     ]
+    "context": "../../.."
   },
 
   "containerEnv": {

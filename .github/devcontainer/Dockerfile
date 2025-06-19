@@ -189,6 +189,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
   && sudo rm -rf /var/lib/apt/lists/*
 
 # CMake configure will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)
+RUN echo "kill cache"
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
     --mount=type=ssh,uid=1000 \
