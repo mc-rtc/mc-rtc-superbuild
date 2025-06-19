@@ -189,7 +189,6 @@ RUN --mount=type=cache,target=/var/cache/apt \
   && sudo rm -rf /var/lib/apt/lists/*
 
 # CMake configure will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)
-RUN echo "kill cache"
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
     --mount=type=ssh,uid=1000 \
@@ -203,15 +202,12 @@ RUN --mount=type=cache,target=/var/cache/apt \
   # Configure the chosen superbuild preset
   && echo "SUPERBUILD: Configuring superbuild with preset $CMAKE_PRESET" \
   && cmake --preset $CMAKE_PRESET \
-  # Clone repositories into the image first (fail early if a repository fails to clone)
-  && echo "SUPERBUILD: Cloning all dependencies specified in the superbuild" \
-  && cmake --build --preset $CMAKE_PRESET --target clone \
   # Build the whole superbuild
   && echo "SUPERBUILD: Building the superbuild" \
-  && cmake --build --preset $CMAKE_PRESET; \
+  && cmake --build --preset $CMAKE_PRESET \
   # Cleanup files to leave in the container
   # Set default values for IS_KEEP_* depending on BUILD_VERSION
-  if [ "${BUILD_VERSION}" = "devcontainer" ]; then \
+  && if [ "${BUILD_VERSION}" = "devcontainer" ]; then \
     IS_KEEP_SOURCES="${KEEP_SOURCES:-false}"; \
     IS_KEEP_BUILD="${KEEP_BUILD:-false}"; \
     IS_KEEP_INSTALL="${KEEP_INSTALL:-false}"; \
@@ -221,35 +217,35 @@ RUN --mount=type=cache,target=/var/cache/apt \
     IS_KEEP_BUILD="${KEEP_BUILD:-false}"; \
     IS_KEEP_INSTALL="${KEEP_INSTALL:-true}"; \
     IS_KEEP_CCACHE="${KEEP_CCACHE:-false}"; \
-  fi; \
-  if [ "$IS_KEEP_SOURCES" = "false" ]; then \
+  fi \
+  && if [ "$IS_KEEP_SOURCES" = "false" ]; then \
     echo "CLEAN: Removing sources in ${WORKSPACE_DEVEL_DIR}" \
     && rm -rf ${WORKSPACE_DEVEL_DIR}; \
     echo "CLEAN: Removing superbuild in ${SUPERBUILD_DIR}" \
     && rm -rf ${SUPERBUILD_DIR}; \
-  fi; \
-  if [ "$IS_KEEP_BUILD" = "false" ]; then \
+  fi \
+  && if [ "$IS_KEEP_BUILD" = "false" ]; then \
     echo "CLEAN: Removing build in ${WORKSPACE_BUILD_DIR}" \
     && rm -rf ${WORKSPACE_BUILD_DIR}; \
-  fi; \
-  if [ "$IS_KEEP_INSTALL" = "false" ]; then \
+  fi \
+  && if [ "$IS_KEEP_INSTALL" = "false" ]; then \
     echo "CLEAN: Removing install in ${WORKSPACE_INSTALL_DIR}" \
     && rm -rf ${WORKSPACE_INSTALL_DIR}; \
-  fi; \
-  if [ -z "$(ls -A $WORKSPACE_DIR)" ]; then \
+  fi \
+  && if [ -z "$(ls -A $WORKSPACE_DIR)" ]; then \
     echo "CLEAN: Removing the empty $WORKSPACE_DIR folder" \
     && rmdir $WORKSPACE_DIR; \
-  fi; \
-  echo "CCACHE: Checking ccache contents after build:" \
+  fi \
+  && echo "CCACHE: Checking ccache contents after build:" \
   && ccache -sv; \
   if [ "$IS_KEEP_CCACHE" = "true" ]; then \
     echo "CCACHE: Moving the generated ccache cache to the image folder $CCACHE_IMAGE_DIR so that it can be used at runtime" \
     && mkdir -p $CCACHE_IMAGE_DIR \
     && sudo chown vscode $CCACHE_IMAGE_DIR \
     && cp -r $CCACHE_BUILD_DIR/* $CCACHE_IMAGE_DIR; \
-  fi; \
+  fi \
   # Further cleanup
-  rm ~/.gitconfig \
+  && rm ~/.gitconfig \
   && sudo rm -rf /var/lib/apt/lists/*;
 
 # oh-my-zsh & plugins
