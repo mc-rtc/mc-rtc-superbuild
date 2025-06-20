@@ -4,6 +4,12 @@
   "build": {
     "dockerfile": "../Dockerfile",
     "context": "../../.."
+    "args":
+    {
+      "CMAKE_PRESET": "${localEnv:CMAKE_PRESET}",
+      "BUILD_VERSION": "${localEnv:BUILD_VERSION}",
+      "UBUNTU_VERSION": "${localEnv:UBUNTU_VERSION}"
+    }
   },
 
   "containerEnv": {

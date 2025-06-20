@@ -42,51 +42,82 @@
 #
 # and you need to provide '--ssh default' argument to podman/docker when building the image
 
+# GLOBAL args:
+# - available in all build stages
+# - Each ARG instruction should be re-declared in each stage that wishes to use it
+#   ex: ARG UBUNTU_VERSION
+# - ARGS are not available as env variable. To make them available they need to be declared as ENV
+#   ex: ENV UBUNTU_VERSION=${UBUNTU_VERSION}
 ARG UBUNTU_VERSION="jammy"
+ARG BUILD_VERSION="devcontainer"
+ARG CMAKE_PRESET="relwithdebinfo"
+# When KEEP_CCACHE=true, the ccache cache generated in CCACHE_BUILD_DIR is copied to the CCACHE_IMAGE_DIR for fast initial build times when using this image
+ARG CCACHE_IMAGE_DIR=/home/vscode/.cache/ccache
+ARG SUPERBUILD_DIR="/home/vscode/superbuild"
+ARG WORKSPACE_DIR="/home/vscode/workspace"
+ARG WORKSPACE_INSTALL_DIR="/home/vscode/workspace/install"
+ARG WORKSPACE_DEVEL_DIR="/home/vscode/workspace/devel"
+ARG WORKSPACE_BUILD_DIR="/home/vscode/workspace/build"
 
 # First stage build mc-rtc-superbuild and generates ccache
 FROM ubuntu:$UBUNTU_VERSION as build
 
-ARG UBUNTU_VERSION="jammy"
+ARG UBUNTU_VERSION
+ARG BUILD_VERSION
+ARG CMAKE_PRESET
+ARG CCACHE_IMAGE_DIR
+ARG SUPERBUILD_DIR
+ARG WORKSPACE_DIR
+ARG WORKSPACE_INSTALL_DIR
+ARG WORKSPACE_DEVEL_DIR
+ARG WORKSPACE_BUILD_DIR
+
 # Choices are devcontainer, standalone
-ARG BUILD_VERSION="devcontainer"
-ARG CMAKE_PRESET="relwithdebinfo"
+ENV BUILD_VERSION=$BUILD_VERSION
+ENV CMAKE_PRESET=$CMAKE_PRESET
 # - KEEP_SOURCE=""      : do the default action for the  BUILD_VERSION (do not keep sources)
 # - KEEP_SOURCE="false" : do not keep sources
 # - KEEP_SOURCE="true"  : keep sources regardless of BUILD_VERSION
 ARG KEEP_SOURCES=""
+ENV KEEP_SOURCES=$KEEP_SOURCES
 # Same as KEEP_SOURCES but for the build folder
 ARG KEEP_BUILD=""
+ENV KEEP_BUILD=$KEEP_BUILD
 ARG KEEP_CCACHE=""
+ENV KEEP_CCACHE=$KEEP_CCACHE
 # Same as KEEP_SOURCES but for the install folder
 ARG KEEP_INSTALL=""
+ENV KEEP_INSTALL=KEEP_INSTALL
 ARG SSH_KNOWN_HOSTS="github.com gite.lirmm.fr"
+ENV SSH_KNOWN_HOSTS=${SSH_KNOWN_HOSTS}
 # Build time cache directory to speed up sucessive rebuilds of this image
 # This is kept into the docker cache
 ARG CCACHE_BUILD_DIR=/tmp/ccache
-# When KEEP_CCACHE=true, the ccache cache generated in CCACHE_BUILD_DIR is copied to the CCACHE_IMAGE_DIR for fast initial build times when using this image
-ARG CCACHE_IMAGE_DIR=/home/vscode/.cache/ccache
+ENV CCACHE_BUILD_DIR=$CCACHE_BUILD_DIR
+ENV CCACHE_IMAGE_DIR=$CCACHE_IMAGE_DIR
 # During build phase, use build time ccache directory (mounted in docker build cache)
 ENV CCACHE_DIR=${CCACHE_BUILD_DIR}
-ARG ZSH_THEME="bira"
+ARG BUILD_SUPERBUILD="true"
+ENV BUILD_SUPERBUILD=${BUILD_SUPERBUILD}
 
+ARG ZSH_THEME="bira"
 
 ARG APT_PACKAGES_STANDALONE="sudo gnupg2 gpg-agent openssh-server openssh-client wget curl ca-certificates git ccache"
 ARG APT_PACKAGES_DEVCONTAINER="sudo gnupg2 gpg-agent openssh-server wget curl ca-certificates ripgrep rsync clangd git ccache"
 ARG EMAIL="devcontainer@mc-rtc-superbuild.com"
+ENV EMAIL=$EMAIL
 ARG NAME="mc_rtc devcontainer"
+ENV NAME=$NAME
 
-ENV UBUNTU_VERSION="$UBUNTU_VERSION"
-ENV SUPERBUILD_DIR="/home/vscode/superbuild"
-ENV WORKSPACE_DIR="/home/vscode/workspace"
-ENV WORKSPACE_INSTALL_DIR="/home/vscode/workspace/install"
-ENV WORKSPACE_DEVEL_DIR="/home/vscode/workspace/devel"
-ENV WORKSPACE_BUILD_DIR="/home/vscode/workspace/build"
+ENV SUPERBUILD_DIR=${SUPERBUILD_DIR}
+ENV WORKSPACE_DIR=${WORKSPACE_DIR}
+ENV WORKSPACE_INSTALL_DIR=${WORKSPACE_INSTALL_DIR}
+ENV WORKSPACE_DEVEL_DIR=${WORKSPACE_DEVEL_DIR}
+ENV WORKSPACE_BUILD_DIR=${WORKSPACE_BUILD_DIR}
 
 RUN export DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone;
-
 
 RUN echo "Building with ARGS:" \
  && echo "CMAKE_PRESET=$CMAKE_PRESET" \
@@ -183,75 +214,23 @@ WORKDIR ${SUPERBUILD_DIR}
 RUN \
   cp $SUPERBUILD_DIR/.devcontainer/docker-entrypoint.sh ~/.docker-entrypoint.sh
 
-RUN --mount=type=cache,target=/var/cache/apt \
-  ./utils/bootstrap-linux.sh \
-  && git config --global user.email "$EMAIL" && git config --global user.name "$NAME" \
-  && sudo rm -rf /var/lib/apt/lists/*
-
 # CMake configure will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
     --mount=type=ssh,uid=1000 \
-  # Check if there is an existing ccache from a previous build
-  echo "CCACHE: Clean stats" \
-  && ccache -z \
-  && echo "CCACHE: Checking ccache stats:" \
-  && ccache -sv \
-  && echo "CCACHE: Checking ccache size:" \
-  && du -hs $CCACHE_DIR \
-  # Configure the chosen superbuild preset
-  && echo "SUPERBUILD: Configuring superbuild with preset $CMAKE_PRESET" \
-  && cmake --preset $CMAKE_PRESET \
-  # Build the whole superbuild
-  && echo "SUPERBUILD: Building the superbuild" \
-  && cmake --build --preset $CMAKE_PRESET \
-  # Cleanup files to leave in the container
-  # Set default values for IS_KEEP_* depending on BUILD_VERSION
-  && if [ "${BUILD_VERSION}" = "devcontainer" ]; then \
-    IS_KEEP_SOURCES="${KEEP_SOURCES:-false}"; \
-    IS_KEEP_BUILD="${KEEP_BUILD:-false}"; \
-    IS_KEEP_INSTALL="${KEEP_INSTALL:-false}"; \
-    IS_KEEP_CCACHE="${KEEP_CCACHE:-true}"; \
-  else \
-    IS_KEEP_SOURCES="${KEEP_SOURCES:-false}"; \
-    IS_KEEP_BUILD="${KEEP_BUILD:-false}"; \
-    IS_KEEP_INSTALL="${KEEP_INSTALL:-true}"; \
-    IS_KEEP_CCACHE="${KEEP_CCACHE:-false}"; \
-  fi \
-  && if [ "$IS_KEEP_SOURCES" = "false" ]; then \
-    echo "CLEAN: Removing sources in ${WORKSPACE_DEVEL_DIR}" \
-    && rm -rf ${WORKSPACE_DEVEL_DIR}; \
-    echo "CLEAN: Removing superbuild in ${SUPERBUILD_DIR}" \
-    && rm -rf ${SUPERBUILD_DIR}; \
-  fi \
-  && if [ "$IS_KEEP_BUILD" = "false" ]; then \
-    echo "CLEAN: Removing build in ${WORKSPACE_BUILD_DIR}" \
-    && rm -rf ${WORKSPACE_BUILD_DIR}; \
-  fi \
-  && if [ "$IS_KEEP_INSTALL" = "false" ]; then \
-    echo "CLEAN: Removing install in ${WORKSPACE_INSTALL_DIR}" \
-    && rm -rf ${WORKSPACE_INSTALL_DIR}; \
-  fi \
-  && if [ -z "$(ls -A $WORKSPACE_DIR)" ]; then \
-    echo "CLEAN: Removing the empty $WORKSPACE_DIR folder" \
-    && rmdir $WORKSPACE_DIR; \
-  fi \
-  && echo "CCACHE: Checking ccache contents after build:" \
-  && ccache -sv; \
-  if [ "$IS_KEEP_CCACHE" = "true" ]; then \
-    echo "CCACHE: Moving the generated ccache cache to the image folder $CCACHE_IMAGE_DIR so that it can be used at runtime" \
-    && mkdir -p $CCACHE_IMAGE_DIR \
-    && sudo chown vscode $CCACHE_IMAGE_DIR \
-    && cp -r $CCACHE_BUILD_DIR/* $CCACHE_IMAGE_DIR; \
-  fi \
-  # Further cleanup
-  && rm ~/.gitconfig \
-  && sudo rm -rf /var/lib/apt/lists/*;
+    .github/devcontainer/build_superbuild.sh
 
 # oh-my-zsh & plugins
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
     -t $ZSH_THEME \
     -p git;
+
+# Clean up APT cache and temporary files
+RUN \
+    sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    sudo apt-get clean && \
+    # Remove docs, man pages, and locales (optional)
+    sudo rm -rf /usr/share/doc/* /usr/share/man/* /usr/share/locale/*
 
 # Second stage: copy final files generated in the 'build' stage
 FROM ubuntu:$UBUNTU_VERSION as final
@@ -259,14 +238,29 @@ COPY --from=build / /
 LABEL org.opencontainers.image.source=https://github.com/mc-rtc/mc-rtc-superbuild
 LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild (ubuntu $UBUNTU_VERSION, preset $CMAKE_PRESET, $BUILD_VERSION)"
 LABEL org.opencontainers.image.licenses=BSD-2
-ARG CUSTOM_ENTRYPOINT=""
-ARG BUILD_VERSION
+
+ARG UBUNTU_VERSION
 ARG CCACHE_IMAGE_DIR
-# entrypoint.sh will sync this default image cache with the mounted local folder cache upon starting the container
-# This is done to allow updating the cache while working within the container
-ENV UBUNTU_VERSION="$UBUNTU_VERSION"
-ENV BUILD_VERSION=$BUILD_VERSION
+ARG SUPERBUILD_DIR
+ARG WORKSPACE_DIR
+ARG WORKSPACE_INSTALL_DIR
+ARG WORKSPACE_DEVEL_DIR
+ARG WORKSPACE_BUILD_DIR
+
+ENV UBUNTU_VERSION=${UBUNTU_VERSION}
+ENV CCACHE_IMAGE_DIR=$CCACHE_IMAGE_DIR
+ENV SUPERBUILD_DIR=${SUPERBUILD_DIR}
+ENV WORKSPACE_DIR=${WORKSPACE_DIR}
+ENV WORKSPACE_INSTALL_DIR=${WORKSPACE_INSTALL_DIR}
+ENV WORKSPACE_DEVEL_DIR=${WORKSPACE_DEVEL_DIR}
+ENV WORKSPACE_BUILD_DIR=${WORKSPACE_BUILD_DIR}
+
+ARG CUSTOM_ENTRYPOINT=""
+ENV CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT
+
 # Change CCACHE_DIR to its final location in the image
+# entrypoint.sh will sync this default image cache with the mounted local folder cache upon starting the container
+ARG CCACHE_IMAGE_DIR
 ENV CCACHE_DIR=$CCACHE_IMAGE_DIR
 
 USER vscode
