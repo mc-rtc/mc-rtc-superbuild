@@ -50,14 +50,22 @@ else
   # Needed for robot_description packages and other ros tools
   IS_KEEP_CATKIN_DEVEL="true"
 fi
+
+echo "  IS_KEEP_SOURCES=${IS_KEEP_SOURCES}"
+echo "  IS_KEEP_BUILD=${IS_KEEP_BUILD}"
+echo "  IS_KEEP_INSTALL=${IS_KEEP_INSTALL}"
+echo "  IS_KEEP_CCACHE=${IS_KEEP_CCACHE}"
+echo "  IS_KEEP_CATKIN_DEVEL=${IS_KEEP_CATKIN_DEVEL}"
+
 if [ "$IS_KEEP_SOURCES" = "false" ]; then
   echo "CLEAN: Removing sources in ${WORKSPACE_DEVEL_DIR}"
   if [ "$IS_KEEP_CATKIN_DEVEL" = "true" ]; then
-    echo "CLEAN: but keeping catkin workspaces" || true
-    find ${WORKSPACE_DEVEL_DIR} -type f -not -path "./catkin_ws/*" -not -path "./catkin_data_ws/*" -delete
+    echo "CLEAN: but keeping catkin workspaces"
+    find ${WORKSPACE_DEVEL_DIR} -mindepth 1 -not -path "${WORKSPACE_DEVEL_DIR}/catkin_ws" -not -path "${WORKSPACE_DEVEL_DIR}/catkin_ws/*" -not -path "${WORKSPACE_DEVEL_DIR}/catkin_data_ws" -not -path "${WORKSPACE_DEVEL_DIR}/catkin_data_ws/*" -delete
     # Remove empty directories
-    find ${WORKSPACE_DEVEL_DIR} -type d -empty -delete
+    # find ${WORKSPACE_DEVEL_DIR} -type d -empty -delete
   else
+    echo "CLEAN: removing catkin workspaces"
     rm -rf ${WORKSPACE_DEVEL_DIR}
   fi
   echo "CLEAN: Removing superbuild in ${SUPERBUILD_DIR}"
@@ -75,6 +83,12 @@ if [ -d $WORKSPACE_DIR ] && [ -z "$(ls -A $WORKSPACE_DIR 2>/dev/null)" ]; then
   echo "CLEAN: Removing the empty $WORKSPACE_DIR folder"
   rmdir $WORKSPACE_DIR
 fi
+
+if [ -d $SUPERBUILD_DIR ] && [ -z "$(ls -A $SUPERBUILD_DIR 2>/dev/null)" ]; then
+  echo "CLEAN: Removing the empty $SUPERBUILD_DIR folder"
+  rmdir $SUPERBUILD_DIR
+fi
+
 # Further cleanup
 rm -f ~/.gitconfig
 sudo rm -rf /var/lib/apt/lists/*

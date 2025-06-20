@@ -87,7 +87,7 @@ ARG KEEP_CCACHE=""
 ENV KEEP_CCACHE=$KEEP_CCACHE
 # Same as KEEP_SOURCES but for the install folder
 ARG KEEP_INSTALL=""
-ENV KEEP_INSTALL=KEEP_INSTALL
+ENV KEEP_INSTALL=$KEEP_INSTALL
 ARG SSH_KNOWN_HOSTS="github.com gite.lirmm.fr"
 ENV SSH_KNOWN_HOSTS=${SSH_KNOWN_HOSTS}
 # Build time cache directory to speed up sucessive rebuilds of this image
@@ -196,7 +196,8 @@ RUN mkdir -p ~/.ssh; \
   cat ~/.ssh/config;
 
 # Check ccache
-RUN --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
+RUN \
+  # --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
   if [ "$(ls -A ${CCACHE_BUILD_DIR})" ]; then \
     echo "CCACHE: Found existing ccache cache in the docker build cache, using it"; \
     ccache -z; \
@@ -216,10 +217,9 @@ RUN \
 
 # CMake configure will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)
 RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
+    # --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
     --mount=type=ssh,uid=1000 \
-    sudo chmod 777 ${CCACHE_BUILD_DIR} \
-    && .github/devcontainer/build_superbuild.sh
+    .github/devcontainer/build_superbuild.sh
 
 # oh-my-zsh & plugins
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
@@ -232,6 +232,13 @@ RUN \
     sudo apt-get clean && \
     # Remove docs, man pages, and locales (optional)
     sudo rm -rf /usr/share/doc/* /usr/share/man/* /usr/share/locale/*
+
+WORKDIR /home/vscode
+RUN \
+  if [ -d $SUPERBUILD_DIR ] && [ -z "$(ls -A $SUPERBUILD_DIR 2>/dev/null)" ]; then \
+    echo "CLEAN: Removing the empty $SUPERBUILD_DIR folder" \
+    && rmdir $SUPERBUILD_DIR; \
+  fi
 
 # Second stage: copy final files generated in the 'build' stage
 FROM ubuntu:$UBUNTU_VERSION as final
