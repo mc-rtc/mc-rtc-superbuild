@@ -6,10 +6,13 @@
     "context": "../../.."
     "args":
     {
-      "CMAKE_PRESET": "${localEnv:CMAKE_PRESET}",
-      "BUILD_VERSION": "${localEnv:BUILD_VERSION}",
-      "UBUNTU_VERSION": "${localEnv:UBUNTU_VERSION}"
-    }
+      "CMAKE_PRESET": "${localEnv:CMAKE_PRESET:relwithdebinfo}",
+      "BUILD_VERSION": "${localEnv:BUILD_VERSION:devcontainer}",
+      "UBUNTU_VERSION": "jammy"
+    },
+    "options": [
+      "${localEnv:SSH_OPT:''}"
+    ]
   },
 
   "containerEnv": {

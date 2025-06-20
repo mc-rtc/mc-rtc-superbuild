@@ -4,6 +4,16 @@
   "build": {
     "dockerfile": "../Dockerfile",
     "context": "../../.."
+    "args":
+    {
+      "CMAKE_PRESET": "${localEnv:CMAKE_PRESET:relwithdebinfo}",
+      "BUILD_VERSION": "${localEnv:BUILD_VERSION:devcontainer}",
+      "UBUNTU_VERSION": "noble"
+    },
+    "options":
+    {
+      "${localEnv:SSH_OPT:''}"
+    }
   },
 
   "containerEnv": {

@@ -52,7 +52,7 @@ else
 fi
 if [ "$IS_KEEP_SOURCES" = "false" ]; then
   echo "CLEAN: Removing sources in ${WORKSPACE_DEVEL_DIR}"
-  if [ "IS_KEEP_CATKIN_DEVEL" = "true" ]; then
+  if [ "$IS_KEEP_CATKIN_DEVEL" = "true" ]; then
     echo "CLEAN: but keeping catkin workspaces" || true
     find ${WORKSPACE_DEVEL_DIR} -type f -not -path "./catkin_ws/*" -not -path "./catkin_data_ws/*" -delete
     # Remove empty directories
@@ -71,7 +71,7 @@ if [ "$IS_KEEP_INSTALL" = "false" ]; then
   echo "CLEAN: Removing install in ${WORKSPACE_INSTALL_DIR}"
   rm -rf ${WORKSPACE_INSTALL_DIR}
 fi
-if [ -d $WORKSPACE_DIR && -z "$(ls -A $WORKSPACE_DIR 2>/dev/null)" ]; then
+if [ -d $WORKSPACE_DIR ] && [ -z "$(ls -A $WORKSPACE_DIR 2>/dev/null)" ]; then
   echo "CLEAN: Removing the empty $WORKSPACE_DIR folder"
   rmdir $WORKSPACE_DIR
 fi
