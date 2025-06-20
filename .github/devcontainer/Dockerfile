@@ -218,7 +218,8 @@ RUN \
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
     --mount=type=ssh,uid=1000 \
-    .github/devcontainer/build_superbuild.sh
+    sudo chmod 777 ${CCACHE_BUILD_DIR} \
+    && .github/devcontainer/build_superbuild.sh
 
 # oh-my-zsh & plugins
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
