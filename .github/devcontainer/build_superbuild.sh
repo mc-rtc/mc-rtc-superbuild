@@ -37,12 +37,24 @@ fi
 # Cleanup files to leave in the container
 # Set default values for IS_KEEP_* depending on BUILD_VERSION
 IS_KEEP_CATKIN_DEVEL="false"
+# Devcontainer: no sources and install, keep only ccache folder
+# for quick builds. The user is expected to mount the corresponding superbuild folder
+# and a workspace folder
 if [ "${BUILD_VERSION}" = "devcontainer" ]; then
   IS_KEEP_SOURCES="${KEEP_SOURCES:-false}"
   IS_KEEP_BUILD="${KEEP_BUILD:-false}"
   IS_KEEP_INSTALL="${KEEP_INSTALL:-false}"
   IS_KEEP_CCACHE="${KEEP_CCACHE:-true}"
-else
+# Full image with developpement and install
+# This allows full reproducibility of the build environment
+# The image is likely to be huge >10Gb
+elif [ "${BUILD_VERSION}" = "standalone-devel" ]; then
+  IS_KEEP_SOURCES="${KEEP_SOURCES:-true}"
+  IS_KEEP_BUILD="${KEEP_BUILD:-true}"
+  IS_KEEP_INSTALL="${KEEP_INSTALL:-true}"
+  IS_KEEP_CCACHE="${KEEP_CCACHE:-true}"
+  IS_KEEP_CATKIN_DEVEL="true"
+else # standalone-release (install files only)
   IS_KEEP_SOURCES="${KEEP_SOURCES:-false}"
   IS_KEEP_BUILD="${KEEP_BUILD:-false}"
   IS_KEEP_INSTALL="${KEEP_INSTALL:-true}"
@@ -82,11 +94,6 @@ fi
 if [ -d $WORKSPACE_DIR ] && [ -z "$(ls -A $WORKSPACE_DIR 2>/dev/null)" ]; then
   echo "CLEAN: Removing the empty $WORKSPACE_DIR folder"
   rmdir $WORKSPACE_DIR
-fi
-
-if [ -d $SUPERBUILD_DIR ] && [ -z "$(ls -A $SUPERBUILD_DIR 2>/dev/null)" ]; then
-  echo "CLEAN: Removing the empty $SUPERBUILD_DIR folder"
-  rmdir $SUPERBUILD_DIR
 fi
 
 # Further cleanup
