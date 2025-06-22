@@ -2,56 +2,81 @@
 #
 # This Dockerfile is responsible for creating standalone/devcontainer docker images from a mc-rtc-superbuild repository.
 #
-# There are two main build-modes, controlled by BUILD_VERSION argument:
+# There are three main build targets, controlled by the --target argument:
+# - standalone-release:
+#     this mode installs mc-rtc-superbuild and keeps only the install folder and catkin workspaces in the image.
+#     this is intended for releases, and the user will typically provide their own entrypoint.sh script to run
+#     a specific controller/simulator/tool upon execution. The default entrypoint is meant as an interactive zsh terminal
+#
+# - standalone-devel:
+#     this mode keeps everything (sources, build, install, ccache) for full development capabilities.
+#     Creates a large image (~20Gb) with complete reproducibility of the build environment.
+#     Built incrementally from standalone-release stage for efficiency.
+#
 # - devcontainer:
 #     contains the tools needed to work with mc-rtc, pre-builds the whole superbuild to generate a ccache compilation
 #     cache that can then be used at runtime to speed up compilation (a few minutes for the first full build).
 #     This is intended to be built by a devcontainer.json file to add additional tools into the image
 #
-# - standalone:
-#     this mode installs mc-rtc-superbuild and keeps only the install folder in the image.
-#     this is intended for releases, and the user will typically provide his own entrypoint.sh script to run
-#     a specific controller/simulator/tool upon execution. The default entrypoint is meant as an interactive zsh terminal
+# BUILD_VERSION controls the build stage behavior:
+# - BUILD_VERSION=standalone: builds all components needed for both standalone-release and standalone-devel
+# - BUILD_VERSION=devcontainer: builds components optimized for devcontainer usage
 #
-# In addition to these two default modes, it is possible to override some arguments to influence what is generated in the final image.
-# For instance one can create a standalone version that keeps the sources/build/install folder within the image
-# $ podman build --ssh default . \
+# Example usage:
+#
+# Build standalone-release (minimal image):
+# $ docker build --ssh default . \
 #        --file .github/devcontainer/Dockerfile \
-#        --build-args BUILD_VERSION=devcontainer \
-#        --build-args KEEP_SOURCES=true \
-#        --build-args KEEP_BUILD=true \
-#        --build-args KEEP_INSTALL=true \
-#        --build-args KEEP_SOURCES=true \
-#        --build-args KEEP_CCACHE=true \
-#        -t mc-rtc-superbuild-snapshot-devcontainer
-
-# This will generate a very large image (~20Gb) that contains a snapshot of the full environment needed to reproduce the superbuild.
+#        --target standalone-release \
+#        --build-arg BUILD_VERSION=standalone \
+#        --build-arg CMAKE_PRESET=relwithdebinfo \
+#        --build-arg UBUNTU_VERSION=jammy \
+#        -t mc-rtc-superbuild-standalone-release
 #
-# For a standard standalone release:
-# $ podman build --ssh default . \
+# Build standalone-devel (full development image):
+# $ docker build --ssh default . \
 #        --file .github/devcontainer/Dockerfile \
-#        --build-args BUILD_VERSION=standalone \
-#        --build-args CUSTOM_ENTRYPOINT=</path/to/an/entrypoint/file> \ # the entrypoint file should be in the build context
-#        -t mc-rtc-superbuild-standalone
+#        --target standalone-devel \
+#        --build-arg BUILD_VERSION=standalone \
+#        --build-arg CMAKE_PRESET=relwithdebinfo \
+#        --build-arg UBUNTU_VERSION=jammy \
+#        -t mc-rtc-superbuild-standalone-devel
 #
-# To build private repositories, you need to have ssh-agent forwarding configured. You can add the following to your bashrc:
+# Build devcontainer (ccache-optimized image):
+# $ docker build --ssh default . \
+#        --file .github/devcontainer/Dockerfile \
+#        --target devcontainer \
+#        --build-arg BUILD_VERSION=devcontainer \
+#        --build-arg CMAKE_PRESET=relwithdebinfo \
+#        --build-arg UBUNTU_VERSION=jammy \
+#        -t mc-rtc-superbuild-devcontainer
+#
+# Efficient multi-variant builds (shares build cache):
+# $ docker build --ssh default . \
+#        --file .github/devcontainer/Dockerfile \
+#        --target standalone-release \
+#        --build-arg BUILD_VERSION=standalone \
+#        --build-arg UBUNTU_VERSION=jammy \
+#        -t mc-rtc-superbuild-standalone-release
+# $ docker build --ssh default . \
+#        --file .github/devcontainer/Dockerfile \
+#        --target standalone-devel \
+#        --build-arg BUILD_VERSION=standalone \
+#        --build-arg UBUNTU_VERSION=jammy \
+#        -t mc-rtc-superbuild-standalone-devel
+#
+# To build private repositories, you need to have ssh-agent forwarding configured.
+# You can add the following to your bashrc:
 # # Run the ssh-agent
 # eval $(ssh-agent -s)
 # # Register the private key with the agent
 # ssh-add ~/.ssh/id_rsa
 #
-# and you need to provide '--ssh default' argument to podman/docker when building the image
+# and you need to provide '--ssh default' argument to docker when building the image
 
-# GLOBAL args:
-# - available in all build stages
-# - Each ARG instruction should be re-declared in each stage that wishes to use it
-#   ex: ARG UBUNTU_VERSION
-# - ARGS are not available as env variable. To make them available they need to be declared as ENV
-#   ex: ENV UBUNTU_VERSION=${UBUNTU_VERSION}
 ARG UBUNTU_VERSION="jammy"
 ARG BUILD_VERSION="devcontainer"
 ARG CMAKE_PRESET="relwithdebinfo"
-# When KEEP_CCACHE=true, the ccache cache generated in CCACHE_BUILD_DIR is copied to the CCACHE_IMAGE_DIR for fast initial build times when using this image
 ARG CCACHE_IMAGE_DIR=/home/vscode/.cache/ccache
 ARG SUPERBUILD_DIR="/home/vscode/superbuild"
 ARG WORKSPACE_DIR="/home/vscode/workspace"
@@ -59,7 +84,7 @@ ARG WORKSPACE_INSTALL_DIR="/home/vscode/workspace/install"
 ARG WORKSPACE_DEVEL_DIR="/home/vscode/workspace/devel"
 ARG WORKSPACE_BUILD_DIR="/home/vscode/workspace/build"
 
-# First stage build mc-rtc-superbuild and generates ccache
+# First stage: build mc-rtc-superbuild and generates ccache
 FROM ubuntu:$UBUNTU_VERSION as build
 
 ARG UBUNTU_VERSION
@@ -72,38 +97,30 @@ ARG WORKSPACE_INSTALL_DIR
 ARG WORKSPACE_DEVEL_DIR
 ARG WORKSPACE_BUILD_DIR
 
-# Choices are devcontainer, standalone
+# Choices are devcontainer, standalone-release, standalone-devel
 ENV BUILD_VERSION=$BUILD_VERSION
 ENV CMAKE_PRESET=$CMAKE_PRESET
-# - KEEP_SOURCE=""      : do the default action for the  BUILD_VERSION (do not keep sources)
-# - KEEP_SOURCE="false" : do not keep sources
-# - KEEP_SOURCE="true"  : keep sources regardless of BUILD_VERSION
 ARG KEEP_SOURCES=""
 ENV KEEP_SOURCES=$KEEP_SOURCES
-# Same as KEEP_SOURCES but for the build folder
 ARG KEEP_BUILD=""
 ENV KEEP_BUILD=$KEEP_BUILD
 ARG KEEP_CCACHE=""
 ENV KEEP_CCACHE=$KEEP_CCACHE
-# Same as KEEP_SOURCES but for the install folder
 ARG KEEP_INSTALL=""
 ENV KEEP_INSTALL=$KEEP_INSTALL
 ARG SSH_KNOWN_HOSTS="github.com gite.lirmm.fr"
 ENV SSH_KNOWN_HOSTS=${SSH_KNOWN_HOSTS}
-# Build time cache directory to speed up sucessive rebuilds of this image
-# This is kept into the docker cache
 ARG CCACHE_BUILD_DIR=/tmp/ccache
 ENV CCACHE_BUILD_DIR=$CCACHE_BUILD_DIR
 ENV CCACHE_IMAGE_DIR=$CCACHE_IMAGE_DIR
-# During build phase, use build time ccache directory (mounted in docker build cache)
 ENV CCACHE_DIR=${CCACHE_BUILD_DIR}
 ARG BUILD_SUPERBUILD="true"
 ENV BUILD_SUPERBUILD=${BUILD_SUPERBUILD}
 
 ARG ZSH_THEME="bira"
-
-ARG APT_PACKAGES_STANDALONE="sudo gnupg2 gpg-agent openssh-server openssh-client wget curl ca-certificates git ccache"
-ARG APT_PACKAGES_DEVCONTAINER="sudo gnupg2 gpg-agent openssh-server wget curl ca-certificates ripgrep rsync clangd git ccache"
+ARG APT_PACKAGES_COMMON="sudo gnupg2 gpg-agent openssh-server wget curl ca-certificates git ccache xclip ripgrep"
+ARG APT_PACKAGES_STANDALONE="${APT_PACKAGES_COMMON} neovim"
+ARG APT_PACKAGES_DEVCONTAINER="${APT_PACKAGES_COMMON} rsync clangd"
 ARG EMAIL="devcontainer@mc-rtc-superbuild.com"
 ENV EMAIL=$EMAIL
 ARG NAME="mc_rtc devcontainer"
@@ -120,133 +137,100 @@ ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone;
 
 RUN echo "Building with ARGS:" \
- && echo "CMAKE_PRESET=$CMAKE_PRESET" \
- && echo "BUILD_VERSION=$BUILD_VERSION" \
- && echo "KEEP_SOURCES=$KEEP_SOURCES" \
- && echo "KEEP_BUILD=$KEEP_BUILD" \
- && echo "KEEP_CCACHE=$KEEP_CCACHE" \
- && echo "KEEP_INSTALL=$KEEP_INSTALL" \
- && echo "UBUNTU_VERSION=$UBUNTU_VERSION" \
- && echo "APT_PACKAGES_STANDALONE=$APT_PACKAGES_STANDALONE" \
- && echo "APT_PACKAGES_DEVCONTAINER=$APT_PACKAGES_DEVCONTAINER"
-
-RUN echo "Building with ENV:" \
-  && export
+  && echo "CMAKE_PRESET=$CMAKE_PRESET" \
+  && echo "BUILD_VERSION=$BUILD_VERSION" \
+  && echo "KEEP_SOURCES=$KEEP_SOURCES" \
+  && echo "KEEP_BUILD=$KEEP_BUILD" \
+  && echo "KEEP_CCACHE=$KEEP_CCACHE" \
+  && echo "KEEP_INSTALL=$KEEP_INSTALL" \
+  && echo "UBUNTU_VERSION=$UBUNTU_VERSION" \
+  && echo "APT_PACKAGES_STANDALONE=$APT_PACKAGES_STANDALONE" \
+  && echo "APT_PACKAGES_DEVCONTAINER=$APT_PACKAGES_DEVCONTAINER"
 
 # Allow to keep apt cache between builds
 RUN rm -f /etc/apt/apt.conf.d/docker-clean;
 
 # Install basic dependencies
 RUN --mount=type=cache,target=/var/cache/apt \
-  apt-get update \
-  && \
-  if [ "$BUILD_VERSION" = "devcontainer" ]; then \
-    apt-get install -y --no-install-recommends ${APT_PACKAGES_DEVCONTAINER}; \
-  else \
-    apt-get install -y --no-install-recommends ${APT_PACKAGES_STANDALONE}; \
-  fi
+   apt-get update \
+   && \
+   if [ "$BUILD_VERSION" = "devcontainer" ]; then \
+     apt-get install -y --no-install-recommends ${APT_PACKAGES_DEVCONTAINER}; \
+   else \
+     apt-get install -y --no-install-recommends ${APT_PACKAGES_STANDALONE}; \
+   fi
 
-# Workaround screeen refresh issues with neovim/ncurses
-# Often recommended when using screen/tmux
+# Workaround screen refresh issues with neovim/ncurses
 ENV TERM="screen-256color"
 RUN \
-  if [ "$UBUNTU_VERSION" = "noble" ]; then \
-    apt install --no-install-recommends -y libtinfo6 ncurses-term; \
-  else \
-    apt install --no-install-recommends -y libtinfo5 ncurses-term; \
-  fi
-
+   if [ "$UBUNTU_VERSION" = "noble" ]; then \
+     apt install --no-install-recommends -y libtinfo6 ncurses-term; \
+   else \
+     apt install --no-install-recommends -y libtinfo5 ncurses-term; \
+   fi
 
 # Create ubuntu user with sudo privileges
 RUN useradd -ms /bin/zsh vscode && \
-    usermod -aG sudo vscode \
-    # New added for disable sudo password
-    && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
-    && echo "User vscode (uid=`id -u vscode`:gid=`id -g vscode`) created with passwordless sudo privileges";
+     usermod -aG sudo vscode \
+     && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
+     && echo "User vscode (uid=`id -u vscode`:gid=`id -g vscode`) created with passwordless sudo privileges";
 
 # Check ssh-agent forwarding
 RUN --mount=type=ssh \
-  echo "Check ssh agent forwarding (root)"; \
-  if [ -n "$SSH_AUTH_SOCK" ]; then \
-    echo "ssh-forwarding is not available"; \
-  else \
-    ssh-add -l; \
-  fi
+   echo "Check ssh agent forwarding (root)"; \
+   if [ -n "$SSH_AUTH_SOCK" ]; then \
+     echo "ssh-forwarding is not available"; \
+   else \
+     ssh-add -l; \
+   fi
 
 USER vscode
 
 # Check ssh-agent forwarding for the non-root vscode user
-# See https://github.com/moby/buildkit/issues/763
 RUN --mount=type=ssh,uid=1000 \
-  echo "Check ssh agent forwarding (non-root vscode user)"; \
-  if [ -n "$SSH_AUTH_SOCK" ]; then \
-    echo "ssh-forwarding is not available"; \
-  else \
-    ssh-add -l; \
-  fi
+   echo "Check ssh agent forwarding (non-root vscode user)"; \
+   if [ -n "$SSH_AUTH_SOCK" ]; then \
+     echo "ssh-forwarding is not available"; \
+   else \
+     ssh-add -l; \
+   fi
 
 # Configure ssh-forwarding
-# NOTE: to use ssh-forwarding you need to use
-# RUN --mount=type=ssh,uid=1000 \
 RUN mkdir -p ~/.ssh; \
-  for host in $SSH_KNOWN_HOSTS; do \
-    echo "\nHost $host\n    ForwardAgent yes" >> ~/.ssh/config \
-    && ssh-keyscan $host >> ~/.ssh/known_hosts; \
-  done; \
-  cat ~/.ssh/config;
-
-# Check ccache
-RUN \
-  # --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
-  if [ "$(ls -A ${CCACHE_BUILD_DIR})" ]; then \
-    echo "CCACHE: Found existing ccache cache in the docker build cache, using it"; \
-    ccache -z; \
-    ccache -sv; \
-  else \
-    echo "CCACHE: ccache mount directory is empty, it will be populated during the superbuild build step"; \
-  fi
+   for host in $SSH_KNOWN_HOSTS; do \
+     echo "\nHost $host\n    ForwardAgent yes" >> ~/.ssh/config \
+     && ssh-keyscan $host >> ~/.ssh/known_hosts; \
+   done; \
+   cat ~/.ssh/config;
 
 # Add mc-rtc-superbuild to the build context
-# It is better to keep it in the same folder in order to increase ccache hit rate
 COPY --chown=vscode:vscode ../../.. ${SUPERBUILD_DIR}
 WORKDIR ${SUPERBUILD_DIR}
 
 # Copy entrypoint into the image
 RUN \
-  cp $SUPERBUILD_DIR/.devcontainer/docker-entrypoint.sh ~/.docker-entrypoint.sh
+   cp $SUPERBUILD_DIR/.devcontainer/docker-entrypoint.sh ~/.docker-entrypoint.sh
 
 # CMake configure will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)
 RUN --mount=type=cache,target=/var/cache/apt \
-    # --mount=type=cache,uid=1000,gid=1000,target=${CCACHE_BUILD_DIR} \
-    --mount=type=ssh,uid=1000 \
-    .github/devcontainer/build_superbuild.sh
+     --mount=type=ssh,uid=1000 \
+     .github/devcontainer/build_superbuild.sh
 
 # oh-my-zsh & plugins
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
-    -t $ZSH_THEME \
-    -p git;
+     -t $ZSH_THEME \
+     -p git;
 
 # Clean up APT cache and temporary files
 RUN \
-    sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    sudo apt-get clean && \
-    # Remove docs, man pages, and locales (optional)
-    sudo rm -rf /usr/share/doc/* /usr/share/man/* /usr/share/locale/*
+     sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+     sudo apt-get clean && \
+     sudo rm -rf /usr/share/doc/* /usr/share/man/* /usr/share/locale/*
 
 WORKDIR /home/vscode
-RUN \
-  if [ -d $SUPERBUILD_DIR ] && [ -z "$(ls -A $SUPERBUILD_DIR 2>/dev/null)" ]; then \
-    echo "CLEAN: Removing the empty $SUPERBUILD_DIR folder" \
-    && rmdir $SUPERBUILD_DIR; \
-  fi
 
-# Second stage: copy final files generated in the 'build' stage
-FROM ubuntu:$UBUNTU_VERSION as final
-COPY --from=build / /
-LABEL org.opencontainers.image.source=https://github.com/mc-rtc/mc-rtc-superbuild
-LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild (ubuntu $UBUNTU_VERSION, preset $CMAKE_PRESET, $BUILD_VERSION)"
-LABEL org.opencontainers.image.licenses=BSD-2
-
+# Base stage: System packages and basic user setup
+FROM ubuntu:$UBUNTU_VERSION as base
 ARG UBUNTU_VERSION
 ARG CCACHE_IMAGE_DIR
 ARG SUPERBUILD_DIR
@@ -255,6 +239,17 @@ ARG WORKSPACE_INSTALL_DIR
 ARG WORKSPACE_DEVEL_DIR
 ARG WORKSPACE_BUILD_DIR
 
+# Copy system-level changes and user setup
+# about 1.8Gb
+COPY --from=build /usr /usr
+COPY --from=build /etc /etc
+# about 100Mb
+COPY --from=build /var /var
+COPY --chown=vscode:vscode --from=build /home/vscode/.zshrc /home/vscode/.zshrc
+COPY --chown=vscode:vscode --from=build /home/vscode/.bashrc /home/vscode/.bashrc
+COPY --chown=vscode:vscode --from=build /home/vscode/.docker-entrypoint.sh /home/vscode/.docker-entrypoint.sh
+COPY --chown=vscode:vscode --from=build /home/vscode/.oh-my-zsh /home/vscode/.oh-my-zsh
+
 ENV UBUNTU_VERSION=${UBUNTU_VERSION}
 ENV CCACHE_IMAGE_DIR=$CCACHE_IMAGE_DIR
 ENV SUPERBUILD_DIR=${SUPERBUILD_DIR}
@@ -262,28 +257,96 @@ ENV WORKSPACE_DIR=${WORKSPACE_DIR}
 ENV WORKSPACE_INSTALL_DIR=${WORKSPACE_INSTALL_DIR}
 ENV WORKSPACE_DEVEL_DIR=${WORKSPACE_DEVEL_DIR}
 ENV WORKSPACE_BUILD_DIR=${WORKSPACE_BUILD_DIR}
+ENV CMAKE_PRESET=${CMAKE_PRESET}
 
-ARG CUSTOM_ENTRYPOINT=""
-ENV CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT
-
-# Change CCACHE_DIR to its final location in the image
-# entrypoint.sh will sync this default image cache with the mounted local folder cache upon starting the container
+# Standalone-release stage: Minimal files (install + catkin workspaces)
+FROM base as standalone-release
+ARG UBUNTU_VERSION
+ARG CMAKE_PRESET
 ARG CCACHE_IMAGE_DIR
+ARG CUSTOM_ENTRYPOINT=""
+
+# about 1.5Gb
+COPY --chown=vscode:vscode --from=build ${WORKSPACE_INSTALL_DIR} ${WORKSPACE_INSTALL_DIR}
+# About 800Mb
+COPY --chown=vscode:vscode --from=build ${WORKSPACE_DEVEL_DIR}/catkin_ws/install ${WORKSPACE_DEVEL_DIR}/catkin_ws/install
+# Depends on the robots involved, can be up to several Gb (e.g with RHPS1)
+COPY --chown=vscode:vscode --from=build ${WORKSPACE_DEVEL_DIR}/catkin_data_ws ${WORKSPACE_DEVEL_DIR}/catkin_data_ws
+
+LABEL org.opencontainers.image.source=https://github.com/mc-rtc/mc-rtc-superbuild
+LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild (ubuntu $UBUNTU_VERSION, preset $CMAKE_PRESET, standalone-release)"
+LABEL org.opencontainers.image.licenses=BSD-2
+
+ENV CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT
 ENV CCACHE_DIR=$CCACHE_IMAGE_DIR
 
 USER vscode
 WORKDIR /home/vscode
 
-RUN echo "Building with args:" \
- && echo "CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT"; \
- echo "Building with env:" \
- && export
+RUN echo "Building standalone-release with args:" \
+  && echo "CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT" \
+  && echo "CMAKE_PRESET=$CMAKE_PRESET" \
+  && echo "UBUNTU_VERSION=$UBUNTU_VERSION"
 
 COPY --chown=vscode:vscode ${CUSTOM_ENTRYPOINT} /home/vscode/.docker-custom-entrypoint.sh
 RUN \
   if [ -f "~/.docker-custom-entrypoint.sh" ]; then \
     echo "ENTRYPOINT: Using custom entrypoint: $CUSTOM_ENTRYPOINT located in ~/.docker-custom-entrypoint.sh"; \
-    # && cp $CUSTOM_ENTRYPOINT ~/.docker-custom-entrypoint.sh; \
+  fi
+
+ENTRYPOINT ["/home/vscode/.docker-entrypoint.sh"]
+
+# Standalone-devel stage: All development files
+FROM standalone-release as standalone-devel
+ARG UBUNTU_VERSION
+ARG CMAKE_PRESET
+ARG CCACHE_IMAGE_DIR
+
+# negligible
+COPY --chown=vscode:vscode --from=build ${SUPERBUILD_DIR} ${SUPERBUILD_DIR}
+# Huge, ~6Gb with rhps1
+COPY --chown=vscode:vscode --from=build ${WORKSPACE_DEVEL_DIR} ${WORKSPACE_DEVEL_DIR}
+# Huge, ~5Gb. Do we need to include it?
+COPY --chown=vscode:vscode --from=build ${WORKSPACE_BUILD_DIR} ${WORKSPACE_BUILD_DIR}
+# ~1.5Gb
+COPY --chown=vscode:vscode --from=build ${CCACHE_IMAGE_DIR} ${CCACHE_IMAGE_DIR}
+
+LABEL org.opencontainers.image.source=https://github.com/mc-rtc/mc-rtc-superbuild
+LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild (ubuntu $UBUNTU_VERSION, preset $CMAKE_PRESET, standalone-devel)"
+LABEL org.opencontainers.image.licenses=BSD-2
+
+RUN echo "Building standalone-devel with args:" \
+  && echo "CMAKE_PRESET=$CMAKE_PRESET" \
+  && echo "UBUNTU_VERSION=$UBUNTU_VERSION"
+
+# Devcontainer stage: Only ccache for fast builds
+FROM base as devcontainer
+ARG UBUNTU_VERSION
+ARG CMAKE_PRESET
+ARG CCACHE_IMAGE_DIR
+ARG CUSTOM_ENTRYPOINT=""
+
+COPY --chown=vscode:vscode --from=build ${CCACHE_IMAGE_DIR} ${CCACHE_IMAGE_DIR}
+
+LABEL org.opencontainers.image.source=https://github.com/mc-rtc/mc-rtc-superbuild
+LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild (ubuntu $UBUNTU_VERSION, preset $CMAKE_PRESET, devcontainer)"
+LABEL org.opencontainers.image.licenses=BSD-2
+
+ENV CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT
+ENV CCACHE_DIR=$CCACHE_IMAGE_DIR
+
+USER vscode
+WORKDIR /home/vscode
+
+RUN echo "Building devcontainer with args:" \
+  && echo "CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT" \
+  && echo "CMAKE_PRESET=$CMAKE_PRESET" \
+  && echo "UBUNTU_VERSION=$UBUNTU_VERSION"
+
+COPY --chown=vscode:vscode ${CUSTOM_ENTRYPOINT} /home/vscode/.docker-custom-entrypoint.sh
+RUN \
+  if [ -f "~/.docker-custom-entrypoint.sh" ]; then \
+    echo "ENTRYPOINT: Using custom entrypoint: $CUSTOM_ENTRYPOINT located in ~/.docker-custom-entrypoint.sh"; \
   fi
 
 ENTRYPOINT ["/home/vscode/.docker-entrypoint.sh"]
