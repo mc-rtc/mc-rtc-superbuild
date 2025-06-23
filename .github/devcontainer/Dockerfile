@@ -249,6 +249,8 @@ ARG WORKSPACE_BUILD_DIR
 # Copy system-level changes and user setup
 # about 1.8Gb
 COPY --from=build /usr /usr
+# For ROS
+COPY --from=build /opt /opt
 COPY --from=build /etc /etc
 # about 100Mb
 COPY --from=build /var /var
