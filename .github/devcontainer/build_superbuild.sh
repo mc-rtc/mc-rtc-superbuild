@@ -38,4 +38,10 @@ fi
 rm -f ~/.gitconfig
 sudo rm -rf /var/lib/apt/lists/*
 
+# Ensure that the catkin workspace directories always exist
+# This is needed for the multi-stage Docker build to work properly
+# as it does not support COPY instructions with directories that do not exist
+mkdir -p ${WORKSPACE_DEVEL_DIR}/catkin_ws/install \
+    ${WORKSPACE_DEVEL_DIR}/catkin_data_ws/install
+
 echo "SUPERBUILD: Build completed. All files preserved for multi-stage Docker build."

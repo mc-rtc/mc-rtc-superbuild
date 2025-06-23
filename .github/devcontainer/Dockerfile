@@ -278,7 +278,11 @@ COPY --chown=vscode:vscode --from=build ${WORKSPACE_INSTALL_DIR} ${WORKSPACE_INS
 # About 800Mb
 COPY --chown=vscode:vscode --from=build ${WORKSPACE_DEVEL_DIR}/catkin_ws/install ${WORKSPACE_DEVEL_DIR}/catkin_ws/install
 # Depends on the robots involved, can be up to several Gb (e.g with RHPS1)
-COPY --chown=vscode:vscode --from=build ${WORKSPACE_DEVEL_DIR}/catkin_data_ws ${WORKSPACE_DEVEL_DIR}/catkin_data_ws
+COPY --chown=vscode:vscode --from=build ${WORKSPACE_DEVEL_DIR}/catkin_data_ws/install ${WORKSPACE_DEVEL_DIR}/catkin_data_ws/install
+
+# Remove catkin worksapces if they are empty
+RUN [ -z "$(ls -A ${WORKSPACE_DEVEL_DIR}/catkin_ws/install)" ] && rmdir ${WORKSPACE_DEVEL_DIR}/catkin_ws/install || true
+RUN [ -z "$(ls -A ${WORKSPACE_DEVEL_DIR}/catkin_data_ws/install)" ] && rmdir ${WORKSPACE_DEVEL_DIR}/catkin_data_ws/install || true
 
 LABEL org.opencontainers.image.source=https://github.com/mc-rtc/mc-rtc-superbuild
 LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild (ubuntu $UBUNTU_VERSION, preset $CMAKE_PRESET, standalone-release)"

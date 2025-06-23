@@ -30,6 +30,8 @@
     "DISPLAY": "${localEnv:DISPLAY}"
   },
 
+  "postCreateCommand": "source /home/vscode/.docker-entrypoint.sh",
+
   "remoteUser": "vscode",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/superbuild,type=bind",
   "workspaceFolder": "/home/vscode/superbuild"

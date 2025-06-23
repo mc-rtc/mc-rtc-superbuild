@@ -34,10 +34,6 @@ if [ -f ~/.docker-custom-entrypoint.sh ]; then
   echo 'source ~/.docker-custom-entrypoint.sh' >> ~/.zshrc
 fi
 
-echo "Checking env exported from docker build"
-export
-echo "export" >> ~/.zshrc
-
 # Check if zsh is installed
 if command -v zsh >/dev/null 2>&1; then
   echo "✅ zsh found! Starting zsh..."
