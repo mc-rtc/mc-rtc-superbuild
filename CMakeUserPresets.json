@@ -3,7 +3,7 @@
     "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
     "configurePresets": [
         {
-            "name": "choreonoid-system",
+            "name": "choreonoid",
             "displayName": "Choreonoid RelWithDebInfo (with tests)",
             "inherits": [
                 "relwithdebinfo"
@@ -19,7 +19,7 @@
     ],
     "buildPresets": [
         {
-            "name": "choreonoid-system",
+            "name": "choreonoid",
             "displayName": "Choreonoid RelWithDebInfo (with tests)",
             "configurePreset": "choreonoid-system",
             "configuration": "RelWithDebInfo",
