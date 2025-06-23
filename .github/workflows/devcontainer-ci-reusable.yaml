@@ -3,7 +3,8 @@ name: Package Devcontainers Reusable
 on:
   repository_dispatch:
     types:
-    - build-jammy
+      - build-jammy
+      - build-noble
   push:
     branches:
       - '**'
@@ -12,14 +13,21 @@ on:
       - '**'
 
 jobs:
-  # test2
   package-devcontainers:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [jammy, noble]
     uses: arntanguy/github-actions/.github/workflows/superbuild-devcontainer.yml@topic/devcontainer
     with:
       runner: ubuntu-24.04
       free-disk-space: true
-      # preset: relwithdebinfo
-      # repository:
-      # branch:
-      container-repository: ghcr.io/arntanguy/mc-rtc-superbuild
-      push: true
+      os: ${{ matrix.os }}
+      preset: relwithdebinfo${{ matrix.os == 'noble' && '-noble' || '' }}
+      include-preset-in-name: false
+      build-standalone-release: true
+      build-standalone-devel: true
+      build-devcontainer: true
+      container-repository: ghcr.io/mc-rtc/mc-rtc-superbuild
+      push: ${{ github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild' }}
+      branch: ${{ github.ref_name }}
