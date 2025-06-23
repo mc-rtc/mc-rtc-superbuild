@@ -1,0 +1,100 @@
+{
+    "version": 10,
+    "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
+    "configurePresets": [
+        {
+            "name": "cdadance-demo",
+            "displayName": "CDADance demo setup (no ros, no python, no tests)",
+            "inherits": "relwithdebinfo",
+            "cacheVariables": {
+                "BUILD_TESTING": "OFF",
+                "WITH_ROS_SUPPORT": "ON", // only needed for AutonomousInteraction state in CDADance
+                "PYTHON_BINDING": "OFF",
+                "WITH_HRP4": "ON",
+                "WITH_RHPS1": "ON",
+                "WITH_XSENS_STREAMING": "OFF",
+                "CDADANCE_AUTO_MODE": "ON",
+                "CDADANCE_REAL_ROBOT_MODE": "OFF"
+            }
+        },
+        {
+            "name": "cdadance-demo-auto",
+            "inherits": "cdadance-demo",
+            "cacheVariables": {
+                "CDADANCE_AUTO_MODE": "ON",
+                "CDADANCE_REAL_ROBOT_MODE": "ON"
+            }
+
+        },
+        {
+            "name": "cdadance-demo-manual",
+            "inherits": "cdadance-demo",
+            "cacheVariables": {
+                "CDADANCE_AUTO_MODE": "OFF",
+                "CDADANCE_REAL_ROBOT_MODE": "ON"
+            }
+
+        },
+        {
+            "name": "cdadance-simu-auto",
+            "inherits": "cdadance-demo",
+            "cacheVariables": {
+                "CDADANCE_AUTO_MODE": "ON",
+                "CDADANCE_REAL_ROBOT_MODE": "OFF"
+            }
+
+        },
+        {
+            "name": "cdadance-simu-manual",
+            "inherits": "cdadance-demo",
+            "cacheVariables": {
+                "CDADANCE_AUTO_MODE": "OFF",
+                "CDADANCE_REAL_ROBOT_MODE": "OFF"
+            }
+
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "cdadance-demo",
+            "displayName": "CDADance demo setup (no ros, no python, no tests)",
+            "configurePreset": "cdadance-demo",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "cdadance-demo-auto",
+            "configurePreset": "cdadance-demo-auto",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "cdadance-demo-manual",
+            "configurePreset": "cdadance-demo-manual",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "cdadance-simu-auto",
+            "configurePreset": "cdadance-simu-auto",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "cdadance-simu-manual",
+            "configurePreset": "cdadance-simu-manual",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        }
+    ]
+}
