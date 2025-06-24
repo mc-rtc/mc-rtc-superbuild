@@ -83,6 +83,7 @@ ARG WORKSPACE_DIR="/home/vscode/workspace"
 ARG WORKSPACE_INSTALL_DIR="/home/vscode/workspace/install"
 ARG WORKSPACE_DEVEL_DIR="/home/vscode/workspace/devel"
 ARG WORKSPACE_BUILD_DIR="/home/vscode/workspace/build"
+ARG IMAGE_SOURCE_REPO="mc-rtc/mc-rtc-superbuild" # for LABEL org.opencontainers.image.source
 
 # First stage: build mc-rtc-superbuild and generates ccache
 FROM ubuntu:$UBUNTU_VERSION as build
@@ -274,6 +275,7 @@ ARG UBUNTU_VERSION
 ARG CMAKE_PRESET
 ARG CCACHE_IMAGE_DIR
 ARG CUSTOM_ENTRYPOINT=""
+ARG IMAGE_SOURCE_REPO
 
 # about 1.5Gb
 COPY --chown=vscode:vscode --from=build ${WORKSPACE_INSTALL_DIR} ${WORKSPACE_INSTALL_DIR}
@@ -286,8 +288,8 @@ COPY --chown=vscode:vscode --from=build ${WORKSPACE_DEVEL_DIR}/catkin_data_ws/in
 RUN [ -z "$(ls -A ${WORKSPACE_DEVEL_DIR}/catkin_ws/install)" ] && rmdir ${WORKSPACE_DEVEL_DIR}/catkin_ws/install || true
 RUN [ -z "$(ls -A ${WORKSPACE_DEVEL_DIR}/catkin_data_ws/install)" ] && rmdir ${WORKSPACE_DEVEL_DIR}/catkin_data_ws/install || true
 
-LABEL org.opencontainers.image.source=https://github.com/mc-rtc/mc-rtc-superbuild
-LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild (ubuntu $UBUNTU_VERSION, preset $CMAKE_PRESET, standalone-release)"
+LABEL org.opencontainers.image.source="https://github.com/${IMAGE_SOURCE_REPO}"
+LABEL org.opencontainers.image.description="Development environment for $IMAGE_SOURCE_REPO (ubuntu $UBUNTU_VERSION, preset: $CMAKE_PRESET, build version: $BUILD_VERSION)"
 LABEL org.opencontainers.image.licenses=BSD-2
 
 ENV CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT
@@ -314,6 +316,7 @@ FROM standalone-release as standalone-devel
 ARG UBUNTU_VERSION
 ARG CMAKE_PRESET
 ARG CCACHE_IMAGE_DIR
+ARG IMAGE_SOURCE_REPO
 
 # negligible
 COPY --chown=vscode:vscode --from=build ${SUPERBUILD_DIR} ${SUPERBUILD_DIR}
@@ -324,8 +327,8 @@ COPY --chown=vscode:vscode --from=build ${WORKSPACE_BUILD_DIR} ${WORKSPACE_BUILD
 # ~1.5Gb
 COPY --chown=vscode:vscode --from=build ${CCACHE_IMAGE_DIR} ${CCACHE_IMAGE_DIR}
 
-LABEL org.opencontainers.image.source=https://github.com/mc-rtc/mc-rtc-superbuild
-LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild (ubuntu $UBUNTU_VERSION, preset $CMAKE_PRESET, standalone-devel)"
+LABEL org.opencontainers.image.source="https://github.com/${IMAGE_SOURCE_REPO}"
+LABEL org.opencontainers.image.description="Development environment for $IMAGE_SOURCE_REPO (ubuntu $UBUNTU_VERSION, preset: $CMAKE_PRESET, build version: $BUILD_VERSION)"
 LABEL org.opencontainers.image.licenses=BSD-2
 
 RUN echo "Building standalone-devel with args:" \
@@ -338,11 +341,12 @@ ARG UBUNTU_VERSION
 ARG CMAKE_PRESET
 ARG CCACHE_IMAGE_DIR
 ARG CUSTOM_ENTRYPOINT=""
+ARG IMAGE_SOURCE_REPO
 
 COPY --chown=vscode:vscode --from=build ${CCACHE_IMAGE_DIR} ${CCACHE_IMAGE_DIR}
 
-LABEL org.opencontainers.image.source=https://github.com/mc-rtc/mc-rtc-superbuild
-LABEL org.opencontainers.image.description="Development environment for mc-rtc-superbuild (ubuntu $UBUNTU_VERSION, preset $CMAKE_PRESET, devcontainer)"
+LABEL org.opencontainers.image.source="https://github.com/${IMAGE_SOURCE_REPO}"
+LABEL org.opencontainers.image.description="Development environment for $IMAGE_SOURCE_REPO (ubuntu $UBUNTU_VERSION, preset: $CMAKE_PRESET, build version: $BUILD_VERSION)"
 LABEL org.opencontainers.image.licenses=BSD-2
 
 ENV CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT
