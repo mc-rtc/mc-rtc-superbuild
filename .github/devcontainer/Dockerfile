@@ -140,7 +140,7 @@ ENV WORKSPACE_INSTALL_DIR=${WORKSPACE_INSTALL_DIR}
 ENV WORKSPACE_DEVEL_DIR=${WORKSPACE_DEVEL_DIR}
 ENV WORKSPACE_BUILD_DIR=${WORKSPACE_BUILD_DIR}
 
-RUN export DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone;
 
