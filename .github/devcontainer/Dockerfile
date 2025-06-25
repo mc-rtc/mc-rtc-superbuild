@@ -144,9 +144,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone;
 
-# Set zsh as the default shell for RUN commands
-SHELL ["/bin/zsh", "-c"]
-
 RUN echo "Building with ARGS:" \
   && echo "CMAKE_PRESET=$CMAKE_PRESET" \
   && echo "BUILD_VERSION=$BUILD_VERSION" \
@@ -170,6 +167,20 @@ RUN --mount=type=cache,target=/var/cache/apt \
    else \
      apt-get install -y --no-install-recommends ${APT_PACKAGES_STANDALONE}; \
    fi
+
+
+# # Test SSH mount with default shell (bash)
+# RUN --mount=type=ssh \
+#     echo "SSH_AUTH_SOCK: $SSH_AUTH_SOCK" && \
+#     ssh-add -l
+#
+# # Set zsh as the default shell for RUN commands
+# SHELL ["/bin/zsh", "-c"]
+#
+# # Test SSH mount with zsh shell
+# RUN --mount=type=ssh \
+#     echo "SSH_AUTH_SOCK: $SSH_AUTH_SOCK" && \
+#     ssh-add -l
 
 # Workaround screen refresh issues with neovim/ncurses
 ENV TERM="screen-256color"

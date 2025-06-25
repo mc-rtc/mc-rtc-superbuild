@@ -153,11 +153,23 @@ message(
 ** - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 )
 
-set(RC_FILE ".bashrc")
-set(RC_EXT ".bash")
-if("$ENV{SHELL}" STREQUAL "/usr/bin/zsh" OR "$ENV{SHELL}" STREQUAL "/bin/zsh")
+# This option may be used by CI to override the shell
+# This is meant to be used when the shell used for building differs
+# from the one used at runtime
+option(SUPERBUILD_OVERRIDE_SHELL "Manually override shell (zsh or bash)" "")
+if(SUPERBUILD_OVERRIDE_SHELL STREQUAL "zsh")
   set(RC_FILE ".zshrc")
   set(RC_EXT ".zsh")
+elseif(SUPERBUILD_OVERRIDE_SHELL STREQUAL "bash")
+  set(RC_FILE ".bashrc")
+  set(RC_EXT ".bash")
+else()
+  set(RC_FILE ".bashrc")
+  set(RC_EXT ".bash")
+  if("$ENV{SHELL}" STREQUAL "/usr/bin/zsh" OR "$ENV{SHELL}" STREQUAL "/bin/zsh")
+    set(RC_FILE ".zshrc")
+    set(RC_EXT ".zsh")
+  endif()
 endif()
 
 set(FINAL_MESSAGE
