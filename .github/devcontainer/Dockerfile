@@ -126,7 +126,7 @@ ARG BUILD_SUPERBUILD="true"
 ENV BUILD_SUPERBUILD=${BUILD_SUPERBUILD}
 
 ARG ZSH_THEME="bira"
-ARG APT_PACKAGES_COMMON="sudo gnupg2 gpg-agent openssh-server wget curl ca-certificates git ccache xclip ripgrep"
+ARG APT_PACKAGES_COMMON="sudo gnupg2 gpg-agent openssh-server wget curl ca-certificates git ccache xclip ripgrep zsh"
 ARG APT_PACKAGES_STANDALONE="${APT_PACKAGES_COMMON} neovim"
 ARG APT_PACKAGES_DEVCONTAINER="${APT_PACKAGES_COMMON} rsync clangd"
 ARG EMAIL="devcontainer@mc-rtc-superbuild.com"
@@ -143,6 +143,9 @@ ENV WORKSPACE_BUILD_DIR=${WORKSPACE_BUILD_DIR}
 RUN export DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone;
+
+# Set zsh as the default shell for RUN commands
+SHELL ["/bin/zsh", "-c"]
 
 RUN echo "Building with ARGS:" \
   && echo "CMAKE_PRESET=$CMAKE_PRESET" \
