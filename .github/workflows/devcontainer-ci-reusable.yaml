@@ -30,4 +30,3 @@ jobs:
       build-devcontainer: true
       container-repository: ghcr.io/mc-rtc/mc-rtc-superbuild
       push: ${{ github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild' }}
-      branch: ${{ github.ref_name }}
