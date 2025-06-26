@@ -1,135 +1,32 @@
-# name: Package Devcontainers
-#
-# on:
-#   repository_dispatch:
-#     types:
-#     - build-jammy
-#   push:
-#     branches:
-#       - '**'
-#   pull_request:
-#     branches:
-#       - '**'
-#
-# jobs:
-#   run:
-#     runs-on: ubuntu-24.04
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         os: [jammy, noble]
-#
-#     steps:
-#     - name: Dump github context
-#       run:   echo "$GITHUB_CONTEXT"
-#       shell: bash
-#       env:
-#        GITHUB_CONTEXT: ${{ toJson(github) }}
-#
-#     # Configures ssh-agent if SSH_KEY secret exists
-#     - name: Configure ssh-agent
-#       env:
-#         SSH_KEY: ${{ secrets.SSH_KEY }}
-#       if: ${{ env.SSH_KEY != '' }}
-#       uses: webfactory/ssh-agent@v0.9.0
-#       with:
-#         ssh-private-key: ${{ secrets.SSH_KEY }}
-#
-#     - name: Check ssh-agent
-#       if: ${{ env.SSH_KEY != '' }}
-#       shell: bash
-#       run: |
-#           echo "SSH_AUTH_SOCK = ${{ env.SSH_AUTH_SOCK }}"
-#           ssh-add -l
-#
-#     - name: Free Disk Space (Ubuntu)
-#       uses: jlumbroso/free-disk-space@main
-#
-#     - uses: actions/checkout@v3
-#       with:
-#         submodules: recursive
-#
-#     - name: Login to GitHub Container Registry
-#       uses: docker/login-action@v2
-#       with:
-#         registry: ghcr.io
-#         username: ${{ github.repository_owner }}
-#         password: ${{ secrets.GITHUB_TOKEN }}
-#
-#     - name: 'Docker: Build Standalone Release'
-#       env:
-#         CONTAINER_NAME: ghcr.io/mc-rtc/mc-rtc-superbuild
-#         CONTAINER_TAG: ${{ matrix.os }}-standalone-latest
-#         SSH_OPT: ""
-#       shell: bash
-#       run: |
-#         echo "::group::Prepare docker"
-#         CMAKE_PRESET="relwithdebinfo"
-#         if [ "${{ matrix.os }}" = "noble" ]; then
-#           echo "os is noble"
-#           CMAKE_PRESET=relwithdebinfo-noble
-#         else
-#           echo "os is not noble"
-#         fi
-#         echo "CMAKE_PRESET: $CMAKE_PRESET"
-#
-#         if [ ${{ env.SSH_KEY }} != '' ]; then
-#           echo "SSH_OPT='--ssh default'" >> $GITHUB_ENV;
-#         fi
-#         CONTAINER_FULL_NAME=$CONTAINER_NAME:$CONTAINER_TAG
-#         echo "CONTAINER_FULL_NAME=$CONTAINER_FULL_NAME" >> $GITHUB_ENV
-#         echo "::endgroup::"
-#
-#         echo "::group::Print Dockerfile"
-#         cat .github/devcontainer/Dockerfile
-#         echo "::endgroup::"
-#
-#         echo "::group::Build Dockerfile"
-#         docker build . -f .github/devcontainer/Dockerfile $SSH_OPT --tag $CONTAINER_FULL_NAME --build-arg CMAKE_PRESET=$CMAKE_PRESET --build-arg BUILD_VERSION=standalone --build-arg UBUNTU_VERSION="${{ matrix.os }}"
-#         echo "::endgroup::"
-#
-#         echo "::group::Check docker image size"
-#         docker inspect -f "{{ .Size }}" $CONTAINER_FULL_NAME | numfmt --to=si
-#         echo "::endgroup::"
-#
-#     - name: 'Docker: Push Standalone Release (public repositories)'
-#       if: github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild'
-#       shell: bash
-#       run: |
-#         docker push $CONTAINER_FULL_NAME
-#
-#     - name: Free Disk Space (Ubuntu)
-#       uses: jlumbroso/free-disk-space@main
-#
-#     # This workflow tests building the image but does not push it to github container registry
-#     - name: Pre-build dev container image (branches and forks)
-#       if: (github.ref != 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild') || github.repository != 'mc-rtc/mc-rtc-superbuild'
-#       uses: devcontainers/ci@v0.3
-#       with:
-#         subFolder: .github/devcontainer/${{ matrix.os }}
-#         configFile: .github/devcontainer/${{ matrix.os }}/devcontainer.json
-#         push: never
-#
-#     # Main workflow builds and pushes
-#     - name: Pre-build dev container image (main branch of official repository)
-#       if: github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild'
-#       env:
-#         DEVCONTAINER_TAG: ${{ matrix.os }}-devcontainer-latest
-#         DEVCONTAINER_FULL_NAME: $CONTAINER_NAME:${{ matrix.os }}-devcontainer-latest
-#       uses: devcontainers/ci@v0.3
-#       with:
-#         # cacheFrom: ghcr.io/arntanguy/mc-rtc-superbuild
-#         imageName: $CONTAINER_NAME
-#         imageTag: $DEVCONTAINER_TAG
-#         subFolder: .github/devcontainer/${{ matrix.os }}
-#         configFile: .github/devcontainer/${{ matrix.os }}/devcontainer.json
-#         push: always
-#
-#     - name: 'Docker: Check devcontainer size'
-#       shell: bash
-#       run: |
-#         echo "::group::Check devcontainer's docker image size $DEVCONTAINER_FULL_NAME"
-#         docker images
-#         docker ps
-#         docker inspect -f "{{ .Size }}" $DEVCONTAINER_FULL_NAME | numfmt --to=si
-#         echo "::endgroup::"
+name: Package Devcontainers Reusable
+
+on:
+  repository_dispatch:
+    types:
+      - build-jammy
+      - build-noble
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  package-devcontainers:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [jammy, noble]
+    uses: jrl-umi3218/github-actions/.github/workflows/superbuild-devcontainer.yml@master
+    with:
+      runner: ubuntu-24.04
+      free-disk-space: true
+      os: ${{ matrix.os }}
+      preset: relwithdebinfo${{ matrix.os == 'noble' && '-noble' || '' }}
+      include-preset-in-name: false
+      build-standalone-release: true
+      build-standalone-devel: true
+      build-devcontainer: true
+      container-repository: ghcr.io/mc-rtc/mc-rtc-superbuild
+      push: ${{ github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild' }}
