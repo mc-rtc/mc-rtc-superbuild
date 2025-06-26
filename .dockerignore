@@ -1,9 +1,10 @@
-build/
-devel/
-install/
 .github/
 .ccache/
-.devcontainer/
+# Ignore entire folder
+.devcontainer/*
+# But allow specific files
+!.devcontainer/docker-entrypoint.sh
+!.github/devcontainer/build_superbuild.sh
 .vscode/
 .git/
 .gitignore/

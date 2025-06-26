@@ -26,7 +26,7 @@ function(PrefixRequireSudo PREFIX VAR_OUT)
         TRUE
         PARENT_SCOPE
     )
-    message("-- Use sudo for install: ${SUDO_CMD}")
+    message("-- Use sudo for install: ${SUDO_CMD} (needed by prefix ${PREFIX})")
   else()
     file(REMOVE ${TEST_FILE})
     set(${VAR_OUT}
@@ -39,3 +39,7 @@ endfunction()
 # Check if the install prefix is writable by the current user and set SUDO_CMD
 # accordingly
 PrefixRequireSudo(${CMAKE_INSTALL_PREFIX} USE_SUDO)
+set(SUDO_OPT_CMD "")
+if(USE_SUDO)
+  set(SUDO_OPT_CMD ${SUDO_CMD})
+endif()
