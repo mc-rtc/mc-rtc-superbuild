@@ -91,7 +91,7 @@ contexts:
 - Create you devpod workspace
   ```
   cd <mc-rtc-superbuild>
-  devpod up . --devcontainer-path ./devcontainer/jammy/devcontainer.json --ide=none
+  devpod up . --devcontainer-path .devcontainer/jammy/devcontainer.json --ide=none
   ```
 - Connect to the devcontainer using ssh
   ```
@@ -162,7 +162,7 @@ By default the following folders are mounted within the container:
 </details>
 
 <details>
-  <summary>Cutom build</summary>
+  <summary>Custom build</summary>
 
   To customize the build process, create a `CMakeUserPresets.json` file that inherits from one of the default presets, and set up your preferred build options (build folders, cmake arguments, build type, etc)
 
@@ -222,7 +222,7 @@ This files contains runtime information about the state of your program, and can
 On Ubuntu, by default, core dump files are managed by `apport` and disabled for non-official packages.
 The easiest way to generate them is by disabling `apport` and manually specifying a location for the core files.
 
-First diable apport
+First disable apport
 ```bash
 sudo service apport stop # temporarely disable apport
 sudo nano /etc/default/apport
