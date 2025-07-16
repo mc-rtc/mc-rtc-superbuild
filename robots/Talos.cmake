@@ -4,7 +4,6 @@ if(NOT WITH_Talos)
   return()
 endif()
 
-
 AddCatkinProject(
   pal_urdf_utils
   GITHUB pal-robotics/pal_urdf_utils
