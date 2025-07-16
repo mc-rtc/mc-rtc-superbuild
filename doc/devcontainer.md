@@ -211,7 +211,7 @@ To use `mc_rtc`, you need to setup the environment variables for the local insta
 This can be done by sourcing the following file:
 
 ```
-source ./install/relwithdebinfo/setup_mc_rtc.sh
+source /home/vscode/workspace/install/setup_mc_rtc.sh
 ```
 
 
