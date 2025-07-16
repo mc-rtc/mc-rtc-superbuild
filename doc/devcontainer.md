@@ -142,7 +142,7 @@ By default the following folders are mounted within the container:
 </details>
 
 <details>
-  <summary>Build within the terminal<summary>
+  <summary>Build within the terminal</summary>
   You can now build from the terminal, or use VSCode's "CMake Tools" extension to select your desired build preset.
   Note that default presets will:
   - clone all projects in `./devel`
