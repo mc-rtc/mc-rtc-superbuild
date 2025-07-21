@@ -192,10 +192,19 @@ RUN \
    fi
 
 # Create ubuntu user with sudo privileges
-RUN useradd -u 1000 -ms /bin/zsh vscode && \
-     usermod -aG sudo vscode \
-     && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
-     && echo "User vscode (uid=`id -u vscode`:gid=`id -g vscode`) created with passwordless sudo privileges";
+# Rename ubuntu user to vscode (noble)
+# Create a new vscode user (jammy)
+RUN \
+  if [ "$UBUNTU_VERSION" = "noble" ]; then \
+    usermod -l vscode ubuntu \
+    && usermod -d /home/vscode -m vscode \
+    && groupmod -n vscode ubuntu; \
+  else \
+    useradd -u 1000 -ms /bin/zsh vscode \
+    && usermod -aG sudo vscode; \
+  fi; \
+  echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
+  && echo "User vscode (uid=`id -u vscode`:gid=`id -g vscode`) created with passwordless sudo privileges";
 
 # Check ssh-agent forwarding
 RUN --mount=type=ssh \
