@@ -6,7 +6,7 @@
     "context": "../../..",
     "args":
     {
-      "CMAKE_PRESET": "${localEnv:CMAKE_PRESET:relwithdebinfo}",
+      "CMAKE_PRESET": "${localEnv:CMAKE_PRESET:relwithdebinfo-noble}",
       "BUILD_VERSION": "${localEnv:BUILD_VERSION:devcontainer}",
       "IMAGE_SOURCE_REPO": "",
       "UBUNTU_VERSION": "noble"

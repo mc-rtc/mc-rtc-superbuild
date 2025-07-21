@@ -200,10 +200,10 @@ RUN \
     && usermod -d /home/vscode -m vscode \
     && groupmod -n vscode ubuntu; \
   else \
-    useradd -u 1000 -ms /bin/zsh vscode \
-    && usermod -aG sudo vscode; \
+    useradd -u 1000 -ms /bin/zsh vscode; \
   fi; \
-  echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
+  usermod -aG sudo vscode \
+  && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
   && echo "User vscode (uid=`id -u vscode`:gid=`id -g vscode`) created with passwordless sudo privileges";
 
 # Check ssh-agent forwarding
