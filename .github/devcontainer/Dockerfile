@@ -192,7 +192,7 @@ RUN \
    fi
 
 # Create ubuntu user with sudo privileges
-RUN useradd -ms /bin/zsh vscode && \
+RUN useradd -u 1000 -ms /bin/zsh vscode && \
      usermod -aG sudo vscode \
      && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
      && echo "User vscode (uid=`id -u vscode`:gid=`id -g vscode`) created with passwordless sudo privileges";

@@ -3,12 +3,12 @@
 
   "build": {
     "dockerfile": "../Dockerfile",
-    "context": "../../.."
+    "context": "../../..",
     "args":
     {
       "CMAKE_PRESET": "${localEnv:CMAKE_PRESET:relwithdebinfo}",
       "BUILD_VERSION": "${localEnv:BUILD_VERSION:devcontainer}",
-      "IMAGE_SOURCE_REPO": ""
+      "IMAGE_SOURCE_REPO": "",
       "UBUNTU_VERSION": "jammy"
     },
     "options": [
