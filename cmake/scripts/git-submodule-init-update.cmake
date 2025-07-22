@@ -22,9 +22,20 @@ if("${OPERATION}" STREQUAL "init")
   if(GIT_TAG_IS_TAG)
     set(BRANCH_OPTION)
   endif()
-  set(GIT_COMMAND git submodule add -f ${BRANCH_OPTION} ${GIT_REPOSITORY}
-                  "${TARGET_FOLDER}"
+  message(
+    STATUS
+      "Adding submodule '${TARGET_FOLDER}' from '${GIT_REPOSITORY}' at tag/branch '${GIT_TAG}'"
   )
+  execute_process(
+    COMMAND git submodule add -f ${BRANCH_OPTION} ${GIT_REPOSITORY} "${TARGET_FOLDER}"
+    WORKING_DIRECTORY "${SOURCE_DESTINATION}"
+    RESULT_VARIABLE GIT_SUBMODULE_FAILED
+  )
+  if(NOT GIT_SUBMODULE_FAILED EQUAL 0)
+    message(
+      FATAL_ERROR "Failed to add submodule '${TARGET_FOLDER}' from '${GIT_REPOSITORY}'."
+    )
+  endif()
 elseif("${OPERATION}" STREQUAL "update")
   # The "update" operation attemps to change to the new branch/tag specified for this project. It does its best to ensure that the local branch is in a clean state before switching to the new branch/tag and that no data is lost in the process.
 
