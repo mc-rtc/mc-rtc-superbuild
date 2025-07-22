@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "✅ Welcome to mc-rtc-superbuild devcontainer"
+echo ""
 if [ "$BUILD_VERSION" = "devcontainer" ]; then
   echo "Using the devcontainer entrypoint"
   # Check if /home/vscode/workspace exists
@@ -32,14 +34,4 @@ fi
 if [ -f ~/.docker-custom-entrypoint.sh ]; then
   echo 'echo "--> Using custom entrypoint ~/.docker-custom-entrypoint.sh"' >> ~/.zshrc
   echo 'source ~/.docker-custom-entrypoint.sh' >> ~/.zshrc
-fi
-
-# Check if zsh is installed
-if command -v zsh >/dev/null 2>&1; then
-  echo "✅ zsh found! Starting zsh..."
-  if [ "$#" -eq 0 ]; then
-    exec zsh
-  else
-    exec zsh "$@"
-  fi
 fi

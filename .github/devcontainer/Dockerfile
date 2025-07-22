@@ -388,5 +388,6 @@ RUN \
   if [ -f "~/.docker-custom-entrypoint.sh" ]; then \
     echo "ENTRYPOINT: Using custom entrypoint: $CUSTOM_ENTRYPOINT located in ~/.docker-custom-entrypoint.sh"; \
   fi
+RUN "echo ~/.docker-entrypoint.sh" > ~/.zshrc
 
-ENTRYPOINT ["/home/vscode/.docker-entrypoint.sh"]
+ENTRYPOINT ["zsh"]
