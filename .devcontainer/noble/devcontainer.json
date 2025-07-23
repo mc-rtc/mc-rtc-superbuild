@@ -26,6 +26,8 @@
     // "--gpus=all",
   ],
 
+  "postCreateCommand": "source /home/vscode/.docker-entrypoint.sh",
+
   "containerEnv": {
     "DISPLAY": "${localEnv:DISPLAY}"
   },
