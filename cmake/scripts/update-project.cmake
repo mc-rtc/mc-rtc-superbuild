@@ -94,13 +94,13 @@ execute_process(
 )
 
 if(DEFINED PRE_COMMIT
+   AND EXISTS "${PRE_COMMIT}"
    AND EXISTS "${SOURCE_DIR}/.pre-commit-config.yaml"
    AND EXISTS "${SOURCE_DIR}/.git"
 )
   execute_process(
-    COMMAND ${PRE_COMMIT} install
-    WORKING_DIRECTORY ${SOURCE_DIR}
-    OUTPUT_QUIET ERROR_QUIET COMMAND_ERROR_IS_FATAL ANY
+    COMMAND ${PRE_COMMIT} install WORKING_DIRECTORY ${SOURCE_DIR}
+                                                    COMMAND_ERROR_IS_FATAL ANY
   )
 endif()
 
