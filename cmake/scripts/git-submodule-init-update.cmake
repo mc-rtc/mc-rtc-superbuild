@@ -59,6 +59,32 @@ elseif("${OPERATION}" STREQUAL "update")
     )
   endif()
 
+  # Get current branch name
+  execute_process(
+    COMMAND git rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
+    OUTPUT_VARIABLE GIT_CURRENT_TAG
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+
+  # Check if upstream is set for the current branch
+  execute_process(
+    COMMAND git rev-parse --abbrev-ref --symbolic-full-name @{u}
+    WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
+    RESULT_VARIABLE GIT_UPSTREAM_RESULT
+    OUTPUT_VARIABLE GIT_UPSTREAM_BRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  if(NOT GIT_UPSTREAM_RESULT EQUAL 0)
+    message(FATAL_ERROR
+      "No upstream (remote tracking branch) is set for the current branch ${GIT_CURRENT_TAG} in '${SOURCE_DESTINATION}/${TARGET_FOLDER}'.\n"
+      "Set it with:\n"
+      "  git branch --set-upstream-to=<remote>/${GIT_CURRENT_TAG} ${GIT_CURRENT_TAG}\n"
+      "Or push the branch with:\n"
+      "  git push -u <remote> ${GIT_CURRENT_TAG}"
+    )
+  endif()
+
   # Check if local branch is fully pushed
   execute_process(
     COMMAND git rev-list --count @{u}..
@@ -130,7 +156,7 @@ elseif("${OPERATION}" STREQUAL "update")
       RESULT_VARIABLE SET_URL_RESULT
     )
     message(
-      FATAL_ERROR "Branch '${GIT_TAG}' does NOT exist on remote '${GIT_REPOSITORY}'."
+      FATAL_ERROR "Branch '${GIT_TAG}' does NOT exist on remote '${GIT_REPOSITORY}'. If you meant to create it, use\n  cd ${SOURCE_DESTINATION}/${TARGET_FOLDER}\n  git checkout -b ${GIT_TAG}\n  git push --set-upstream origin ${GIT_TAG}\n"
     )
   endif()
 
