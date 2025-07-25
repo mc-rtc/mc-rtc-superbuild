@@ -227,8 +227,33 @@ This is likely a conflict between different extensions."
   # already been cloned the operation might lose local work if it hasn't been saved,
   # therefore we check for this and error if there is local changes
   if(DEFINED MC_RTC_SUPERBUILD_${NAME}_GIT_REPOSITORY)
-    set(PREVIOUS_GIT_REPOSITORY "${MC_RTC_SUPERBUILD_${NAME}_GIT_REPOSITORY}")
-    set(PREVIOUS_GIT_TAG "${MC_RTC_SUPERBUILD_${NAME}_GIT_TAG}")
+
+    # GIT_REPOSITORY and/or GIT_TAG have changed
+    if(EXISTS "${SOURCE_DIR}/.git")
+      # Get current repository origin remote url
+      execute_process(
+        COMMAND git remote get-url origin
+        WORKING_DIRECTORY "${SOURCE_DESTINATION}/${NAME}"
+        OUTPUT_VARIABLE PREVIOUS_GIT_REPOSITORY
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+
+      # Get current repository tag
+      execute_process(
+        COMMAND git symbolic-ref --short HEAD
+        WORKING_DIRECTORY "${SOURCE_DESTINATION}"
+        OUTPUT_VARIABLE PREVIOUS_GIT_TAG
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+    else()
+      set(PREVIOUS_GIT_REPOSITORY "${MC_RTC_SUPERBUILD_${NAME}_GIT_REPOSITORY}")
+      set(PREVIOUS_GIT_TAG "${MC_RTC_SUPERBUILD_${NAME}_GIT_TAG}")
+    endif()
+
+    message(
+      WARNING
+        "Previous repository for ${NAME} was ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG}"
+    )
     if(NOT "${PREVIOUS_GIT_REPOSITORY}" STREQUAL "${GIT_REPOSITORY}"
        OR NOT "${PREVIOUS_GIT_TAG}" STREQUAL "${GIT_TAG}"
     )

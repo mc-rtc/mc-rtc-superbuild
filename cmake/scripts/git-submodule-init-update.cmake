@@ -44,6 +44,7 @@ elseif("${OPERATION}" STREQUAL "update")
     COMMAND git remote update origin
     WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
     RESULT_VARIABLE GIT_SUBMODULE_FAILED
+    OUTPUT_QUIET
   )
 
   # Check for uncommitted changes
@@ -59,147 +60,161 @@ elseif("${OPERATION}" STREQUAL "update")
     )
   endif()
 
-  # Get current branch name
+  # Try to get current branch name
   execute_process(
-    COMMAND git rev-parse --abbrev-ref HEAD
+    COMMAND git symbolic-ref --short -q HEAD
     WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
-    OUTPUT_VARIABLE GIT_CURRENT_TAG
-    OUTPUT_STRIP_TRAILING_WHITESPACE
+    OUTPUT_VARIABLE GIT_CURRENT_REF
+    OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_QUIET
   )
 
-  # Check if upstream is set for the current branch
-  execute_process(
-    COMMAND git rev-parse --abbrev-ref --symbolic-full-name @{u}
-    WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
-    RESULT_VARIABLE GIT_UPSTREAM_RESULT
-    OUTPUT_VARIABLE GIT_UPSTREAM_BRANCH
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-  if(NOT GIT_UPSTREAM_RESULT EQUAL 0)
-    message(FATAL_ERROR
-      "No upstream (remote tracking branch) is set for the current branch ${GIT_CURRENT_TAG} in '${SOURCE_DESTINATION}/${TARGET_FOLDER}'.\n"
-      "Set it with:\n"
-      "  git branch --set-upstream-to=<remote>/${GIT_CURRENT_TAG} ${GIT_CURRENT_TAG}\n"
-      "Or push the branch with:\n"
-      "  git push -u <remote> ${GIT_CURRENT_TAG}"
-    )
-  endif()
-
-  # Check if local branch is fully pushed
-  execute_process(
-    COMMAND git rev-list --count @{u}..
-    WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
-    OUTPUT_VARIABLE AHEAD_COUNT
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    RESULT_VARIABLE GIT_REV_RESULT
-  )
-  if(GIT_REV_RESULT)
-    message(FATAL_ERROR "Failed to check if branch is pushed. Is the upstream set?")
-  endif()
-  if(NOT AHEAD_COUNT STREQUAL "0")
-    message(
-      FATAL_ERROR
-        "Local branch has commits not pushed to remote. Please push before updating."
-    )
-  endif()
-
-  # Check if there is a local branch with the same name as the new branch
-  execute_process(
-    COMMAND git branch --list "${GIT_TAG}"
-    WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
-    OUTPUT_VARIABLE BRANCH_EXISTS
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-
-  # Get URI of previous remote
-  execute_process(
-    COMMAND git remote get-url origin
-    WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
-    OUTPUT_VARIABLE PREVIOUS_REMOTE
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-
-  # Set URI or origin remote to GIT_REPOSITORY
-  execute_process(
-    COMMAND git remote set-url origin "${GIT_REPOSITORY}"
-    COMMAND git remote update origin
-    WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
-    RESULT_VARIABLE SET_URL_RESULT
-  )
-  if(NOT SET_URL_RESULT EQUAL 0)
-    # Restore PREVIOUS_REMOTE
+  # If we are on a local branch, check that it has been fully pushed to the remote
+  if(GIT_CURRENT_REF)
+    # Check if upstream is set for the current branch
     execute_process(
-      COMMAND git remote set-url origin "${PREVIOUS_REMOTE}"
-      COMMAND git remote update origin
+      COMMAND git rev-parse --abbrev-ref --symbolic-full-name @{u}
       WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
-      RESULT_VARIABLE SET_URL_RESULT
+      RESULT_VARIABLE GIT_UPSTREAM_RESULT
+      OUTPUT_VARIABLE GIT_UPSTREAM_BRANCH
+      OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    message(FATAL_ERROR "Failed to set remote URL to '${GIT_REPOSITORY}'.")
-  endif()
+    if(NOT GIT_UPSTREAM_RESULT EQUAL 0)
+      message(
+        FATAL_ERROR
+          "No upstream (remote tracking branch) is set for the current branch ${GIT_CURRENT_TAG} in '${SOURCE_DESTINATION}/${TARGET_FOLDER}'.\n"
+          "Set it with:\n"
+          "  git branch --set-upstream-to=<remote>/${GIT_CURRENT_TAG} ${GIT_CURRENT_TAG}\n"
+          "Or push the branch with:\n"
+          "  git push -u <remote> ${GIT_CURRENT_TAG}"
+      )
+    endif()
 
-  # Ensure that the branch exists on the remote
-  execute_process(
-    COMMAND git ls-remote --heads origin ${GIT_TAG}
-    WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
-    OUTPUT_VARIABLE BRANCH_EXISTS_OUTPUT
-    RESULT_VARIABLE GIT_LS_REMOTE_RESULT
-  )
-
-  if(BRANCH_EXISTS_OUTPUT)
-    message(STATUS "Branch '${GIT_TAG}' exists on remote '${GIT_REPOSITORY}'.")
-  else()
-    # Restore PREVIOUS_REMOTE
+    # Check if local branch is fully pushed
     execute_process(
-      COMMAND git remote set-url origin "${PREVIOUS_REMOTE}"
-      COMMAND git remote update origin
+      COMMAND git rev-list --count @{u}..
       WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
-      RESULT_VARIABLE SET_URL_RESULT
+      OUTPUT_VARIABLE AHEAD_COUNT
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      RESULT_VARIABLE GIT_REV_RESULT
     )
-    message(
-      FATAL_ERROR "Branch '${GIT_TAG}' does NOT exist on remote '${GIT_REPOSITORY}'. If you meant to create it, use\n  cd ${SOURCE_DESTINATION}/${TARGET_FOLDER}\n  git checkout -b ${GIT_TAG}\n  git push --set-upstream origin ${GIT_TAG}\n"
-    )
+    if(GIT_REV_RESULT)
+      message(FATAL_ERROR "Failed to check if branch is pushed. Is the upstream set?")
+    endif()
+    if(NOT AHEAD_COUNT STREQUAL "0")
+      message(
+        FATAL_ERROR
+          "Local branch has commits not pushed to remote. Please push before updating."
+      )
+    endif()
   endif()
 
-  # Checkout the new branch from remote
-  if(BRANCH_EXISTS)
-    message(
-      STATUS
-        "Branch '${GIT_TAG}' already exists locally. Resetting its HEAD to the remote's new HEAD."
-    )
-    # Ensure that we are on this branch locally
+  if(GIT_TAG_IS_TAG)
+    # checkout new tag
     execute_process(
       COMMAND git checkout "${GIT_TAG}"
       WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
       RESULT_VARIABLE CHECKOUT_RESULT
     )
-    if(NOT CHECKOUT_RESULT EQUAL 0)
-      message(FATAL_ERROR "Failed to checkout branch '${GIT_TAG}'.")
+  else() # we are updating from a branch on the remote
+    # Check if there is a local branch with the same name as the new branch
+    execute_process(
+      COMMAND git branch --list "${GIT_TAG}"
+      WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
+      OUTPUT_VARIABLE BRANCH_EXISTS
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    # Get URI of previous remote
+    execute_process(
+      COMMAND git remote get-url origin
+      WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
+      OUTPUT_VARIABLE PREVIOUS_REMOTE
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    # Set URI or origin remote to GIT_REPOSITORY
+    execute_process(
+      COMMAND git remote set-url origin "${GIT_REPOSITORY}"
+      COMMAND git remote update origin
+      WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
+      RESULT_VARIABLE SET_URL_RESULT
+    )
+    if(NOT SET_URL_RESULT EQUAL 0)
+      # Restore PREVIOUS_REMOTE
+      execute_process(
+        COMMAND git remote set-url origin "${PREVIOUS_REMOTE}"
+        COMMAND git remote update origin
+        WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
+        RESULT_VARIABLE SET_URL_RESULT
+      )
+      message(FATAL_ERROR "Failed to set remote URL to '${GIT_REPOSITORY}'.")
     endif()
 
-    # Reset that branch to some other branch/commit, e.g. target-branch
+    # Ensure that the branch exists on the remote
     execute_process(
-      COMMAND git reset --hard "origin/${GIT_TAG}"
+      COMMAND git ls-remote --heads origin ${GIT_TAG}
       WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
-      RESULT_VARIABLE CHECKOUT_RESULT
+      OUTPUT_VARIABLE BRANCH_EXISTS_OUTPUT
+      RESULT_VARIABLE GIT_LS_REMOTE_RESULT
     )
-    if(NOT CHECKOUT_RESULT EQUAL 0)
-      message(FATAL_ERROR "Failed to reset branch '${GIT_TAG}'.")
-    endif()
-  else()
-    message(
-      STATUS
-        "Branch '${GIT_TAG}' does not exist locally. Checking it out from remote ${GIT_REPOSITORY}."
-    )
-    execute_process(
-      COMMAND git checkout -b "${GIT_TAG}" "origin/${GIT_TAG}"
-      WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
-      RESULT_VARIABLE CHECKOUT_RESULT
-    )
-    if(NOT CHECKOUT_RESULT EQUAL 0)
+
+    if(BRANCH_EXISTS_OUTPUT)
+      message(STATUS "Branch '${GIT_TAG}' exists on remote '${GIT_REPOSITORY}'.")
+    else()
+      # Restore PREVIOUS_REMOTE
+      execute_process(
+        COMMAND git remote set-url origin "${PREVIOUS_REMOTE}"
+        COMMAND git remote update origin
+        WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
+        RESULT_VARIABLE SET_URL_RESULT
+      )
       message(
         FATAL_ERROR
-          "Failed to checkout branch '${GIT_TAG}' from remote ${GIT_REPOSITORY}."
+          "Branch '${GIT_TAG}' does NOT exist on remote '${GIT_REPOSITORY}'. If you meant to create it, use\n  cd ${SOURCE_DESTINATION}/${TARGET_FOLDER}\n  git checkout -b ${GIT_TAG}\n  git push --set-upstream origin ${GIT_TAG}\n"
       )
+    endif()
+
+    # Checkout the new branch from remote
+    if(BRANCH_EXISTS)
+      message(
+        STATUS
+          "Branch '${GIT_TAG}' already exists locally. Resetting its HEAD to the remote's new HEAD."
+      )
+      # Ensure that we are on this branch locally
+      execute_process(
+        COMMAND git checkout "${GIT_TAG}"
+        WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
+        RESULT_VARIABLE CHECKOUT_RESULT
+      )
+      if(NOT CHECKOUT_RESULT EQUAL 0)
+        message(FATAL_ERROR "Failed to checkout branch '${GIT_TAG}'.")
+      endif()
+
+      # Reset that branch to some other branch/commit, e.g. target-branch
+      execute_process(
+        COMMAND git reset --hard "origin/${GIT_TAG}"
+        WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
+        RESULT_VARIABLE CHECKOUT_RESULT
+      )
+      if(NOT CHECKOUT_RESULT EQUAL 0)
+        message(FATAL_ERROR "Failed to reset branch '${GIT_TAG}'.")
+      endif()
+    else()
+      message(
+        STATUS
+          "Branch '${GIT_TAG}' does not exist locally. Checking it out from remote ${GIT_REPOSITORY}."
+      )
+      execute_process(
+        COMMAND git checkout -b "${GIT_TAG}" "origin/${GIT_TAG}"
+        WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
+        RESULT_VARIABLE CHECKOUT_RESULT
+      )
+      if(NOT CHECKOUT_RESULT EQUAL 0)
+        message(
+          FATAL_ERROR
+            "Failed to checkout branch '${GIT_TAG}' from remote ${GIT_REPOSITORY}."
+        )
+      endif()
     endif()
   endif()
 
