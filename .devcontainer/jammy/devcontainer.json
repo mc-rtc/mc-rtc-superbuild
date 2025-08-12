@@ -1,6 +1,5 @@
 {
   "name": "mc-rtc-superbuild-jammy",
-
   // See .github/devcontainer/ubuntu-22.04/devcontainer.json to see how this image was built
   // This image contains:
   // - All of mc-rtc-superbuild dependencies
@@ -9,12 +8,10 @@
   // - All tools required to build the project
   // - A sensible default configuration for vscode
   "image": "ghcr.io/mc-rtc/mc-rtc-superbuild:jammy-devcontainer-latest",
-
   "mounts": [
-    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached"
+    // "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached"
     // "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/mc-rtc-superbuild-jammy,target=/home/vscode/workspace,type=bind,consistency=cached"
   ],
-
   "runArgs": [
     "--network=host",
     "--cap-add=sys_nice", // Grants the container the CAP_SYS_NICE capability, which allows the container to raise process nice values, set real-time scheduling policies, set CPU affinity, and other operations.
@@ -25,13 +22,10 @@
     // "--runtime=nvidia",
     // "--gpus=all",
   ],
-
   "containerEnv": {
     "DISPLAY": "${localEnv:DISPLAY}"
   },
-
-  "postCreateCommand": "source /home/vscode/.docker-entrypoint.sh",
-
+  "postCreateCommand": ". /home/vscode/superbuild/.devcontainer/docker-entrypoint.sh",
   "remoteUser": "vscode",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/superbuild,type=bind",
   "workspaceFolder": "/home/vscode/superbuild"
