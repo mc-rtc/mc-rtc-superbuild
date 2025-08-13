@@ -22,6 +22,14 @@
     // "--runtime=nvidia",
     // "--gpus=all",
   ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode-remote.remote-containers",
+        "ms-vscode.cmake-tools"
+      ]
+    }
+  },
   "containerEnv": {
     "DISPLAY": "${localEnv:DISPLAY}"
   },
