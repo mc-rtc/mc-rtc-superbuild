@@ -31,9 +31,10 @@
     }
   },
   "containerEnv": {
-    "DISPLAY": "${localEnv:DISPLAY}"
+    "DISPLAY": "host.docker.internal:0.0"
   },
-  "postCreateCommand": ". /home/vscode/superbuild/.devcontainer/docker-entrypoint.sh",
+  // "postCreateCommand": ". /home/vscode/superbuild/.devcontainer/docker-entrypoint.sh",
+  "postCreateCommand": ". /home/vscode/.docker-entrypoint.sh",
   "remoteUser": "vscode",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/superbuild,type=bind",
   "workspaceFolder": "/home/vscode/superbuild"

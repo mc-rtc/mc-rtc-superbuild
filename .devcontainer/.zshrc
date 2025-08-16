@@ -111,7 +111,3 @@ DISABLE_AUTO_UPDATE=true
 DISABLE_UPDATE_PROMPT=true
 
 source $HOME/superbuild/.devcontainer/entrypoint.sh
-
-export PATH="$HOME/workspace/install/bin:$PATH"
-export LD_LIBRARY_PATH="$HOME/workspace/install/lib:$LD_LIBRARY_PATH"
-
