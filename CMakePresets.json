@@ -11,7 +11,8 @@
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo",
                 "SOURCE_DESTINATION": "${sourceDir}/../workspace/devel",
                 "BUILD_DESTINATION": "${sourceDir}/../workspace/build/projects",
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/../workspace/install"
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/../workspace/install",
+                "WITH_ROS_SUPPORT": "ON"
             }
         },
         {
@@ -32,7 +33,7 @@
             ],
             "cacheVariables": {
                 "PYTHON_BINDING": "OFF",
-		"WITH_ROS_SUPPORT": "OFF"
+                "WITH_ROS_SUPPORT": "OFF"
             },
             "condition": {
                 "type": "equals",
