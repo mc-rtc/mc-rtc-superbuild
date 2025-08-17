@@ -30,30 +30,16 @@ void MyFirstController::reset(const mc_control::ControllerResetData & reset_data
 
 void MyFirstController::switch_target()
 {
-  // if(goingLeft)
-  // {
-  //   postureTask->target(NECK_Y);
-  // }
-  // else
-  // {
-  //   postureTask->target(NECK_Y);
-  // }
-  // goingLeft = !goingLeft;
-
-  // Create a map for the target posture
   std::map<std::string, std::vector<double>> targetPosture;
 
-  // Set the NECK_Y joint to desired position
   if(goingLeft)
   {
-      targetPosture["NECK_Y"] = {0.5};  // radians to look left
+      targetPosture["NECK_Y"] = {0.5};  // radians, looking left
   }
   else
   {
-      targetPosture["NECK_Y"] = {-0.5}; // radians to look right
+      targetPosture["NECK_Y"] = {-0.5};
   }
-
-  // Update the posture task
   postureTask->target(targetPosture);
 
   goingLeft = !goingLeft;
