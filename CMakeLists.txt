@@ -142,9 +142,9 @@ message(
 ================================================================================
 **
 ** mc-rtc-superbuild is now ready, the following special targets are available:
-** - clone: clone all projects into their location
-** - update: update all the projects at once
-** - uninstall: uninstall all the project at once
+** - clone: clone all projects into their location, or update remote/branch
+** - update: update all projects at once
+** - uninstall: uninstall all projects at once
 **
 ** You can also use the [COMMAND]-[NAME] form to update particular projects
 **
