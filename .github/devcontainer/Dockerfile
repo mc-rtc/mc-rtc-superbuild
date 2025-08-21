@@ -250,7 +250,10 @@ RUN --mount=type=cache,target=/var/cache/apt \
 # oh-my-zsh & plugins
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
      -t $ZSH_THEME \
-     -p git;
+     -p git \
+     -p https://github.com/zsh-users/zsh-autosuggestions \
+     -p https://github.com/zsh-users/zsh-syntax-highlighting.git \
+     && cp $SUPERBUILD_DIR/.devcontainer/.zshrc ~/.zshrc
 
 # Clean up APT cache and temporary files
 RUN \
@@ -263,12 +266,21 @@ WORKDIR /home/vscode
 # Base stage: System packages and basic user setup
 FROM ubuntu:$UBUNTU_VERSION as base
 ARG UBUNTU_VERSION
+ENV UBUNTU_VERSION=${UBUNTU_VERSION}
 ARG CCACHE_IMAGE_DIR
+ENV CCACHE_DIR=$CCACHE_IMAGE_DIR
 ARG SUPERBUILD_DIR
+ENV SUPERBUILD_DIR=${SUPERBUILD_DIR}
 ARG WORKSPACE_DIR
+ENV WORKSPACE_DIR=${WORKSPACE_DIR}
 ARG WORKSPACE_INSTALL_DIR
+ENV WORKSPACE_INSTALL_DIR=${WORKSPACE_INSTALL_DIR}
 ARG WORKSPACE_DEVEL_DIR
+ENV WORKSPACE_DEVEL_DIR=${WORKSPACE_DEVEL_DIR}
 ARG WORKSPACE_BUILD_DIR
+ENV WORKSPACE_BUILD_DIR=${WORKSPACE_BUILD_DIR}
+ARG CMAKE_PRESET
+ENV CMAKE_PRESET=${CMAKE_PRESET}
 
 # Copy system-level changes and user setup
 # about 1.8Gb
@@ -279,26 +291,28 @@ COPY --from=build /etc /etc
 # about 100Mb
 COPY --from=build /var /var
 COPY --chown=vscode:vscode --from=build /home/vscode/.zshrc /home/vscode/.zshrc
-COPY --chown=vscode:vscode --from=build /home/vscode/.bashrc /home/vscode/.bashrc
 COPY --chown=vscode:vscode --from=build /home/vscode/.docker-entrypoint.sh /home/vscode/.docker-entrypoint.sh
 COPY --chown=vscode:vscode --from=build /home/vscode/.oh-my-zsh /home/vscode/.oh-my-zsh
 
-ENV UBUNTU_VERSION=${UBUNTU_VERSION}
-ENV CCACHE_IMAGE_DIR=$CCACHE_IMAGE_DIR
-ENV SUPERBUILD_DIR=${SUPERBUILD_DIR}
-ENV WORKSPACE_DIR=${WORKSPACE_DIR}
-ENV WORKSPACE_INSTALL_DIR=${WORKSPACE_INSTALL_DIR}
-ENV WORKSPACE_DEVEL_DIR=${WORKSPACE_DEVEL_DIR}
-ENV WORKSPACE_BUILD_DIR=${WORKSPACE_BUILD_DIR}
-ENV CMAKE_PRESET=${CMAKE_PRESET}
 
 # Standalone-release stage: Minimal files (install + catkin workspaces)
 FROM base as standalone-release
-ARG UBUNTU_VERSION
-ARG CMAKE_PRESET
-ARG CCACHE_IMAGE_DIR
-ARG CUSTOM_ENTRYPOINT=""
 ARG IMAGE_SOURCE_REPO
+
+ARG UBUNTU_VERSION
+ENV UBUNTU_VERSION=${UBUNTU_VERSION}
+ARG CMAKE_PRESET
+ENV CMAKE_PRESET=${CMAKE_PRESET}
+ARG CCACHE_IMAGE_DIR
+ENV CCACHE_DIR=$CCACHE_IMAGE_DIR
+ARG CUSTOM_ENTRYPOINT=""
+ENV CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT
+ARG WORKSPACE_DIR
+ENV WORKSPACE_DIR=${WORKSPACE_DIR}
+ARG WORKSPACE_INSTALL_DIR
+ENV WORKSPACE_INSTALL_DIR=${WORKSPACE_INSTALL_DIR}
+ARG WORKSPACE_DEVEL_DIR
+ENV WORKSPACE_DEVEL_DIR=${WORKSPACE_DEVEL_DIR}
 
 # about 1.5Gb
 COPY --chown=vscode:vscode --from=build ${WORKSPACE_INSTALL_DIR} ${WORKSPACE_INSTALL_DIR}
@@ -315,8 +329,6 @@ LABEL org.opencontainers.image.source="https://github.com/${IMAGE_SOURCE_REPO}"
 LABEL org.opencontainers.image.description="Development environment for $IMAGE_SOURCE_REPO (ubuntu $UBUNTU_VERSION, preset: $CMAKE_PRESET, build version: $BUILD_VERSION)"
 LABEL org.opencontainers.image.licenses=BSD-2
 
-ENV CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT
-ENV CCACHE_DIR=$CCACHE_IMAGE_DIR
 
 USER vscode
 WORKDIR /home/vscode
@@ -336,10 +348,26 @@ ENTRYPOINT ["/home/vscode/.docker-entrypoint.sh"]
 
 # Standalone-devel stage: All development files
 FROM standalone-release as standalone-devel
-ARG UBUNTU_VERSION
-ARG CMAKE_PRESET
 ARG CCACHE_IMAGE_DIR
 ARG IMAGE_SOURCE_REPO
+
+
+ARG UBUNTU_VERSION
+ENV UBUNTU_VERSION=${UBUNTU_VERSION}
+ARG BUILD_VERSION
+ENV BUILD_VERSION=${BUILD_VERSION}
+ARG CMAKE_PRESET
+ENV CMAKE_PRESET=${CMAKE_PRESET}
+ARG SUPERBUILD_DIR
+ENV SUPERBUILD_DIR=$SUPERBUILD_DIR
+ARG WORKSPACE_DIR
+ENV WORKSPACE_DIR=$WORKSPACE_DIR
+ARG WORKSPACE_INSTALL_DIR
+ENV WORKSPACE_INSTALL_DIR=$WORKSPACE_INSTALL_DIR
+ARG WORKSPACE_DEVEL_DIR
+ENV WORKSPACE_DEVEL_DIR=$WORKSPACE_DEVEL_DIR
+ARG WORKSPACE_BUILD_DIR
+ENV WORKSPACE_BUILD_DIR=$WORKSPACE_BUILD_DIR
 
 # negligible
 COPY --chown=vscode:vscode --from=build ${SUPERBUILD_DIR} ${SUPERBUILD_DIR}
@@ -360,20 +388,36 @@ RUN echo "Building standalone-devel with args:" \
 
 # Devcontainer stage: Only ccache for fast builds
 FROM base as devcontainer
-ARG UBUNTU_VERSION
-ARG CMAKE_PRESET
-ARG CCACHE_IMAGE_DIR
-ARG CUSTOM_ENTRYPOINT=""
 ARG IMAGE_SOURCE_REPO
+ARG CCACHE_IMAGE_DIR
+
+ARG CUSTOM_ENTRYPOINT=""
+ARG UBUNTU_VERSION
+ARG BUILD_VERSION
+ARG CMAKE_PRESET
+ARG SUPERBUILD_DIR
+ARG WORKSPACE_DIR
+ARG WORKSPACE_INSTALL_DIR
+ARG WORKSPACE_DEVEL_DIR
+ARG WORKSPACE_BUILD_DIR
+
+ENV CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT
+ENV CCACHE_DIR=$CCACHE_IMAGE_DIR
+ENV UBUNTU_VERSION=${UBUNTU_VERSION}
+ENV BUILD_VERSION=${BUILD_VERSION}
+ENV CMAKE_PRESET=${CMAKE_PRESET}
+ENV SUPERBUILD_DIR=$SUPERBUILD_DIR
+ENV WORKSPACE_DIR=$WORKSPACE_DIR
+ENV WORKSPACE_INSTALL_DIR=$WORKSPACE_INSTALL_DIR
+ENV WORKSPACE_DEVEL_DIR=$WORKSPACE_DEVEL_DIR
+ENV WORKSPACE_BUILD_DIR=$WORKSPACE_BUILD_DIR
+
 
 COPY --chown=vscode:vscode --from=build ${CCACHE_IMAGE_DIR} ${CCACHE_IMAGE_DIR}
 
 LABEL org.opencontainers.image.source="https://github.com/${IMAGE_SOURCE_REPO}"
 LABEL org.opencontainers.image.description="Development environment for $IMAGE_SOURCE_REPO (ubuntu $UBUNTU_VERSION, preset: $CMAKE_PRESET, build version: $BUILD_VERSION)"
 LABEL org.opencontainers.image.licenses=BSD-2
-
-ENV CUSTOM_ENTRYPOINT=$CUSTOM_ENTRYPOINT
-ENV CCACHE_DIR=$CCACHE_IMAGE_DIR
 
 USER vscode
 WORKDIR /home/vscode
@@ -384,9 +428,5 @@ RUN echo "Building devcontainer with args:" \
   && echo "UBUNTU_VERSION=$UBUNTU_VERSION"
 
 COPY --chown=vscode:vscode ${CUSTOM_ENTRYPOINT} /home/vscode/.docker-custom-entrypoint.sh
-RUN \
-  if [ -f "~/.docker-custom-entrypoint.sh" ]; then \
-    echo "ENTRYPOINT: Using custom entrypoint: $CUSTOM_ENTRYPOINT located in ~/.docker-custom-entrypoint.sh"; \
-  fi
 
 ENTRYPOINT ["/home/vscode/.docker-entrypoint.sh"]

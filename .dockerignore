@@ -4,6 +4,7 @@
 .devcontainer/*
 # But allow specific files
 !.devcontainer/docker-entrypoint.sh
+!.devcontainer/.zshrc
 !.github/devcontainer/build_superbuild.sh
 .vscode/
 .git/

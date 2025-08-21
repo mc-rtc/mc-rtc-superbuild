@@ -26,7 +26,6 @@
     // "--gpus=all",
   ],
 
-  "postCreateCommand": "~/superbuild/.devcontainer/setupShell.sh",
 
   "containerEnv": {
     "DISPLAY": "${localEnv:DISPLAY}"

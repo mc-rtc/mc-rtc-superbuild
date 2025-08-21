@@ -19,7 +19,7 @@ fi
 
 echo "-- Sourcing additional files --"
 # If the install folder is present, source it
-if [ -d $WORKSPACE_INSTALL_DIR ]; then
+if [ -f $WORKSPACE_INSTALL_DIR/setup_mc_rtc.sh ]; then
   echo "--> Sourcing mc-rtc-superbuild environment from $WORKSPACE_INSTALL_DIR/setup_mc_rtc.sh"
   source $WORKSPACE_INSTALL_DIR/setup_mc_rtc.sh
 fi
