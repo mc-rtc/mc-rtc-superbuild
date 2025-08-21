@@ -1,13 +1,41 @@
 #!/usr/bin/env bash
 
-echo "------"
-echo "Setting up environment variables..."
+echo "-- Setting up the container --"
+echo "-- Checking devcontainer requirements --"
+if [ "$BUILD_VERSION" = "devcontainer" ]; then
+  # Check if /home/vscode/workspace exists
+  if [ ! -d /home/vscode/workspace ]; then
+    echo "⚠️ The /home/vscode/workspace directory is missing!"
+    echo "➡️ Please add the following to your devcontainer.json to mount it:"
+    echo '  "mounts": [ "type=bind,source=/path/to/local/workspace/mount/folder,target=/home/vscode/workspace" ]'
+  fi
+  if [ ! -d /home/vscode/superbuild ]; then
+    echo "⚠️ The /home/vscode/superbuild directory is missing!"
+    echo "➡️ Please add the following to your devcontainer.json to mount it:"
+    echo '"workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/superbuild,type=bind",'
+    echo '"workspaceFolder": "/home/vscode/superbuild"'
+  fi
+fi
+
+echo "-- Sourcing additional files --"
+# If the install folder is present, source it
+if [ -d $WORKSPACE_INSTALL_DIR ]; then
+  echo "--> Sourcing mc-rtc-superbuild environment from $WORKSPACE_INSTALL_DIR/setup_mc_rtc.sh"
+  source $WORKSPACE_INSTALL_DIR/setup_mc_rtc.sh
+fi
+
+# If the image was built with a custom entrypoint, source it as well
+if [ -f ~/.docker-custom-entrypoint.sh ]; then
+  echo '--> Using custom entrypoint ~/.docker-custom-entrypoint.sh'
+  source ~/.docker-custom-entrypoint.sh
+fi
+
+echo "-- Setting up environment variables --"
 # Makes GNUPG ask for password in the terminal
 export GPG_TTY=$(tty)
 echo "GPG_TTY=$GPG_TTY"
 
-echo ""
-echo "------"
+echo "-- ccache --"
 echo "ccache is configured as follows:"
 # Copy cache from the image to the local repository
 # This ensures that cache is kept between successive container runs
@@ -16,10 +44,13 @@ echo "CCACHE_DIR=$CCACHE_DIR"
 rsync -a ~/.cache/ccache/ ~/workspace/.ccache --exclude='**.tmp.*' --ignore-existing
 export CCACHE_DIR=~/workspace/.ccache
 ccache -sv
-echo ""
+# Add checkbox emoji
+echo "✅ Container setup complete"
 
-echo "------"
-echo "Welcome to mc-rtc-superbuild image for Ubuntu `lsb_release -cs`!"
+echo ""
+echo ""
+echo "-- Welcome to mc-rtc-superbuild image for Ubuntu `lsb_release -cs`! --"
+echo ""
 echo "All the tools needed to work with mc_rtc are pre-installed in this image."
 echo "To build, use one of the proposed cmake presets:"
 echo ""
