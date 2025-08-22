@@ -250,10 +250,6 @@ This is likely a conflict between different extensions."
       set(PREVIOUS_GIT_TAG "${MC_RTC_SUPERBUILD_${NAME}_GIT_TAG}")
     endif()
 
-    message(
-      WARNING
-        "Previous repository for ${NAME} was ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG}"
-    )
     if(NOT "${PREVIOUS_GIT_REPOSITORY}" STREQUAL "${GIT_REPOSITORY}"
        OR NOT "${PREVIOUS_GIT_TAG}" STREQUAL "${GIT_TAG}"
     )
