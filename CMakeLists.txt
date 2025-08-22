@@ -118,6 +118,11 @@ if(EMSCRIPTEN)
   include(cmake/emscripten-dependencies.cmake)
 endif()
 
+if(UNIX)
+  # Workaround for Boost, cmake does not include this path by default
+  set(ENV{CMAKE_PREFIX_PATH} "/usr/lib/x86_64-linux-gnu:$ENV{CMAKE_PREFIX_PATH}")
+endif()
+
 if(UNIX
    AND NOT APPLE
    AND NOT EMSCRIPTEN
