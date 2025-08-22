@@ -33,6 +33,7 @@ add_custom_target(
 #   LINK_COMPILE_COMMANDS
 # * NO_SOURCE_MONITOR Do not monitor source for changes
 # * NO_NINJA Indicate that the project is not compatible with the Ninja generator
+# * NO_COLOR Disables color output for projects that do not support it
 # * SUBFOLDER <folder> sub-folder of SOURCE_DESTINATION where to clone the project (also
 #   used as a sub-folder of BUILD_DESTINATION)
 # * APT_PACKAGES provide a list of packages to be installed instead of building from
@@ -56,7 +57,9 @@ add_custom_target(
 
 function(AddProject NAME)
   get_property(MC_RTC_SUPERBUILD_SOURCES GLOBAL PROPERTY MC_RTC_SUPERBUILD_SOURCES)
-  set(options NO_NINJA NO_SOURCE_MONITOR CLONE_ONLY SKIP_TEST SKIP_SYMBOLIC_LINKS)
+  set(options NO_NINJA NO_COLOR NO_SOURCE_MONITOR CLONE_ONLY SKIP_TEST
+              SKIP_SYMBOLIC_LINKS
+  )
   set(oneValueArgs
       ${MC_RTC_SUPERBUILD_SOURCES}
       GIT_TAG
@@ -350,7 +353,7 @@ This is likely a conflict between different extensions."
       set(BINARY_DIR "${BUILD_DESTINATION}/${NAME}")
     endif()
   endif()
-  getcommandprefix(COMMAND_PREFIX "${STAMP_DIR}/cmake-prefix.cmake")
+  GetCommandPrefix(COMMAND_PREFIX "${STAMP_DIR}/cmake-prefix.cmake")
   if(EMSCRIPTEN)
     set(EMCMAKE emcmake)
     set(EMMAKE emmake)

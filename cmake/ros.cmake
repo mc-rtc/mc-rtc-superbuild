@@ -106,7 +106,7 @@ function(CreateCatkinWorkspace)
     AppendROSWorkspace("${DIR}/devel" "${DIR}/src")
   endif()
   set(STAMP_DIR "${PROJECT_BINARY_DIR}/catkin-stamps/")
-  getcommandprefix(COMMAND_PREFIX "${STAMP_DIR}/cmake-prefix.cmake")
+  GetCommandPrefix(COMMAND_PREFIX "${STAMP_DIR}/cmake-prefix.cmake")
   file(MAKE_DIRECTORY "${STAMP_DIR}")
   set(STAMP_FILE "${STAMP_DIR}/${ID}.init.stamp")
   add_custom_command(

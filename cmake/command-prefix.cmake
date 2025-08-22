@@ -33,6 +33,10 @@ function(GetCommandPrefix VAR WRITE_TO)
       list(APPEND CMAKE_COMMAND_PREFIX PYTHONPATH=$ENV{PYTHONPATH})
     endif()
   endif()
+  if(UNIX AND ADD_PROJECT_ARGS_NO_COLOR)
+    message(CONFIGURE_LOG "Disabling color output for ${NAME} build command")
+    list(APPEND CMAKE_COMMAND_PREFIX CLICOLOR=0)
+  endif()
   if(EMSCRIPTEN)
     list(
       PREPEND

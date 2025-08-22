@@ -100,7 +100,7 @@ AddProject(
   eigen-qld
   GITHUB jrl-umi3218/eigen-qld
   GIT_TAG origin/master
-  NO_NINJA
+  NO_NINJA NO_COLOR
   CMAKE_ARGS ${USE_F2C_ARGS}
   APT_PACKAGES libeigen-qld-dev python-eigen-qld python3-eigen-qld
 )
