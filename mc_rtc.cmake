@@ -89,7 +89,7 @@ AddProject(
 
 if(EMSCRIPTEN)
   set(USE_F2C_ARGS
-      CMAKE_ARGS "-DUSE_F2C:BOOL=ON"
+      "-DUSE_F2C:BOOL=ON"
       "-DCMAKE_C_STANDARD_INCLUDE_DIRECTORIES=${CMAKE_INSTALL_PREFIX}/include"
   )
 else()
@@ -99,14 +99,18 @@ endif()
 AddProject(
   eigen-qld
   GITHUB jrl-umi3218/eigen-qld
-  GIT_TAG origin/master NO_NINJA ${USE_F2C_ARGS}
+  GIT_TAG origin/master
+  NO_NINJA
+  CMAKE_ARGS ${USE_F2C_ARGS}
   APT_PACKAGES libeigen-qld-dev python-eigen-qld python3-eigen-qld
 )
 
 AddProject(
   eigen-quadprog
   GITHUB jrl-umi3218/eigen-quadprog
-  GIT_TAG origin/master NO_NINJA ${USE_F2C_ARGS}
+  GIT_TAG origin/master
+  NO_NINJA
+  CMAKE_ARGS ${USE_F2C_ARGS}
   APT_PACKAGES libeigen-quadprog-dev
 )
 
@@ -117,7 +121,9 @@ if(WITH_LSSOL)
   AddProject(
     eigen-lssol
     GITE multi-contact/eigen-lssol
-    GIT_TAG origin/master NO_NINJA ${USE_F2C_ARGS}
+    GIT_TAG origin/master
+    NO_NINJA
+    CMAKE_ARGS ${USE_F2C_ARGS}
   )
 endif()
 

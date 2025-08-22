@@ -25,6 +25,7 @@ with section("parse"):
     'AddGitSource': {},
     'AddProject': {
       'pargs': 1,
+      'flags': [ "NO_NINJA" ],
       'kwargs': {
         "APT_PACKAGES": "*",
         "APT_DEPENDENCIES": "*",
