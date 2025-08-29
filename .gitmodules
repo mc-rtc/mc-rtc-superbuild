@@ -1,0 +1,3 @@
+[submodule "extensions/biRobotTeleoperation-superbuild"]
+	path = extensions/biRobotTeleoperation-superbuild
+	url = https://github.com/antodld/biRobotTeleoperation-superbuild.git
