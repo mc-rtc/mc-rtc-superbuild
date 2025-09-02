@@ -49,7 +49,7 @@ elseif("${OPERATION}" STREQUAL "update")
 
   # Check for uncommitted changes
   execute_process(
-    COMMAND git status --porcelain
+    COMMAND git status --porcelain -uno
     WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
     OUTPUT_VARIABLE GIT_STATUS_OUTPUT
     RESULT_VARIABLE GIT_STATUS_RESULT
