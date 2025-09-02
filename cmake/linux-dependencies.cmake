@@ -121,6 +121,9 @@ if(WITH_ROS_SUPPORT AND ROS_DISTRO)
     AptInstall(${ROS_APT_DEPENDENCIES})
     if(NOT DEFINED ENV{ROS_DISTRO})
       set(ENV{PATH} "/opt/ros/${ROS_DISTRO}/bin:$ENV{PATH}")
+      set(ENV{LD_LIBRARY_PATH}
+          "/opt/ros/${ROS_DISTRO}/lib:/opt/ros/${ROS_DISTRO}/lib/x86_64-linux-gnu:$ENV{LD_LIBRARY_PATH}"
+      )
       set(ENV{ROS_DISTRO} ${ROS_DISTRO})
       set(ENV{ROS_ETC_DIR} /opt/ros/${ROS_DISTRO}/etc/ros)
       set(ENV{ROS_ROOT} /opt/ros/${ROS_DISTRO}/share/ros)
