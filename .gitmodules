@@ -1,3 +1,6 @@
 [submodule "extensions/biRobotTeleoperation-superbuild"]
 	path = extensions/biRobotTeleoperation-superbuild
 	url = https://github.com/antodld/biRobotTeleoperation-superbuild.git
+[submodule "extensions/superbuild-extensions"]
+	path = extensions/superbuild-extensions
+	url = https://github.com/mc-rtc/superbuild-extensions
