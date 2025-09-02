@@ -158,8 +158,8 @@ endif()
 
 AddProject(
   tvm
-  GITHUB jrl-umi3218/tvm
-  GIT_TAG origin/master
+  GITHUB Hugo-L3174/tvm
+  GIT_TAG origin/topic/DynamicConstraint
   DEPENDS eigen-qld eigen-quadprog lexls ${tvm_EXTRA_DEPENDS}
   CMAKE_ARGS -DTVM_WITH_QLD:BOOL=ON
              -DTVM_WITH_QUADPROG:BOOL=ON -DTVM_WITH_LEXLS:BOOL=ON
