@@ -14,35 +14,12 @@ AddProject(
 
 include(${EXTENSIONS_DIR}/simulation/MuJoCo.cmake)
 
-AptInstall(libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libglew-dev)
-
-AddProject(
-  mc_mujoco
-  GITHUB rohanpsingh/mc_mujoco
-  # GIT_TAG origin/main
-  # GITHUB arntanguy/mc_mujoco
-  GIT_TAG main
-  CMAKE_ARGS -DMUJOCO_ROOT_DIR=${MUJOCO_ROOT_DIR}
-  DEPENDS mc_rtc
-)
-
-if(WITH_HRP5)
-  AddProject(
-    hrp5p_mj_description
-    GITHUB_PRIVATE isri-aist/hrp5p_mj_description
-    GIT_TAG origin/main
-    DEPENDS mc_mujoco
-  )
-endif()
-
-if(WITH_HRP4CR)
-  AddProject(
-    hrp4cr_mj_description
-    GITHUB_PRIVATE isri-aist/hrp4cr_mj_description
-    GIT_TAG origin/main
-    DEPENDS mc_mujoco
-  )
-endif()
+# Disable HRP4 from the default superbuild-extensions to install a custom one instead
+# TODO: merge hrp4_mj_description
+set(WITH_HRP4_BEFORE ${WITH_HRP4})
+set(WITH_HRP4 OFF)
+include(${EXTENSIONS_DIR}/interfaces/mc_mujoco.cmake)
+set(WITH_HRP4 ${WITH_HRP4_BEFORE})
 
 if(WITH_HRP4)
   AddProject(
