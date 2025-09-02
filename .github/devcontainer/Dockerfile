@@ -240,7 +240,8 @@ WORKDIR ${SUPERBUILD_DIR}
 
 # Copy entrypoint into the image
 RUN \
-   cp $SUPERBUILD_DIR/.devcontainer/docker-entrypoint.sh ~/.docker-entrypoint.sh
+   cp $SUPERBUILD_DIR/.devcontainer/docker-entrypoint.sh ~/.docker-entrypoint.sh \
+   && cp $SUPERBUILD_DIR/.devcontainer/entrypoint.sh ~/.entrypoint.sh
 
 # CMake configure will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)
 RUN --mount=type=cache,target=/var/cache/apt \
