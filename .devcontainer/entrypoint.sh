@@ -35,15 +35,18 @@ echo "-- Setting up environment variables --"
 export GPG_TTY=$(tty)
 echo "GPG_TTY=$GPG_TTY"
 
-echo "-- ccache --"
-echo "ccache is configured as follows:"
-# Copy cache from the image to the local repository
-# This ensures that cache is kept between successive container runs
-echo "Synching local .ccache in your workspace with the pre-built cache in the docker image"
-echo "CCACHE_DIR=$CCACHE_DIR"
-rsync -a ~/.cache/ccache/ ~/workspace/.ccache --exclude='**.tmp.*' --ignore-existing
-export CCACHE_DIR=~/workspace/.ccache
-ccache -sv
+if [ "$BUILD_VERSION" = "devcontainer" ]; then
+  echo "-- ccache --"
+  echo "ccache is configured as follows:"
+  # Copy cache from the image to the local repository
+  # This ensures that cache is kept between successive container runs
+  echo "Synching local .ccache in your workspace with the pre-built cache in the docker image"
+  echo "CCACHE_DIR=$CCACHE_DIR"
+  rsync -a ~/.cache/ccache/ ~/workspace/.ccache --exclude='**.tmp.*' --ignore-existing
+  export CCACHE_DIR=~/workspace/.ccache
+  ccache -sv
+fi
+
 # Add checkbox emoji
 echo "✅ Container setup complete"
 
