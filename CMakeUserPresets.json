@@ -10,7 +10,8 @@
             ],
             "cacheVariables": {
                 "WITH_RHPS1": "ON",
-                "WITH_HRP4": "ON"
+                "WITH_HRP4": "ON",
+                "WITH_Panda": "ON"
             }
         }
     ],
