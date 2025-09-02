@@ -12,8 +12,6 @@ AddProject(
   DEPENDS mc_rtc
 )
 
-include(${EXTENSIONS_DIR}/simulation/MuJoCo.cmake)
-
 # Disable HRP4 from the default superbuild-extensions to install a custom one instead
 # TODO: merge hrp4_mj_description
 set(WITH_HRP4_BEFORE ${WITH_HRP4})
