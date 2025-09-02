@@ -190,6 +190,21 @@ elseif("${OPERATION}" STREQUAL "update")
         message(FATAL_ERROR "Failed to checkout branch '${GIT_TAG}'.")
       endif()
 
+      # Check if local branch is ahead of remote
+      execute_process(
+        COMMAND git rev-list --count origin/${GIT_TAG}..${GIT_TAG}
+        WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
+        OUTPUT_VARIABLE LOCAL_AHEAD_COUNT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+
+      if(NOT LOCAL_AHEAD_COUNT STREQUAL "0")
+        message(
+          FATAL_ERROR
+            "Local branch '${GIT_TAG}' in '${SOURCE_DESTINATION}/${TARGET_FOLDER}' has commits not pushed to remote. Please push or backup your changes before updating."
+        )
+      endif()
+
       # Reset that branch to some other branch/commit, e.g. target-branch
       execute_process(
         COMMAND git reset --hard "origin/${GIT_TAG}"
