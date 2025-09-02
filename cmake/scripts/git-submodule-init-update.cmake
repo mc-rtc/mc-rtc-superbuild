@@ -49,11 +49,12 @@ elseif("${OPERATION}" STREQUAL "update")
 
   # Check for uncommitted changes
   execute_process(
-    COMMAND git diff-index --quiet HEAD --
+    COMMAND git status --porcelain
     WORKING_DIRECTORY "${SOURCE_DESTINATION}/${TARGET_FOLDER}"
-    RESULT_VARIABLE GIT_DIFF_RESULT
+    OUTPUT_VARIABLE GIT_STATUS_OUTPUT
+    RESULT_VARIABLE GIT_STATUS_RESULT
   )
-  if(NOT GIT_DIFF_RESULT EQUAL 0)
+  if(NOT "${GIT_STATUS_OUTPUT}" STREQUAL "")
     message(
       FATAL_ERROR
         "Local branch '${GIT_TAG}' in '${SOURCE_DESTINATION}/${TARGET_FOLDER}' has uncommitted local changes. Please commit or stash them before updating."

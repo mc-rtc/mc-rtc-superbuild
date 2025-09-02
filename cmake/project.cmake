@@ -144,7 +144,7 @@ Git repository: \"${GIT_REPOSITORY}\""
   endforeach()
   # Handle GIT_TAG
   if(MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG)
-    set(GIT_TAG "${MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG}")
+    set(GIT_TAG "${MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG")
     message(
       WARNING
         "Overriding GIT_TAG property for project ${NAME} because MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG is set:
@@ -230,27 +230,53 @@ This is likely a conflict between different extensions."
   # already been cloned the operation might lose local work if it hasn't been saved,
   # therefore we check for this and error if there is local changes
   if(DEFINED MC_RTC_SUPERBUILD_${NAME}_GIT_REPOSITORY)
+    message(
+      CONFIGURE_LOG
+      "MC_RTC_SUPERBUILD_${NAME}_GIT_REPOSITORY is defined: ${MC_RTC_SUPERBUILD_${NAME}_GIT_REPOSITORY}"
+    )
 
     # GIT_REPOSITORY and/or GIT_TAG have changed
     if(EXISTS "${SOURCE_DIR}/.git")
+      message(CONFIGURE_LOG "${SOURCE_DIR}/.git exists")
+      message(CONFIGURE_LOG "working dir is ${SOURCE_DIR}")
       # Get current repository origin remote url
       execute_process(
-        COMMAND git remote get-url origin
-        WORKING_DIRECTORY "${SOURCE_DESTINATION}/${NAME}"
+        COMMAND git config --local --get remote.origin.url
+        WORKING_DIRECTORY "${SOURCE_DIR}"
         OUTPUT_VARIABLE PREVIOUS_GIT_REPOSITORY
         OUTPUT_STRIP_TRAILING_WHITESPACE
       )
 
-      # Get current repository tag
+      # Get current branch
       execute_process(
         COMMAND git symbolic-ref --short HEAD
-        WORKING_DIRECTORY "${SOURCE_DESTINATION}"
-        OUTPUT_VARIABLE PREVIOUS_GIT_TAG
-        OUTPUT_STRIP_TRAILING_WHITESPACE
+        WORKING_DIRECTORY "${SOURCE_DIR}"
+        OUTPUT_VARIABLE PREVIOUS_GIT_REF
+        OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET
+      )
+
+      # if the branch does not exist, check if it is a tag
+      if(PREVIOUS_GIT_REF STREQUAL "")
+        execute_process(
+          COMMAND git describe --tags --exact-match HEAD
+          WORKING_DIRECTORY "${SOURCE_DIR}"
+          OUTPUT_VARIABLE PREVIOUS_GIT_TAG
+          OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+      else()
+        set(PREVIOUS_GIT_TAG origin/${PREVIOUS_GIT_REF})
+      endif()
+
+      message(CONFIGURE_LOG
+              "Previous repository is ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG}"
       )
     else()
+      message(CONFIGURE_LOG "${SOURCE_DIR}/.git does not exist")
       set(PREVIOUS_GIT_REPOSITORY "${MC_RTC_SUPERBUILD_${NAME}_GIT_REPOSITORY}")
       set(PREVIOUS_GIT_TAG "${MC_RTC_SUPERBUILD_${NAME}_GIT_TAG}")
+      message(CONFIGURE_LOG
+              "Previous repository is ${PREVIOUS_GIT_REPOSITORY}#${PREVIOUS_GIT_TAG}"
+      )
     endif()
 
     if(NOT "${PREVIOUS_GIT_REPOSITORY}" STREQUAL "${GIT_REPOSITORY}"
