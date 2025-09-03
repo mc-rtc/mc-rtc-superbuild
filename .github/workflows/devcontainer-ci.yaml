@@ -7,7 +7,7 @@ on:
       - build-noble
   push:
     branches:
-      - '**'
+      - 'main'
   pull_request:
     branches:
       - '**'
@@ -30,3 +30,5 @@ jobs:
       build-devcontainer: true
       container-repository: ghcr.io/mc-rtc/mc-rtc-superbuild
       push: ${{ github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild' }}
+    secrets:
+      SSH_KEY: ${{ secrets.SSH_KEY }}
