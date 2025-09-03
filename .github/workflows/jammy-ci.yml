@@ -39,6 +39,9 @@ jobs:
       shell: bash
       run: |
         sudo apt-mark hold grub-efi-amd64-signed
+    - name: Remove default CMake
+      run: |
+        sudo apt-get remove --purge -y cmake
     - name: Bootstrap
       shell: bash
       run: |
