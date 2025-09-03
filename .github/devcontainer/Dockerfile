@@ -293,6 +293,7 @@ COPY --from=build /etc /etc
 COPY --from=build /var /var
 COPY --chown=vscode:vscode --from=build /home/vscode/.zshrc /home/vscode/.zshrc
 COPY --chown=vscode:vscode --from=build /home/vscode/.docker-entrypoint.sh /home/vscode/.docker-entrypoint.sh
+COPY --chown=vscode:vscode --from=build /home/vscode/.entrypoint.sh /home/vscode/.entrypoint.sh
 COPY --chown=vscode:vscode --from=build /home/vscode/.oh-my-zsh /home/vscode/.oh-my-zsh
 
 
@@ -340,11 +341,10 @@ RUN echo "Building standalone-release with args:" \
   && echo "CMAKE_PRESET=$CMAKE_PRESET" \
   && echo "UBUNTU_VERSION=$UBUNTU_VERSION"
 
-COPY --chown=vscode:vscode ${CUSTOM_ENTRYPOINT} /home/vscode/.docker-custom-entrypoint.sh
-RUN \
-  if [ -f "~/.docker-custom-entrypoint.sh" ]; then \
-    echo "ENTRYPOINT: Using custom entrypoint: $CUSTOM_ENTRYPOINT located in ~/.docker-custom-entrypoint.sh"; \
-  fi
+RUN if [ -n "$CUSTOM_ENTRYPOINT" ] && [ -f "$SUPERBUILD_DIR/$CUSTOM_ENTRYPOINT" ]; then \
+      cp "$SUPERBUILD_DIR/$CUSTOM_ENTRYPOINT" /home/vscode/.docker-custom-entrypoint.sh; \
+      echo "ENTRYPOINT: Copying custom entrypoint: $CUSTOM_ENTRYPOINT located in ~/.docker-custom-entrypoint.sh"; \
+    fi
 
 ENTRYPOINT ["/home/vscode/.docker-entrypoint.sh"]
 
