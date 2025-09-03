@@ -85,9 +85,15 @@ ARG WORKSPACE_DEVEL_DIR="/home/vscode/workspace/devel"
 ARG WORKSPACE_BUILD_DIR="/home/vscode/workspace/build"
 ARG IMAGE_SOURCE_REPO="mc-rtc/mc-rtc-superbuild" # for LABEL org.opencontainers.image.source
 
+
+
+
+
+
+
+
 # First stage: build mc-rtc-superbuild and generates ccache
 FROM ubuntu:$UBUNTU_VERSION as build
-
 ARG UBUNTU_VERSION
 ENV UBUNTU_VERSION=$UBUNTU_VERSION
 ARG BUILD_VERSION
@@ -262,6 +268,16 @@ RUN \
      sudo rm -rf /usr/share/doc/* /usr/share/man/* /usr/share/locale/*
 
 WORKDIR /home/vscode
+# ==================
+# end of build stage
+# ==================
+
+
+
+
+
+
+
 
 # Base stage: System packages and basic user setup
 FROM ubuntu:$UBUNTU_VERSION as base
@@ -295,6 +311,16 @@ COPY --chown=vscode:vscode --from=build /home/vscode/.zshrc /home/vscode/.zshrc
 COPY --chown=vscode:vscode --from=build /home/vscode/.docker-entrypoint.sh /home/vscode/.docker-entrypoint.sh
 COPY --chown=vscode:vscode --from=build /home/vscode/.entrypoint.sh /home/vscode/.entrypoint.sh
 COPY --chown=vscode:vscode --from=build /home/vscode/.oh-my-zsh /home/vscode/.oh-my-zsh
+# =================
+# end of base stage
+# =================
+
+
+
+
+
+
+
 
 
 # Standalone-release stage: Minimal files (install + catkin workspaces)
@@ -347,6 +373,13 @@ RUN if [ -n "$CUSTOM_ENTRYPOINT" ] && [ -f "$SUPERBUILD_DIR/$CUSTOM_ENTRYPOINT" 
     fi
 
 ENTRYPOINT ["/home/vscode/.docker-entrypoint.sh"]
+# ===============================
+# end of standalone-release stage
+# ===============================
+
+
+
+
 
 # Standalone-devel stage: All development files
 FROM standalone-release as standalone-devel
@@ -416,7 +449,6 @@ ENV WORKSPACE_DEVEL_DIR=$WORKSPACE_DEVEL_DIR
 ENV WORKSPACE_BUILD_DIR=$WORKSPACE_BUILD_DIR
 ENV TERM="screen-256color"
 
-
 COPY --chown=vscode:vscode --from=build ${CCACHE_IMAGE_DIR} ${CCACHE_IMAGE_DIR}
 
 LABEL org.opencontainers.image.source="https://github.com/${IMAGE_SOURCE_REPO}"
@@ -431,6 +463,7 @@ RUN echo "Building devcontainer with args:" \
   && echo "CMAKE_PRESET=$CMAKE_PRESET" \
   && echo "UBUNTU_VERSION=$UBUNTU_VERSION"
 
-COPY --chown=vscode:vscode ${CUSTOM_ENTRYPOINT} /home/vscode/.docker-custom-entrypoint.sh
-
 ENTRYPOINT ["/home/vscode/.docker-entrypoint.sh"]
+# ===============================
+# end of standalone-devel stage
+# ===============================
