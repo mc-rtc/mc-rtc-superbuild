@@ -121,6 +121,9 @@ endif()
 if(UNIX)
   # Workaround for Boost, cmake does not include this path by default
   set(ENV{CMAKE_PREFIX_PATH} "/usr/lib/x86_64-linux-gnu:$ENV{CMAKE_PREFIX_PATH}")
+  set(ENV{PKG_CONFIG_PATH}
+      "${CMAKE_INSTALL_PREFIX}/share/pkgconfig:$ENV{PKG_CONFIG_PATH}"
+  )
 endif()
 
 if(UNIX
