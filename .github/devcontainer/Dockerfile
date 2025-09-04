@@ -84,6 +84,7 @@ ARG WORKSPACE_INSTALL_DIR="/home/vscode/workspace/install"
 ARG WORKSPACE_DEVEL_DIR="/home/vscode/workspace/devel"
 ARG WORKSPACE_BUILD_DIR="/home/vscode/workspace/build"
 ARG IMAGE_SOURCE_REPO="mc-rtc/mc-rtc-superbuild" # for LABEL org.opencontainers.image.source
+ARG MC_RTC_CONTROLLER_CONFIG=""
 
 
 
@@ -189,7 +190,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 #     ssh-add -l
 
 # Workaround screen refresh issues with neovim/ncurses
-ENV TERM="screen-256color"
+ENV TERM="xterm-256color"
 RUN \
    if [ "$UBUNTU_VERSION" = "noble" ]; then \
      apt install --no-install-recommends -y libtinfo6 ncurses-term; \
@@ -297,7 +298,7 @@ ARG WORKSPACE_BUILD_DIR
 ENV WORKSPACE_BUILD_DIR=${WORKSPACE_BUILD_DIR}
 ARG CMAKE_PRESET
 ENV CMAKE_PRESET=${CMAKE_PRESET}
-ENV TERM="screen-256color"
+ENV TERM="xterm-256color"
 
 # Copy system-level changes and user setup
 # about 1.8Gb
@@ -341,7 +342,9 @@ ARG WORKSPACE_INSTALL_DIR
 ENV WORKSPACE_INSTALL_DIR=${WORKSPACE_INSTALL_DIR}
 ARG WORKSPACE_DEVEL_DIR
 ENV WORKSPACE_DEVEL_DIR=${WORKSPACE_DEVEL_DIR}
-ENV TERM="screen-256color"
+ENV TERM="xterm-256color"
+ARG MC_RTC_CONTROLLER_CONFIG
+ENV MC_RTC_CONTROLLER_CONFIG=${MC_RTC_CONTROLLER_CONFIG}
 
 # about 1.5Gb
 COPY --chown=vscode:vscode --from=build ${WORKSPACE_INSTALL_DIR} ${WORKSPACE_INSTALL_DIR}
@@ -403,7 +406,9 @@ ARG WORKSPACE_DEVEL_DIR
 ENV WORKSPACE_DEVEL_DIR=$WORKSPACE_DEVEL_DIR
 ARG WORKSPACE_BUILD_DIR
 ENV WORKSPACE_BUILD_DIR=$WORKSPACE_BUILD_DIR
-ENV TERM="screen-256color"
+ENV TERM="xterm-256color"
+ARG MC_RTC_CONTROLLER_CONFIG
+ENV MC_RTC_CONTROLLER_CONFIG=${MC_RTC_CONTROLLER_CONFIG}
 
 # negligible
 COPY --chown=vscode:vscode --from=build ${SUPERBUILD_DIR} ${SUPERBUILD_DIR}
@@ -447,7 +452,9 @@ ENV WORKSPACE_DIR=$WORKSPACE_DIR
 ENV WORKSPACE_INSTALL_DIR=$WORKSPACE_INSTALL_DIR
 ENV WORKSPACE_DEVEL_DIR=$WORKSPACE_DEVEL_DIR
 ENV WORKSPACE_BUILD_DIR=$WORKSPACE_BUILD_DIR
-ENV TERM="screen-256color"
+ENV TERM="xterm-256color"
+ARG MC_RTC_CONTROLLER_CONFIG
+ENV MC_RTC_CONTROLLER_CONFIG=${MC_RTC_CONTROLLER_CONFIG}
 
 COPY --chown=vscode:vscode --from=build ${CCACHE_IMAGE_DIR} ${CCACHE_IMAGE_DIR}
 
