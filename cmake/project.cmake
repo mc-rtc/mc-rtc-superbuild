@@ -144,7 +144,7 @@ Git repository: \"${GIT_REPOSITORY}\""
   endforeach()
   # Handle GIT_TAG
   if(MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG)
-    set(GIT_TAG "${MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG")
+    set(GIT_TAG "${MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG}")
     message(
       WARNING
         "Overriding GIT_TAG property for project ${NAME} because MC_RTC_SUPERBUILD_OVERRIDE_${NAME}_GIT_TAG is set:
