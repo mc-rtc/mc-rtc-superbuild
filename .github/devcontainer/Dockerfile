@@ -113,6 +113,7 @@ ARG WORKSPACE_DEVEL_DIR
 ENV WORKSPACE_DEVEL_DIR=$WORKSPACE_DEVEL_DIR
 ARG WORKSPACE_BUILD_DIR
 ENV WORKSPACE_BUILD_DIR=$WORKSPACE_BUILD_DIR
+ARG MC_RTC_CONTROLLER_CONFIG
 
 # Choices are devcontainer, standalone-release, standalone-devel
 ARG KEEP_SOURCES=""
@@ -254,6 +255,15 @@ RUN --mount=type=cache,target=/var/cache/apt \
      --mount=type=ssh,uid=1000 \
      .github/devcontainer/build_superbuild.sh
 
+# mc_rtc configuration copy if MC_RTC_CONTROLLER_CONFIG is set and file exists
+RUN mkdir -p ~/.config/mc_rtc && \
+    if [ -n "$MC_RTC_CONTROLLER_CONFIG" ] && [ -f "$SUPERBUILD_DIR/$MC_RTC_CONTROLLER_CONFIG" ]; then \
+      cp "$SUPERBUILD_DIR/$MC_RTC_CONTROLLER_CONFIG" ~/.config/mc_rtc/mc_rtc.yaml && \
+      echo "Copied mc_rtc controller configuration file from $MC_RTC_CONTROLLER_CONFIG to ~/.config/mc_rtc/mc_rtc.yaml"; \
+    else \
+      echo "MC_RTC_CONTROLLER_CONFIG is not set or the file does not exist, skipping copy of mc_rtc configuration"; \
+    fi
+
 # oh-my-zsh & plugins
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
      -t $ZSH_THEME \
@@ -312,6 +322,7 @@ COPY --chown=vscode:vscode --from=build /home/vscode/.zshrc /home/vscode/.zshrc
 COPY --chown=vscode:vscode --from=build /home/vscode/.docker-entrypoint.sh /home/vscode/.docker-entrypoint.sh
 COPY --chown=vscode:vscode --from=build /home/vscode/.entrypoint.sh /home/vscode/.entrypoint.sh
 COPY --chown=vscode:vscode --from=build /home/vscode/.oh-my-zsh /home/vscode/.oh-my-zsh
+COPY --chown=vscode:vscode --from=build /home/vscode/.config/mc_rtc /home/vscode/.config
 # =================
 # end of base stage
 # =================
@@ -343,8 +354,6 @@ ENV WORKSPACE_INSTALL_DIR=${WORKSPACE_INSTALL_DIR}
 ARG WORKSPACE_DEVEL_DIR
 ENV WORKSPACE_DEVEL_DIR=${WORKSPACE_DEVEL_DIR}
 ENV TERM="xterm-256color"
-ARG MC_RTC_CONTROLLER_CONFIG
-ENV MC_RTC_CONTROLLER_CONFIG=${MC_RTC_CONTROLLER_CONFIG}
 
 # about 1.5Gb
 COPY --chown=vscode:vscode --from=build ${WORKSPACE_INSTALL_DIR} ${WORKSPACE_INSTALL_DIR}
@@ -407,8 +416,6 @@ ENV WORKSPACE_DEVEL_DIR=$WORKSPACE_DEVEL_DIR
 ARG WORKSPACE_BUILD_DIR
 ENV WORKSPACE_BUILD_DIR=$WORKSPACE_BUILD_DIR
 ENV TERM="xterm-256color"
-ARG MC_RTC_CONTROLLER_CONFIG
-ENV MC_RTC_CONTROLLER_CONFIG=${MC_RTC_CONTROLLER_CONFIG}
 
 # negligible
 COPY --chown=vscode:vscode --from=build ${SUPERBUILD_DIR} ${SUPERBUILD_DIR}
@@ -426,6 +433,13 @@ LABEL org.opencontainers.image.licenses=BSD-2
 RUN echo "Building standalone-devel with args:" \
   && echo "CMAKE_PRESET=$CMAKE_PRESET" \
   && echo "UBUNTU_VERSION=$UBUNTU_VERSION"
+# ===============================
+# end of standalone-devel stage
+# ===============================
+
+
+
+
 
 # Devcontainer stage: Only ccache for fast builds
 FROM base as devcontainer
@@ -453,8 +467,6 @@ ENV WORKSPACE_INSTALL_DIR=$WORKSPACE_INSTALL_DIR
 ENV WORKSPACE_DEVEL_DIR=$WORKSPACE_DEVEL_DIR
 ENV WORKSPACE_BUILD_DIR=$WORKSPACE_BUILD_DIR
 ENV TERM="xterm-256color"
-ARG MC_RTC_CONTROLLER_CONFIG
-ENV MC_RTC_CONTROLLER_CONFIG=${MC_RTC_CONTROLLER_CONFIG}
 
 COPY --chown=vscode:vscode --from=build ${CCACHE_IMAGE_DIR} ${CCACHE_IMAGE_DIR}
 
@@ -472,5 +484,5 @@ RUN echo "Building devcontainer with args:" \
 
 ENTRYPOINT ["/home/vscode/.docker-entrypoint.sh"]
 # ===============================
-# end of standalone-devel stage
+# end of devcontainer stage
 # ===============================
