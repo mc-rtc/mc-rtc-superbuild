@@ -134,7 +134,7 @@ ARG BUILD_SUPERBUILD="true"
 ENV BUILD_SUPERBUILD=${BUILD_SUPERBUILD}
 
 ARG ZSH_THEME="bira"
-ARG APT_PACKAGES_COMMON="sudo gnupg2 gpg-agent openssh-server wget curl ca-certificates git ccache xclip ripgrep zsh"
+ARG APT_PACKAGES_COMMON="sudo gnupg2 gpg-agent openssh-server wget curl ca-certificates git ccache xclip ripgrep zsh kitty-terminfo"
 ARG APT_PACKAGES_STANDALONE="${APT_PACKAGES_COMMON} neovim"
 ARG APT_PACKAGES_DEVCONTAINER="${APT_PACKAGES_COMMON} rsync clangd"
 ARG EMAIL="devcontainer@mc-rtc-superbuild.com"
