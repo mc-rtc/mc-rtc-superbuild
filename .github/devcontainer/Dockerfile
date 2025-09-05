@@ -259,8 +259,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
 
 # mc_rtc configuration copy if MC_RTC_CONTROLLER_CONFIG is set and file exists
 RUN mkdir -p ~/.config/mc_rtc && \
-    if [ -n "$MC_RTC_CONTROLLER_CONFIG" ] && [ -f "$SUPERBUILD_DIR/$MC_RTC_CONTROLLER_CONFIG" ]; then \
-      cp "$SUPERBUILD_DIR/$MC_RTC_CONTROLLER_CONFIG" ~/.config/mc_rtc/mc_rtc.yaml && \
+    if [ -n "$MC_RTC_CONTROLLER_CONFIG" ] && [ -f "$MC_RTC_CONTROLLER_CONFIG" ]; then \
+      cp "$MC_RTC_CONTROLLER_CONFIG" ~/.config/mc_rtc/mc_rtc.yaml && \
       echo "Copied mc_rtc controller configuration file from $MC_RTC_CONTROLLER_CONFIG to ~/.config/mc_rtc/mc_rtc.yaml"; \
     else \
       echo "MC_RTC_CONTROLLER_CONFIG is not set or the file does not exist, skipping copy of mc_rtc configuration"; \
@@ -327,7 +327,7 @@ COPY --chown=vscode:vscode --from=build /home/vscode/.zshrc /home/vscode/.zshrc
 COPY --chown=vscode:vscode --from=build /home/vscode/.docker-entrypoint.sh /home/vscode/.docker-entrypoint.sh
 COPY --chown=vscode:vscode --from=build /home/vscode/.entrypoint.sh /home/vscode/.entrypoint.sh
 COPY --chown=vscode:vscode --from=build /home/vscode/.oh-my-zsh /home/vscode/.oh-my-zsh
-COPY --chown=vscode:vscode --from=build /home/vscode/.config/mc_rtc /home/vscode/.config
+COPY --chown=vscode:vscode --from=build /home/vscode/.config/mc_rtc /home/vscode/.config/mc_rtc
 # =================
 # end of base stage
 # =================
