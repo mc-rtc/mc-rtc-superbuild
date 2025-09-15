@@ -68,6 +68,13 @@ AddProject(
   APT_PACKAGES libsch-core-dev
 )
 
+AddProject(
+  mesh-sampling
+  GITHUB jrl-umi3218/mesh_sampling
+  GIT_TAG origin/master
+  APT_PACKAGES libmesh-sampling-dev
+)
+
 if(PYTHON_BINDING)
   AddProject(
     sch-core-python
@@ -182,7 +189,7 @@ AddCatkinProject(
   CMAKE_ARGS ${MC_RTC_ROS_OPTION}
 )
 
-set(mc_rtc_DEPENDS tvm Tasks mc_rtc_data ndcurves state-observation)
+set(mc_rtc_DEPENDS tvm Tasks mc_rtc_data ndcurves state-observation mesh-sampling)
 if(WITH_ROS_SUPPORT)
   AddCatkinProject(
     mc_rtc_msgs
