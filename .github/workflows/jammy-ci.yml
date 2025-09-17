@@ -39,6 +39,12 @@ jobs:
       shell: bash
       run: |
         sudo apt-mark hold grub-efi-amd64-signed
+    - name: Setup latest CMake
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: 'latest'
+    - name: Check CMake version
+      run: cmake --version
     - name: Bootstrap
       shell: bash
       run: |
