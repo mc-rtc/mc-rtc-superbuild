@@ -31,7 +31,7 @@ else()
 
   AddProject(
     mc_kinova
-    GITHUB mathieu-celerier/mc_kinova
+    GITHUB isri-aist/mc_kinova
     GIT_TAG origin/main
     DEPENDS mc_rtc ros_kortex
   )
