@@ -73,6 +73,7 @@ AddProject(
   GITHUB jrl-umi3218/mesh_sampling
   GIT_TAG origin/master
   APT_PACKAGES libmesh-sampling-dev
+  APT_DEPENDENCIES libgtest-dev libqhull-dev libassimp-dev
 )
 
 if(PYTHON_BINDING)

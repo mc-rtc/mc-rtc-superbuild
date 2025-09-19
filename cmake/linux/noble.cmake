@@ -26,8 +26,6 @@ set(APT_DEPENDENCIES
     # python-is-python3
     libnotify-dev
     # python3-git
-    libqhull-dev
-    libassimp-dev
 )
 if(BUILD_BENCHMARKS)
   list(APPEND APT_DEPENDENCIES libbenchmark-dev)
