@@ -647,7 +647,7 @@ endfunction()
 #
 # * WORKSPACE Catkin workspace where the project is cloned, this option is required
 function(AddCatkinProject NAME)
-  set(options)
+  set(options INSTALL_DEPENDENCIES)
   set(oneValueArgs WORKSPACE)
   set(multiValueArgs)
   cmake_parse_arguments(
@@ -672,6 +672,17 @@ function(AddCatkinProject NAME)
     )
     add_dependencies(catkin-build-${WORKSPACE} ${NAME})
     set_property(GLOBAL APPEND PROPERTY CATKIN_WORKSPACE_${WORKSPACE} "${NAME}")
+
+    if(ADD_CATKIN_PROJECT_ARGS_INSTALL_DEPENDENCIES)
+      ExternalProject_Add_Step(
+        ${NAME} install_dependencies
+        COMMAND
+          ${SUDO_CMD} rosdep update && rosdep install --from-path src --ignore-src -y
+        WORKING_DIRECTORY ${WORKSPACE_DIR}
+        DEPENDEES download
+        DEPENDERS configure
+      )
+    endif()
   else()
     AddProject(${NAME} ${ADD_CATKIN_PROJECT_ARGS_UNPARSED_ARGUMENTS})
   endif()

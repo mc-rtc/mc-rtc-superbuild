@@ -62,7 +62,7 @@ if(WITH_ROS_SUPPORT AND ROS_DISTRO)
       set(PYTHON_CAKTIN_TOOLS python3-colcon-common-extensions)
     endif()
     set(ROS_APT_DEPENDENCIES ros-${ROS_DISTRO}-ros-base ros-${ROS_DISTRO}-tf2-ros
-                             ros-${ROS_DISTRO}-xacro ${PYTHON_CAKTIN_TOOLS}
+                             ros-${ROS_DISTRO}-xacro ${PYTHON_CAKTIN_TOOLS} python3-rosdep
     )
     if(ROS_IS_ROS2)
       list(APPEND ROS_APT_DEPENDENCIES ros-${ROS_DISTRO}-rviz2
@@ -134,6 +134,10 @@ if(WITH_ROS_SUPPORT AND ROS_DISTRO)
       endif()
       AppendROSWorkspace(/opt/ros/${ROS_DISTRO} /opt/ros/${ROS_DISTRO}/share/)
     endif()
+    execute_process(
+      COMMAND sudo rosdep init
+      COMMAND rosdep update
+    )
   else()
     if(NOT DEFINED ENV{ROS_DISTRO})
       message(

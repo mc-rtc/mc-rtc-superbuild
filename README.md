@@ -225,6 +225,9 @@ Adds a catkin project into the provided workspace. The git repository is provide
 
 If `WITH_ROS_SUPPORT` is `OFF` then this is treated like `AddProject`
 
+Other options for `AddCatkinProject` are:
+- `INSTALL_DEPENDENCIES`: install package dependencies using rosdep
+
 AddPackageToCatkinSkiplist
 ==
 
