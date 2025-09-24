@@ -74,9 +74,17 @@ ZSH_THEME="robbyrussell"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
     git
+    nvm
+    pip
+    pre-commit
+    ssh
+    zsh-interactive-cd
     zsh-autosuggestions
-    zsh-syntax-highlighting
 )
+
+# for zsh-completions
+fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
+autoload -U compinit && compinit
 
 source $ZSH/oh-my-zsh.sh
 

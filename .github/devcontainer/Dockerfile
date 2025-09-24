@@ -133,8 +133,8 @@ ENV CCACHE_DIR=${CCACHE_BUILD_DIR}
 ARG BUILD_SUPERBUILD="true"
 ENV BUILD_SUPERBUILD=${BUILD_SUPERBUILD}
 
-ARG ZSH_THEME="bira"
-ARG APT_PACKAGES_COMMON="sudo gnupg2 gpg-agent openssh-server wget curl ca-certificates git ccache xclip ripgrep zsh kitty-terminfo"
+ARG ZSH_THEME="robbyrussell"
+ARG APT_PACKAGES_COMMON="sudo gnupg2 gpg-agent openssh-server wget curl ca-certificates git ccache xclip ripgrep zsh kitty-terminfo fzf"
 ARG APT_PACKAGES_STANDALONE="${APT_PACKAGES_COMMON} neovim"
 ARG APT_PACKAGES_DEVCONTAINER="${APT_PACKAGES_COMMON} rsync clangd"
 ARG EMAIL="devcontainer@mc-rtc-superbuild.com"
@@ -270,6 +270,7 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
      -p git \
      -p https://github.com/zsh-users/zsh-autosuggestions \
      -p https://github.com/zsh-users/zsh-syntax-highlighting.git \
+     -p https://github.com/zsh-users/zsh-completions.git \
      && cp $SUPERBUILD_DIR/.devcontainer/.zshrc ~/.zshrc \
      && sudo chsh -s /usr/bin/zsh
 
