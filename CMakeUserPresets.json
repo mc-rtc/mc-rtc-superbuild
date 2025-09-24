@@ -3,7 +3,7 @@
     "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
     "configurePresets": [
         {
-            "name": "relwithdebinfo-panda_prosthesis-notests",
+            "name": "panda_prosthesis-notests",
             "description": "",
             "displayName": "RelWithDebInfo PandaProsthesis (jammy, no tests)",
             "inherits": [
@@ -20,11 +20,11 @@
             }
         },
         {
-            "name": "relwithdebinfo-panda_prosthesis",
+            "name": "panda_prosthesis",
             "description": "",
             "displayName": "RelWithDebInfo PandaProsthesis (tests)",
             "inherits": [
-                "relwithdebinfo-panda_prosthesis-notests"
+                "panda_prosthesis-notests"
             ],
             "cacheVariables": {
                 "BUILD_TESTING": "ON"
@@ -33,18 +33,18 @@
     ],
     "buildPresets": [
         {
-            "name": "relwithdebinfo-panda_prosthesis-notests",
+            "name": "panda_prosthesis-notests",
             "displayName": "RelWithDebInfo PandaProsthesis (no tests)",
-            "configurePreset": "relwithdebinfo-panda_prosthesis-notests",
+            "configurePreset": "panda_prosthesis-notests",
             "configuration": "RelWithDebInfo",
             "targets": [
                 "all"
             ]
         },
         {
-            "name": "relwithdebinfo-panda_prosthesis",
+            "name": "panda_prosthesis",
             "displayName": "RelWithDebInfo PandaProsthesis (tests)",
-            "configurePreset": "relwithdebinfo-panda_prosthesis",
+            "configurePreset": "panda_prosthesis",
             "configuration": "RelWithDebInfo",
             "targets": [
                 "all"
