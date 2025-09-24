@@ -172,12 +172,22 @@ elseif(SUPERBUILD_OVERRIDE_SHELL STREQUAL "bash")
   set(RC_FILE ".bashrc")
   set(RC_EXT ".bash")
 else()
+  # Defaults to bash
+  set(CURRENT_SHELL "bash")
   set(RC_FILE ".bashrc")
   set(RC_EXT ".bash")
+
   if("$ENV{SHELL}" STREQUAL "/usr/bin/zsh" OR "$ENV{SHELL}" STREQUAL "/bin/zsh")
+    set(CURRENT_SHELL "zsh")
     set(RC_FILE ".zshrc")
     set(RC_EXT ".zsh")
+  elseif("$ENV{SHELL}" STREQUAL "/usr/bin/bash" OR "$ENV{SHELL}" STREQUAL "/bin/bash")
+    # default
+  else()
+    message(WARNING "Current shell could not be detected, assuming bash")
   endif()
+
+  message(STATUS "Detected shell: ${CURRENT_SHELL}")
 endif()
 
 set(FINAL_MESSAGE

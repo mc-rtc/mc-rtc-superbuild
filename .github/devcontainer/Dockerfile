@@ -270,7 +270,9 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
      -p git \
      -p https://github.com/zsh-users/zsh-autosuggestions \
      -p https://github.com/zsh-users/zsh-syntax-highlighting.git \
-     && cp $SUPERBUILD_DIR/.devcontainer/.zshrc ~/.zshrc
+     && cp $SUPERBUILD_DIR/.devcontainer/.zshrc ~/.zshrc \
+     && sudo chsh -s /usr/bin/zsh
+
 
 # Clean up APT cache and temporary files
 RUN \
