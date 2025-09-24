@@ -676,8 +676,8 @@ function(AddCatkinProject NAME)
     if(ADD_CATKIN_PROJECT_ARGS_INSTALL_DEPENDENCIES)
       ExternalProject_Add_Step(
         ${NAME} install_dependencies
-        COMMAND
-          ${SUDO_CMD} rosdep update && rosdep install --from-path src --ignore-src -y
+        COMMAND ${SUDO_CMD} rosdep update && rosdep install --from-path src --ignore-src
+                -y
         WORKING_DIRECTORY ${WORKSPACE_DIR}
         DEPENDEES download
         DEPENDERS configure
