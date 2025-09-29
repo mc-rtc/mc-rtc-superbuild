@@ -16,7 +16,7 @@ if(ROS_IS_ROS2)
 
   AddProject(
     mc_kinova
-    GITHUB mathieu-celerier/mc_kinova
+    GITHUB isri-aist/mc_kinova
     GIT_TAG origin/main
     APT_PACKAGES mc_rtc ros-${ROS_DISTRO}-kortex-api ros-${ROS_DISTRO}-kortex-bringup
                  ros-${ROS_DISTRO}-kortex-description ros-${ROS_DISTRO}-kortex-driver
