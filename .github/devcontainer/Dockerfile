@@ -211,6 +211,8 @@ RUN \
     useradd -u 1000 -ms /bin/zsh vscode; \
   fi; \
   usermod -aG sudo vscode \
+  && usermod -aG dialout vscode \
+  && usermod -aG plugdev vscode \
   && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
   && echo "User vscode (uid=`id -u vscode`:gid=`id -g vscode`) created with passwordless sudo privileges";
 
