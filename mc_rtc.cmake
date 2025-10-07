@@ -121,7 +121,7 @@ if(WITH_LSSOL)
   AddProject(
     eigen-lssol
     GITE multi-contact/eigen-lssol
-    GIT_TAG origin/master
+    GIT_TAG origin/topic/AllowMoreIterations
     NO_NINJA
     CMAKE_ARGS ${USE_F2C_ARGS}
   )
