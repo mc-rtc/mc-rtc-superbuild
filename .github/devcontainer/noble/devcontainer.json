@@ -29,7 +29,7 @@
   "features":
   {
     "ghcr.io/devcontainers/features/node:1": {},
-    "ghcr.io/duduribeiro/devcontainer-features/neovim:1.0.1": {},
+    "ghcr.io/arntanguy/nvim-devcontainer-feature/nvim:latest": {},
     "ghcr.io/devcontainers/features/github-cli": { "version": "latest" },
     "ghcr.io/georgofenbeck/features/lazygit-linuxbinary:1": { "version": "latest" }
   },
@@ -48,7 +48,7 @@
             "GitHub.vscode-github-actions"
           ]
       }
-  },
+  }
 
   "runArgs": [
     "--network=host",

@@ -32,5 +32,29 @@
 
   "remoteUser": "vscode",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/superbuild,type=bind",
-  "workspaceFolder": "/home/vscode/superbuild"
+  "workspaceFolder": "/home/vscode/superbuild",
+
+  "features":
+  {
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/arntanguy/nvim-devcontainer-feature/nvim:latest": {},
+    "ghcr.io/devcontainers/features/github-cli": { "version": "latest" },
+    "ghcr.io/georgofenbeck/features/lazygit-linuxbinary:1": { "version": "latest" }
+  },
+
+  "customizations": {
+      "vscode": {
+          "extensions": [
+            "twxs.cmake",
+            "ms-vscode.cmake-tools",
+            "josetr.cmake-language-support-vscode",
+            "ms-vscode.cpptools",
+            "ms-vscode.docker",
+            "ms-vscode.cpptools-extension-pack",
+            "ms-vscode-remote.remote-containers",
+            "ms-python.python",
+            "GitHub.vscode-github-actions"
+          ]
+      }
+  }
 }
