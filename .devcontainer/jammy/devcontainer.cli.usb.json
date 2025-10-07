@@ -1,0 +1,80 @@
+{
+  "name": "cdadance-jammy",
+
+  // See .github/devcontainer/ubuntu-22.04/devcontainer.json to see how this image was built
+  // This image contains:
+  // - All of mc-rtc-superbuild dependencies
+  // - A ccache build cache built from the latest sources
+  // - A cython build cache built from the latest sources
+  // - All tools required to build the project
+  // - A sensible default configuration for vscode
+
+  // In addition this devcontainer configuration
+  // - Allows access to the host X server
+  // - Forwards the SSH agent. Use ssh-add <your_private_key_file> on the host
+  // - Forwards the GPG agent.
+  // - Gives access to all usb devices. You need to be in the dialout group on the host.
+  //   See https://kb.shawnchen.info/knowledge-base/docker/give-access-to-host-usb-for-serial-device-on-docker-container/ for details
+  "image": "ghcr.io/mc-rtc/mc-rtc-superbuild:jammy-devcontainer-latest",
+
+  "mounts": [
+    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached",
+    "source=${env:SSH_AUTH_SOCK},target=/ssh-agent,type=bind",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.gnupg,target=/home/vscode/.gnupg,type=bind,consistency=cached",
+    "source=${localEnv:XDG_RUNTIME_DIR}/gnupg/S.gpg-agent.extra,target=/run/1000/gnupg/S.gpg-agent.extra,type=bind",
+    "source=/dev,target=/dev,type=bind"
+    // "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/mc-rtc-superbuild-jammy,target=/home/vscode/workspace,type=bind,consistency=cached"
+  ],
+
+  "runArgs": [
+    "--network=host",
+    "--cap-add=sys_nice", // Grants the container the CAP_SYS_NICE capability, which allows the container to raise process nice values, set real-time scheduling policies, set CPU affinity, and other operations.
+    "--security-opt", // allow core dumps
+    "seccomp=unconfined", // allow core dumps
+    // "--device=/dev/ttyUSB0",
+    // Gives access to all usb serial devices
+    "--device-cgroup-rule='c 188:* rmw'",
+    "--device-cgroup-rule"
+    // Uncomment for containers requiring use of nvidia GPUs
+    // You will need to install NVIDIA Container Toolkit first
+    // "--runtime=nvidia",
+    // "--gpus=all",
+  ],
+
+  "containerEnv": {
+    "DISPLAY": "${localEnv:DISPLAY}"
+  },
+
+  "remoteEnv": {
+        "SSH_AUTH_SOCK": "/ssh-agent"
+  },
+
+  "remoteUser": "vscode",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/superbuild,type=bind",
+  "workspaceFolder": "/home/vscode/superbuild",
+
+
+  "features":
+  {
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/duduribeiro/devcontainer-features/neovim:1.0.1": {},
+    "ghcr.io/devcontainers/features/github-cli": { "version": "latest" },
+    "ghcr.io/georgofenbeck/features/lazygit-linuxbinary:1": { "version": "latest" }
+  },
+
+  "customizations": {
+      "vscode": {
+          "extensions": [
+            "twxs.cmake",
+            "ms-vscode.cmake-tools",
+            "josetr.cmake-language-support-vscode",
+            "ms-vscode.cpptools",
+            "ms-vscode.docker",
+            "ms-vscode.cpptools-extension-pack",
+            "ms-vscode-remote.remote-containers",
+            "ms-python.python",
+            "GitHub.vscode-github-actions"
+          ]
+      }
+  },
+}
