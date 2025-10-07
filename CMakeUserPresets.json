@@ -12,8 +12,9 @@
                 "BUILD_TESTING": "OFF",
                 "WITH_RHPS1": "ON",
                 "WITH_HRP4": "ON",
-                "WITH_ROS_SUPPORT": "OFF",
-                "PYTHON_BINDING": "OFF"
+                "WITH_ROS_SUPPORT": "ON",
+                "PYTHON_BINDING": "OFF",
+                "WITH_LSSOL": "ON"
             }
         },
         {
@@ -23,7 +24,7 @@
                 "hugo-notests"
             ],
             "cacheVariables": {
-                "WITH_ROS_SUPPORT": "OFF",
+                "WITH_ROS_SUPPORT": "ON",
                 "PYTHON_BINDING": "OFF"
             }
         },
@@ -47,7 +48,7 @@
                 "hugo-tests"
             ],
             "cacheVariables": {
-                "WITH_ROS_SUPPORT": "OFF",
+                "WITH_ROS_SUPPORT": "ON",
                 "PYTHON_BINDING": "OFF"
             }
         }
