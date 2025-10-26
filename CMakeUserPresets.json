@@ -1,0 +1,88 @@
+{
+    "version": 10,
+    "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
+    "configurePresets": [
+        {
+            "name": "bwc-notests",
+            "displayName": "BaselineWalkingController RelWithDebInfo (no tests)",
+            "inherits": [
+                "relwithdebinfo-notests"
+            ],
+            "cacheVariables": {
+                "BUILD_TESTING": "OFF",
+                "WITH_ROS_SUPPORT": "ON",
+                "PYTHON_BINDING": "ON"
+            }
+        },
+        {
+            "name": "bwc-notests-minimal",
+            "displayName": "BaselineWalkingController RelWithDebInfo (no tests, no ros, no python)",
+            "inherits": [
+                "bwc-notests"
+            ],
+            "cacheVariables": {
+                "BUILD_TESTING": "OFF",
+                "WITH_ROS_SUPPORT": "OFF",
+                "PYTHON_BINDING": "OFF"
+            }
+        },
+        {
+            "name": "bwc-tests",
+            "displayName": "BaselineWalkingController RelWithDebInfo (with tests)",
+            "inherits": [
+                "bwc-notests"
+            ],
+            "cacheVariables": {
+                "BUILD_TESTING": "ON"
+            }
+        },
+        {
+            "name": "bwc-tests-minimal",
+            "displayName": "BaselineWalkingController RelWithDebInfo (with tests, no ros, no python)",
+            "inherits": [
+                "bwc-tests"
+            ],
+            "cacheVariables": {
+                "PYTHON_BINDING": "OFF"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "bwc-notests",
+            "displayName": "BaselineWalkingController RelWithDebInfo (no tests)",
+            "configurePreset": "bwc-notests",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "bwc-notests-minimal",
+            "displayName": "BaselineWalkingController RelWithDebInfo (no tests, no ros, no python)",
+            "configurePreset": "bwc-notests-minimal",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "bwc-tests",
+            "displayName": "BaselineWalkingController RelWithDebInfo (with tests)",
+            "configurePreset": "bwc-tests",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "bwc-tests-minimal",
+            "displayName": "BaselineWalkingController RelWithDebInfo (with tests, no ros, no python)",
+            "configurePreset": "bwc-tests-minimal",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        }
+    ]
+}

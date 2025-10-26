@@ -120,3 +120,9 @@ DISABLE_AUTO_UPDATE=true
 DISABLE_UPDATE_PROMPT=true
 
 source $HOME/.entrypoint.sh
+
+source /opt/ros/humble/setup.zsh
+
+# argcomplete for ros2 & colcon
+eval "$(register-python-argcomplete3 ros2)"
+eval "$(register-python-argcomplete3 colcon)"
