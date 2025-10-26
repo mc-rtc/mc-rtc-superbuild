@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        containerName: [baseline-walking-controller-release]
+        containerName: [baseline-walking-controller-dev]
         buildPreset: [bwc-tests]
     steps:
     - name: Configure ssh-agent 
