@@ -80,7 +80,7 @@ jobs:
       if: github.ref == 'refs/heads/setup/BaselineWalkingController' && github.repository == 'mc-rtc/mc-rtc-superbuild'
       uses: devcontainers/ci@v0.3
       with:
-        imageName: ghcr.io/mc-rtc/baseline-walking-controller
+        imageName: ghcr.io/isri-aist/baseline-walking-controller
         imageTag: ${{ matrix.buildPreset }}-devcontainer-latest
         subFolder: .github/devcontainer/${{ matrix.containerName }}
         configFile: .github/devcontainer/${{ matrix.containerName }}/devcontainer.json
