@@ -86,7 +86,7 @@ if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
         "mc-rtc-venv"
         CACHE STRING "Name of the Python virtualenv to create/use"
     )
-    handle_noble_virtualenv(${MC_RTC_SUPERBUILD_DEFAULT_PYTHON} ${DISTRO})
+    #handle_noble_virtualenv(${MC_RTC_SUPERBUILD_DEFAULT_PYTHON} ${DISTRO})
   endif()
   find_program(
     MC_RTC_SUPERBUILD_PRE_COMMIT
