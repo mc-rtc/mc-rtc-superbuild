@@ -1,5 +1,5 @@
 {
-  "name": "mc-rtc-superbuild-jammy-usb,
+  "name": "mc-rtc-superbuild-jammy-usb",
 
   // See .github/devcontainer/ubuntu-22.04/devcontainer.json to see how this image was built
   // This image contains:
