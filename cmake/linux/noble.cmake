@@ -9,9 +9,6 @@ set(APT_DEPENDENCIES
     cmake
     build-essential
     gfortran
-    cython3
-    # python3-nose python3-pytest python3-numpy python3-coverage python3-setuptools
-    # python3-pip
     libeigen3-dev
     libboost-all-dev
     libtinyxml2-dev
@@ -26,6 +23,12 @@ set(APT_DEPENDENCIES
     # python-is-python3
     libnotify-dev
     # python3-git
+    cython3
+    python3-numpy
+    python3-coverage
+    python3-setuptools
+    python3-pytest
+    pre-commit
 )
 if(BUILD_BENCHMARKS)
   list(APPEND APT_DEPENDENCIES libbenchmark-dev)
