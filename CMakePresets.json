@@ -32,7 +32,7 @@
             ],
             "cacheVariables": {
                 "PYTHON_BINDING": "ON",
-                "WITH_ROS_SUPPORT": "OFF"
+                "WITH_ROS_SUPPORT": "ON"
             },
             "condition": {
                 "type": "equals",
