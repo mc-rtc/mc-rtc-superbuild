@@ -78,6 +78,16 @@ if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
         "${MC_RTC_SUPERBUILD_DEFAULT_PYTHON_USER_BASE}/bin"
     )
   endif()
+  if(DISTRO STREQUAL "noble")
+    # on ubuntu noble onwards, pip requires a virtualenv
+    # detect if we are already in one and if not create one for mc-rtc
+    # we should add options to options.cmake to specify a custom name for the venv
+    set(MC_RTC_SUPERBUILD_VENV_NAME
+        "mc-rtc-venv"
+        CACHE STRING "Name of the Python virtualenv to create/use"
+    )
+    handle_noble_virtualenv(${MC_RTC_SUPERBUILD_DEFAULT_PYTHON} ${DISTRO})
+  endif()
   find_program(
     MC_RTC_SUPERBUILD_PRE_COMMIT
     NAMES pre-commit
