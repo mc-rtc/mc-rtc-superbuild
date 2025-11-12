@@ -18,7 +18,7 @@ function(AppendROSWorkspace DEV_DIR SRC_DIR)
     set(ENV{AMENT_PREFIX_PATH} "${DEV_DIR}:$ENV{AMENT_PREFIX_PATH}")
     set(ENV{COLCON_PREFIX_PATH} "${DEV_DIR}:$ENV{COLCON_PREFIX_PATH}")
     set(ENV{PYTHONPATH}
-        "${DEV_DIR}/local/lib/python3.10/dist-packages:$ENV{PYTHONPATH}"
+        "${DEV_DIR}/local/lib/${PYTHON_VERSION}/dist-packages:$ENV{PYTHONPATH}"
     )
   else()
     set(ENV{ROS_VERSION} "1")
