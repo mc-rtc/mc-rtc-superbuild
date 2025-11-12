@@ -1,16 +1,5 @@
-find_program(LSB_RELEASE lsb_release)
-
-if(NOT LSB_RELEASE)
-  message(FATAL_ERROR "lsb_release must be installed before running this script")
-endif()
-
 set(ROS_IS_ROS2 OFF)
 set(APT_HAS_PYTHON2_PACKAGES ON)
-execute_process(
-  COMMAND lsb_release -sc
-  OUTPUT_VARIABLE DISTRO
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/cmake/linux/${DISTRO}.cmake)
   include(${PROJECT_SOURCE_DIR}/cmake/linux/${DISTRO}.cmake)
