@@ -104,6 +104,8 @@ if(EMSCRIPTEN)
   )
 endif()
 
+include(cmake/detect-system.cmake)
+include(cmake/python.cmake)
 include(cmake/project.cmake)
 
 if(APPLE)
@@ -222,10 +224,16 @@ export LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:$LD_LIBRARY_PATH"
   )
 endif()
 
-if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON AND NOT PYTHON_BINDING_USER_INSTALL)
+if(DISTRO STREQUAL "noble")
   set(FINAL_COMMAND "${FINAL_COMMAND}
-export PYTHONPATH=${EXTRA_PYTHONPATH}:$PYTHONPATH"
+  source ${CMAKE_INSTALL_PREFIX}/${MC_RTC_SUPERBUILD_VENV_NAME}/bin/activate"
   )
+else()
+  if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON AND NOT PYTHON_BINDING_USER_INSTALL)
+    set(FINAL_COMMAND "${FINAL_COMMAND}
+  export PYTHONPATH=${EXTRA_PYTHONPATH}:$PYTHONPATH"
+    )
+  endif()
 endif()
 
 if(WITH_ROS_SUPPORT)
