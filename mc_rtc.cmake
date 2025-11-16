@@ -30,7 +30,7 @@ AddProject(
   GITHUB loco-3d/ndcurves
   GIT_TAG v2.0.0
   CMAKE_ARGS -DBUILD_PYTHON_INTERFACE:BOOL=OFF -DCURVES_WITH_PINOCCHIO_SUPPORT:BOOL=OFF
-                                               SKIP_TEST
+  SKIP_TEST
   APT_PACKAGES libndcurves-dev
 )
 

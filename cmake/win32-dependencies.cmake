@@ -114,28 +114,32 @@ execute_process(COMMAND pip install --user ${PIP_DEPENDENCIES})
 AddProject(
   eigen
   GITHUB eigenteam/eigen-git-mirror
-  GIT_TAG 3.3.7 SKIP_TEST
+  GIT_TAG 3.3.7
+  SKIP_TEST
 )
 list(APPEND GLOBAL_DEPENDS eigen)
 
 AddProject(
   tinyxml2
   GITHUB leethomason/tinyxml2
-  GIT_TAG 7.1.0 SKIP_TEST
+  GIT_TAG 7.1.0
+  SKIP_TEST
 )
 list(APPEND GLOBAL_DEPENDS tinyxml2)
 
 AddProject(
   geos
   GITHUB libgeos/geos
-  GIT_TAG 3.10.1 SKIP_TEST
+  GIT_TAG 3.10.1
+  SKIP_TEST
 )
 list(APPEND GLOBAL_DEPENDS geos)
 
 AddProject(
   nanomsg
   GITHUB nanomsg/nanomsg
-  GIT_TAG 1.1.5 SKIP_TEST
+  GIT_TAG 1.1.5
+  SKIP_TEST
 )
 list(APPEND GLOBAL_DEPENDS nanomsg)
 
@@ -143,7 +147,8 @@ AddProject(
   yaml-cpp
   GITHUB jbeder/yaml-cpp
   GIT_TAG yaml-cpp-0.7.0
-  CMAKE_ARGS -DYAML_CPP_BUILD_TESTS:BOOL=OFF SKIP_TEST
+  CMAKE_ARGS -DYAML_CPP_BUILD_TESTS:BOOL=OFF
+  SKIP_TEST
 )
 list(APPEND GLOBAL_DEPENDS yaml-cpp)
 
@@ -151,7 +156,8 @@ AddProject(
   spdlog
   GITHUB gabime/spdlog
   GIT_TAG v1.6.1
-  CMAKE_ARGS -DSPDLOG_BUILD_EXAMPLE:BOOL=OFF -DSPDLOG_BUILD_SHARED:BOOL=ON SKIP_TEST
+  CMAKE_ARGS -DSPDLOG_BUILD_EXAMPLE:BOOL=OFF -DSPDLOG_BUILD_SHARED:BOOL=ON
+  SKIP_TEST
 )
 list(APPEND GLOBAL_DEPENDS spdlog)
 
@@ -159,7 +165,8 @@ if(BUILD_BENCHMARKS)
   AddProject(
     benchmark
     GITHUB google/benchmark
-    CMAKE_ARGS -DBENCHMARK_ENABLE_GTEST_TESTS:BOOL=OFF SKIP_TEST
+    CMAKE_ARGS -DBENCHMARK_ENABLE_GTEST_TESTS:BOOL=OFF
+    SKIP_TEST
   )
   list(APPEND GLOBAL_DEPENDS benchmark)
 endif()

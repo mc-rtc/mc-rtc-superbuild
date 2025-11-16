@@ -33,6 +33,7 @@ add_custom_target(
 #   LINK_COMPILE_COMMANDS
 # * NO_SOURCE_MONITOR Do not monitor source for changes
 # * NO_NINJA Indicate that the project is not compatible with the Ninja generator
+# * PARALLEL_JOBS <num> number of parallel jobs to use when building this (0 lets Ninja decice, make will build on a single core)
 # * NO_COLOR Disables color output for projects that do not support it
 # * SUBFOLDER <folder> sub-folder of SOURCE_DESTINATION where to clone the project (also
 #   used as a sub-folder of BUILD_DESTINATION)
@@ -70,6 +71,7 @@ function(AddProject NAME)
       LINK_TO
       SOURCE_SUBDIR
       INSTALL_PREFIX
+      PARALLEL_JOBS
   )
   set(multiValueArgs
       CMAKE_ARGS
@@ -84,6 +86,37 @@ function(AddProject NAME)
     ADD_PROJECT_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}
   )
   list(APPEND ADD_PROJECT_ARGS_DEPENDS ${GLOBAL_DEPENDS})
+
+  # Handle --parallel jobs option
+  # Ensure variables are defined and numeric
+  if(NOT DEFINED BUILD_PARALLEL_JOBS)
+    set(BUILD_PARALLEL_JOBS 0)
+  endif()
+  if(NOT DEFINED ADD_PROJECT_ARGS_PARALLEL_JOBS OR "${ADD_PROJECT_ARGS_PARALLEL_JOBS}"
+                                                   STREQUAL ""
+  )
+    set(ADD_PROJECT_ARGS_PARALLEL_JOBS 0)
+  endif()
+
+  # Compute number of parallel jobs to use
+  # If per-project option is set it is used only if it is lower than the global option
+  set(EFFECTIVE_PARALLEL_JOBS 0)
+  if(BUILD_PARALLEL_JOBS GREATER 0 AND ADD_PROJECT_ARGS_PARALLEL_JOBS GREATER 0)
+    math(
+      EXPR
+      EFFECTIVE_PARALLEL_JOBS
+      "(${BUILD_PARALLEL_JOBS} < ${ADD_PROJECT_ARGS_PARALLEL_JOBS}) ? ${BUILD_PARALLEL_JOBS} : ${ADD_PROJECT_ARGS_PARALLEL_JOBS}"
+    )
+  elseif(BUILD_PARALLEL_JOBS GREATER 0)
+    set(EFFECTIVE_PARALLEL_JOBS "${BUILD_PARALLEL_JOBS}")
+  elseif(ADD_PROJECT_ARGS_PARALLEL_JOBS GREATER 0)
+    set(EFFECTIVE_PARALLEL_JOBS "${ADD_PROJECT_ARGS_PARALLEL_JOBS}")
+  endif()
+
+  set(PARALLEL_OPT "")
+  if(EFFECTIVE_PARALLEL_JOBS GREATER 0)
+    set(PARALLEL_OPT "--parallel ${EFFECTIVE_PARALLEL_JOBS}")
+  endif()
 
   # Handle external dependencies
   # XXX: we should provide a way to install some tool
@@ -415,7 +448,7 @@ This is likely a conflict between different extensions."
                                             ADD_PROJECT_ARGS_KEYWORDS_MISSING_VALUES
   )
     set(BUILD_COMMAND ${COMMAND_PREFIX} ${EMMAKE} ${CMAKE_COMMAND} --build
-                      ${BINARY_DIR} --config $<CONFIG>
+                      ${BINARY_DIR} ${PARALLEL_OPT} --config $<CONFIG>
     )
   else()
     if("${ADD_PROJECT_ARGS_BUILD_COMMAND}" STREQUAL "")
@@ -428,8 +461,9 @@ This is likely a conflict between different extensions."
   if(NOT ADD_PROJECT_ARGS_INSTALL_COMMAND AND NOT INSTALL_COMMAND IN_LIST
                                               ADD_PROJECT_ARGS_KEYWORDS_MISSING_VALUES
   )
-    set(INSTALL_COMMAND ${COMMAND_PREFIX} ${EMMAKE} ${CMAKE_COMMAND} --build
-                        ${BINARY_DIR} --target install --config $<CONFIG>
+    set(INSTALL_COMMAND
+        ${COMMAND_PREFIX} ${EMMAKE} ${CMAKE_COMMAND} --build ${BINARY_DIR}
+        ${PARALLEL_OPT} --target install --config $<CONFIG>
     )
   else()
     if("${ADD_PROJECT_ARGS_INSTALL_COMMAND}" STREQUAL "")
@@ -543,8 +577,8 @@ This is likely a conflict between different extensions."
   add_custom_target(
     force-${NAME}
     COMMAND "${CMAKE_COMMAND}" -E remove "${STAMP_DIR}/${NAME}-configure"
-    COMMAND "${CMAKE_COMMAND}" --build "${PROJECT_BINARY_DIR}" --target ${NAME}
-            --config $<CONFIG>
+    COMMAND "${CMAKE_COMMAND}" --build "${PROJECT_BINARY_DIR}" ${PARALLEL_OPT} --target
+            ${NAME} --config $<CONFIG>
   )
   if(SOURCE_DIR_DID_NOT_EXIST)
     file(REMOVE "${SOURCE_DIR}/.mc-rtc-superbuild")
@@ -667,8 +701,8 @@ function(AddCatkinProject NAME)
       "${WORKSPACE_DIR}/src/${NAME}"
       CONFIGURE_COMMAND ${CMAKE_COMMAND} -E rm -f "${WORKSPACE_STAMP}"
       BUILD_COMMAND ""
-      INSTALL_COMMAND "" WORKSPACE ${WORKSPACE} SKIP_TEST SKIP_SYMBOLIC_LINKS
-                      ${ADD_CATKIN_PROJECT_ARGS_UNPARSED_ARGUMENTS}
+      INSTALL_COMMAND "" WORKSPACE ${WORKSPACE}
+      SKIP_TEST SKIP_SYMBOLIC_LINKS ${ADD_CATKIN_PROJECT_ARGS_UNPARSED_ARGUMENTS}
     )
     add_dependencies(catkin-build-${WORKSPACE} ${NAME})
     set_property(GLOBAL APPEND PROPERTY CATKIN_WORKSPACE_${WORKSPACE} "${NAME}")

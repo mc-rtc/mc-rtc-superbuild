@@ -27,6 +27,13 @@ option(LINK_COMPILE_COMMANDS
        "Create a symbolic to compile_commands.json in the source folder" ON
 )
 
+set(BUILD_PARALLEL_JOBS
+    0
+    CACHE
+      INTEGER
+      "Number of parallel jobs to use when building. If 0, ommit option (Ninja: unlimited, make: 1)"
+)
+
 # ######################################################################################
 # -- Python bindings -- #
 # ######################################################################################

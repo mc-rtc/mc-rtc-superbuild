@@ -25,7 +25,7 @@ with section("parse"):
     'AddGitSource': {},
     'AddProject': {
       'pargs': 1,
-      'flags': [ "NO_NINJA", "NO_COLOR" ],
+      'flags': [ "NO_NINJA", "NO_COLOR", "SKIP_TEST", "NO_SOURCE_MONITOR" ],
       'kwargs': {
         "APT_PACKAGES": "*",
         "APT_DEPENDENCIES": "*",
@@ -38,7 +38,9 @@ with section("parse"):
         "GITHUB_PRIVATE": 1,
         "GITE": 1,
         "GIT_TAG": "*",
-        "INSTALL_COMMAND": "*"
+        "INSTALL_COMMAND": "*",
+        "INSTALL_PREFIX": 1,
+        "PARALLEL_JOBS": 1
       }
     },
     'AddToPath': {},
