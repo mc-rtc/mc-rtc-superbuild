@@ -1,3 +1,32 @@
+function(compute_effective_parallel_jobs GLOBAL_PARALLEL_JOBS LOCAL_PARALLEL_JOBS
+         OUT_VAR
+)
+  set(EFFECTIVE_PARALLEL_JOBS 0)
+  # Ensure variables are defined and numeric
+  if(NOT DEFINED GLOBAL_PARALLEL_JOBS OR "${GLOBAL_PARALLEL_JOBS}" STREQUAL "")
+    set(GLOBAL_PARALLEL_JOBS 0)
+  endif()
+  if(NOT DEFINED LOCAL_PARALLEL_JOBS OR "${LOCAL_PARALLEL_JOBS}" STREQUAL "")
+    set(LOCAL_PARALLEL_JOBS 0)
+  endif()
+
+  if(${GLOBAL_PARALLEL_JOBS} GREATER 0 AND ${LOCAL_PARALLEL_JOBS} GREATER 0)
+    math(
+      EXPR
+      EFFECTIVE_PARALLEL_JOBS
+      "(${GLOBAL_PARALLEL_JOBS} < ${LOCAL_PARALLEL_JOBS}) ? ${GLOBAL_PARALLEL_JOBS} : ${LOCAL_PARALLEL_JOBS}"
+    )
+  elseif(${GLOBAL_PARALLEL_JOBS} GREATER 0)
+    set(EFFECTIVE_PARALLEL_JOBS "${GLOBAL_PARALLEL_JOBS}")
+  elseif(${LOCAL_PARALLEL_JOBS} GREATER 0)
+    set(EFFECTIVE_PARALLEL_JOBS "${LOCAL_PARALLEL_JOBS}")
+  endif()
+  set(${OUT_VAR}
+      "${EFFECTIVE_PARALLEL_JOBS}"
+      PARENT_SCOPE
+  )
+endfunction()
+
 include(cmake/apt.cmake)
 include(cmake/download.cmake)
 include(cmake/extensions.cmake)
@@ -88,19 +117,13 @@ function(AddProject NAME)
   list(APPEND ADD_PROJECT_ARGS_DEPENDS ${GLOBAL_DEPENDS})
 
   # Handle --parallel jobs option
-  # Ensure variables are defined and numeric
-  if(NOT DEFINED BUILD_PARALLEL_JOBS)
-    set(BUILD_PARALLEL_JOBS 0)
-  endif()
-  if(NOT DEFINED ADD_PROJECT_ARGS_PARALLEL_JOBS OR "${ADD_PROJECT_ARGS_PARALLEL_JOBS}"
-                                                   STREQUAL ""
-  )
-    set(ADD_PROJECT_ARGS_PARALLEL_JOBS 0)
-  endif()
-
   # Compute number of parallel jobs to use
   # If per-project option is set it is used only if it is lower than the global option
   set(EFFECTIVE_PARALLEL_JOBS 0)
+  compute_effective_parallel_jobs(
+    "${BUILD_PARALLEL_JOBS}" "${ADD_PROJECT_ARGS_PARALLEL_JOBS}"
+    EFFECTIVE_PARALLEL_JOBS
+  )
   if(BUILD_PARALLEL_JOBS GREATER 0 AND ADD_PROJECT_ARGS_PARALLEL_JOBS GREATER 0)
     math(
       EXPR
@@ -691,6 +714,7 @@ function(AddCatkinProject NAME)
     message(FATAL_ERROR "WORKSPACE must be provided when calling AddCatkinProject")
   endif()
   set(WORKSPACE "${ADD_CATKIN_PROJECT_ARGS_WORKSPACE}")
+
   if(WITH_ROS_SUPPORT)
     ensurevalidcatkinworkspace(${WORKSPACE})
     get_property(WORKSPACE_DIR GLOBAL PROPERTY CATKIN_WORKSPACE_${WORKSPACE}_DIR)

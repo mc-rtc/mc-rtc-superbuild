@@ -5,23 +5,18 @@ if(WITH_ROS_SUPPORT)
   # version to 3.5
 
   CreateCatkinWorkspace(
-    ID
-    data_ws
-    DIR
-    "catkin_data_ws"
+    ID data_ws
+    DIR "catkin_data_ws"
     CATKIN_MAKE
-    CATKIN_BUILD_ARGS
-    -DCATKIN_ENABLE_TESTING:BOOL=OFF
-    -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+    CATKIN_BUILD_ARGS -DCATKIN_ENABLE_TESTING:BOOL=OFF
+                      -DCMAKE_POLICY_VERSION_MINIMUM=3.5
   )
   CreateCatkinWorkspace(
-    ID
-    mc_rtc_ws
-    DIR
-    "catkin_ws"
+    ID mc_rtc_ws
+    DIR "catkin_ws"
     CATKIN_BUILD
-    CATKIN_BUILD_ARGS
-    -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+    CATKIN_BUILD_ARGS -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+    PARALLEL_JOBS 8
   )
 endif()
 

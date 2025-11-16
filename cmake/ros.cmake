@@ -64,12 +64,13 @@ endfunction()
 # * CATKIN_MAKE Init/Build the workspace for/with catkin_make
 # * CATKIN_BUILD Init/Build the workspace for/with catkin
 # * CATKIN_BUILD_ARGS <args...> Arguments for catkin build
+# * PARALLEL_JOBS <num> number of parallel jobs to use when building this (0 lets Ninja decice, make will build on a single core)
 #
-# CATKIN_MAKE/CATKIN_BUILD are mutually exclusive
+# CATKIN_MAKE/CATKIN_BUILD are mutually exclusive and only apply for ROS1. For ROS2, colcon is always used
 #
 function(CreateCatkinWorkspace)
   set(options CATKIN_MAKE CATKIN_BUILD)
-  set(oneValueArgs ID DIR)
+  set(oneValueArgs ID DIR PARALLEL_JOBS)
   set(multiValueArgs CATKIN_BUILD_ARGS)
   cmake_parse_arguments(
     CC_WORKSPACE_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}
@@ -107,6 +108,17 @@ function(CreateCatkinWorkspace)
   endif()
   set(STAMP_DIR "${PROJECT_BINARY_DIR}/catkin-stamps/")
   GetCommandPrefix(COMMAND_PREFIX "${STAMP_DIR}/cmake-prefix.cmake")
+
+  # Handle number of build cores
+  set(EFFECTIVE_PARALLEL_JOBS 0)
+  compute_effective_parallel_jobs(
+    "${BUILD_PARALLEL_JOBS}" "${CC_WORKSPACE_ARGS_PARALLEL_JOBS}"
+    EFFECTIVE_PARALLEL_JOBS
+  )
+  if(${EFFECTIVE_PARALLEL_JOBS} GREATER 0)
+    list(APPEND COMMAND_PREFIX "MAKEFLAGS=-j${EFFECTIVE_PARALLEL_JOBS}")
+  endif()
+
   file(MAKE_DIRECTORY "${STAMP_DIR}")
   set(STAMP_FILE "${STAMP_DIR}/${ID}.init.stamp")
   add_custom_command(
@@ -172,7 +184,7 @@ function(CreateCatkinWorkspace)
     # FIXME Add support for skiplist
     set(BUILD_COMMAND
         ${CMAKE_COMMAND} -E chdir ${DIR} ${COMMAND_PREFIX} colcon build --merge-install
-        --cmake-args -DCMAKE_BUILD_TYPE=$<CONFIG>
+        --executor sequential --cmake-args -DCMAKE_BUILD_TYPE=$<CONFIG>
         -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS}
     )
   endif()
