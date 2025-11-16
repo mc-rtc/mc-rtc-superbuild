@@ -21,6 +21,15 @@ function(compute_effective_parallel_jobs GLOBAL_PARALLEL_JOBS LOCAL_PARALLEL_JOB
   elseif(${LOCAL_PARALLEL_JOBS} GREATER 0)
     set(EFFECTIVE_PARALLEL_JOBS "${LOCAL_PARALLEL_JOBS}")
   endif()
+
+  # Get the number of logical cores
+  cmake_host_system_information(RESULT NUM_CORES QUERY NUMBER_OF_LOGICAL_CORES)
+
+  # Clamp EFFECTIVE_PARALLEL_JOBS to NUM_CORES
+  if(${EFFECTIVE_PARALLEL_JOBS} GREATER ${NUM_CORES})
+    set(EFFECTIVE_PARALLEL_JOBS ${NUM_CORES})
+  endif()
+
   set(${OUT_VAR}
       "${EFFECTIVE_PARALLEL_JOBS}"
       PARENT_SCOPE
