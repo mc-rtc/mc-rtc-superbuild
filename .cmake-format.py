@@ -5,10 +5,27 @@ with section("parse"):
 
   # Specify structure for custom cmake functions
   additional_commands = {
+    'CreateCatkinWorkspace': {
+      'flags': [ "CATKIN_MAKE", "CATKIN_BUILD" ],
+      'kwargs': {
+        "ID": 1,
+        "DIR": 1,
+        "WORKSPACE": 1,
+        "CATKIN_BUILD_ARGS": "*",
+        "PARALLEL_JOBS": 1
+      }
+    },
     'AddCatkinProject': {
       'pargs': 1,
+      'flags': [ "CAKIN_MAKE", "CATKIN_BUILD" ],
       'kwargs': {
+        "ID": 1,
+        "DIR": 1,
+        "WORKSPACE": 1,
+        "CATKIN_BUILD_ARGS": "*",
+        # Same options as AddProject
         "APT_PACKAGES": "*",
+        "APT_DEPENDENCIES": "*",
         "BUILD_COMMAND": "*",
         "CMAKE_ARGS": 1,
         "CONFIGURE_COMMAND": "*",
@@ -19,13 +36,14 @@ with section("parse"):
         "GITE": 1,
         "GIT_TAG": "*",
         "INSTALL_COMMAND": "*",
-        "WORKSPACE": 1
+        "INSTALL_PREFIX": 1,
+        "PARALLEL_JOBS": 1
       }
     },
     'AddGitSource': {},
     'AddProject': {
       'pargs': 1,
-      'flags': [ "NO_NINJA", "NO_COLOR" ],
+      'flags': [ "NO_NINJA", "NO_COLOR", "SKIP_TEST", "NO_SOURCE_MONITOR" ],
       'kwargs': {
         "APT_PACKAGES": "*",
         "APT_DEPENDENCIES": "*",
@@ -38,7 +56,9 @@ with section("parse"):
         "GITHUB_PRIVATE": 1,
         "GITE": 1,
         "GIT_TAG": "*",
-        "INSTALL_COMMAND": "*"
+        "INSTALL_COMMAND": "*",
+        "INSTALL_PREFIX": 1,
+        "PARALLEL_JOBS": 1
       }
     },
     'AddToPath': {},
@@ -46,7 +66,6 @@ with section("parse"):
     'AptInstall': {},
     'AptInstallNow': {},
     'ConfigureSkipList': {},
-    'CreateCatkinWorkspace': {},
     'DownloadFile': {},
     'GetExtraPythonPath': {},
     'PrefixRequireSudo': {},

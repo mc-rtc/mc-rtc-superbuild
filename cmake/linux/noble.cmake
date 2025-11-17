@@ -46,7 +46,9 @@ endfunction()
 AddProject(
   geos-cpp-inline
   GITHUB isri-aist/geos-cpp-inline-deb
-  GIT_TAG origin/main INSTALL_PREFIX /usr SKIP_TEST NO_SOURCE_MONITOR
+  GIT_TAG origin/main
+  INSTALL_PREFIX /usr
+  SKIP_TEST NO_SOURCE_MONITOR
   APT_PACKAGES libgeos++-inline-dev
 )
 list(APPEND GLOBAL_DEPENDS geos-cpp-inline)

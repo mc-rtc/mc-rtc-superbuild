@@ -95,7 +95,8 @@ list(APPEND GLOBAL_DEPENDS boost)
 AddProject(
   eigen
   GITHUB eigenteam/eigen-git-mirror
-  GIT_TAG 3.3.7 SKIP_TEST
+  GIT_TAG 3.3.7
+  SKIP_TEST
   CMAKE_ARGS -DCMAKEPACKAGE_INSTALL_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/Eigen3
 )
 list(APPEND GLOBAL_DEPENDS eigen)
@@ -103,14 +104,16 @@ list(APPEND GLOBAL_DEPENDS eigen)
 AddProject(
   tinyxml2
   GITHUB leethomason/tinyxml2
-  GIT_TAG 7.1.0 SKIP_TEST
+  GIT_TAG 7.1.0
+  SKIP_TEST
 )
 list(APPEND GLOBAL_DEPENDS tinyxml2)
 
 AddProject(
   geos
   GITHUB libgeos/geos
-  GIT_TAG 3.10.1 SKIP_TEST
+  GIT_TAG 3.10.1
+  SKIP_TEST
   CMAKE_ARGS -DBUILD_DOCUMENTATION=OFF -DBUILD_SHARED_LIBS=OFF -DDISABLE_GEOS_INLINE=ON
 )
 list(APPEND GLOBAL_DEPENDS geos)
@@ -119,7 +122,8 @@ AddProject(
   yaml-cpp
   GITHUB jbeder/yaml-cpp
   GIT_TAG yaml-cpp-0.7.0
-  CMAKE_ARGS -DYAML_CPP_BUILD_TESTS:BOOL=OFF SKIP_TEST
+  CMAKE_ARGS -DYAML_CPP_BUILD_TESTS:BOOL=OFF
+  SKIP_TEST
 )
 list(APPEND GLOBAL_DEPENDS yaml-cpp)
 
@@ -128,6 +132,7 @@ AddProject(
   GITHUB gabime/spdlog
   GIT_TAG v1.6.1
   CMAKE_ARGS -DSPDLOG_BUILD_TESTS=OFF -DSPDLOG_BUILD_EXAMPLE:BOOL=OFF
-                                      -DSPDLOG_BUILD_SHARED:BOOL=OFF SKIP_TEST
+                                      -DSPDLOG_BUILD_SHARED:BOOL=OFF
+  SKIP_TEST
 )
 list(APPEND GLOBAL_DEPENDS spdlog)

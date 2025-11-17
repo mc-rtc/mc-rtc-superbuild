@@ -43,7 +43,8 @@ function(mc_rtc_extra_steps)
     AddProject(
       google-benchmark
       GITHUB google/benchmark
-      CMAKE_ARGS -DBENCHMARK_ENABLE_GTEST_TESTS:BOOL=OFF SKIP_TEST
+      CMAKE_ARGS -DBENCHMARK_ENABLE_GTEST_TESTS:BOOL=OFF
+      SKIP_TEST
     )
   endif()
 endfunction()

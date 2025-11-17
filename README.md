@@ -135,6 +135,7 @@ The following CMake options can be passed:
 | :---    | :-----: | :---        |
 | `WITH_ROS_SUPPORT` | `ON` (Linux)<br/>`OFF` (others) | Build mc_rtc with the ROS plugin, install ROS if necessary |
 | `WITH_LSSOL` | `OFF` | Enable the LSSOL QP solver, you must have access to the eigen-lssol package |
+| `BUILD_PARALLEL_JOBS` | `0` | Number of parallel jobs to use when building. 0 ommits the option (Ninja will use all cores, make a single one) |
 | `INSTALL_DOCUMENTATION` | `OFF` | Generate and install projects documentation on your local machine |
 | `MC_RTC_SUPERBUILD_VERBOSE` | `OFF` | Output more information about the build actions |
 | `VERBOSE_TEST_OUTPUT` | `OFF` | Output more information during testing |
