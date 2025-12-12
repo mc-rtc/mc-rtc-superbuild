@@ -31,7 +31,7 @@
                 "relwithdebinfo"
             ],
             "cacheVariables": {
-                "PYTHON_BINDING": "ON",
+                "PYTHON_BINDING": "OFF",
                 "WITH_ROS_SUPPORT": "ON"
             },
             "condition": {
