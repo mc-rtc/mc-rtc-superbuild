@@ -26,13 +26,13 @@
         },
         {
             "name": "relwithdebinfo-noble",
-            "displayName": "RelWithDebInfo (noble, no ROS, no Python)",
+            "displayName": "RelWithDebInfo (noble, ROS, no Python)",
             "inherits": [
                 "relwithdebinfo"
             ],
             "cacheVariables": {
                 "PYTHON_BINDING": "OFF",
-		"WITH_ROS_SUPPORT": "OFF"
+                "WITH_ROS_SUPPORT": "ON"
             },
             "condition": {
                 "type": "equals",
