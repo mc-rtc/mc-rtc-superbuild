@@ -1,5 +1,9 @@
 option(WITH_STAUBLI "Build Staubli support" OFF)
 
+if(NOT WITH_ROS_SUPPORT)
+  message(FATAL_ERROR "ROS support is required to use the Staubli robot")
+endif()
+
 if(WITH_STAUBLI)
   if(ROS_IS_ROS2)
     AddCatkinProject(
