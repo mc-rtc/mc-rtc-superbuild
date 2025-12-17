@@ -89,7 +89,7 @@ Then configure and run the superbuild from the terminal, or use VSCode's "CMake 
 >  ]
 >}
 >   ```
-> 
+>
 >   This example defines two custom presets: one for configuring the project and one for building it.
 >
 > - **`configurePresets`**: Defines the settings used for configuration.
@@ -97,7 +97,7 @@ Then configure and run the superbuild from the terminal, or use VSCode's "CMake 
 >   - `"displayName"`: A human-readable name for the preset.
 >   - `"inherits"`: Inherits settings from another preset (e.g., `relwithdebinfo`).
 >   - `"cacheVariables"`: Custom variables to specify directories for source, build, install locations or other options.
-> 
+>
 > - **`buildPresets`**: Defines the settings for building the project.
 >   - `"name"`: The name of the custom preset.
 >   - `"configurePreset"`: Specifies which configure preset to use.
