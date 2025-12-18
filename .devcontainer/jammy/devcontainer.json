@@ -8,7 +8,7 @@
   // - A cython build cache built from the latest sources
   // - All tools required to build the project
   // - A sensible default configuration for vscode
-  "image": "antonin-devcontainer-jammy:latest",
+  "image": "ghcr.io/mc-rtc/mc-rtc-superbuild:jammy-devcontainer-latest",
 
   "mounts": [
     "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached",
