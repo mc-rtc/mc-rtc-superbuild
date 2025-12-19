@@ -12,7 +12,8 @@
                 "WITH_RHPS1": "ON",
                 "WITH_HRP4": "ON",
                 "WITH_Panda": "ON",
-		"WITH_HUMAN": "ON"
+		"WITH_HUMAN": "ON",
+		"WITH_HRP2": "ON"
             }
         }
     ],
