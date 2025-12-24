@@ -7,7 +7,7 @@ endif()
 AddCatkinProject(
   go2_description
   GITHUB isri-aist/go2_description
-  GIT_TAG origin/main
+  GIT_TAG origin/master
   WORKSPACE data_ws
 )
 
