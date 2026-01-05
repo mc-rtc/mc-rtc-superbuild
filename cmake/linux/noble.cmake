@@ -1,17 +1,14 @@
 set(MC_LOG_UI_PYTHON_EXECUTABLE python3)
 set(APT_HAS_PYTHON2_PACKAGES OFF)
 set(ROS_IS_ROS2 ON)
-set(ROS_DISTRO humble)
-set(ROS_WORKSPACE_INSTALL_PYTHON_DESTINATION "lib/python3.10/site-packages")
+set(ROS_DISTRO jazzy)
+set(ROS_WORKSPACE_INSTALL_PYTHON_DESTINATION "lib/python3.12/site-packages")
 set(APT_DEPENDENCIES
     curl
     wget
     cmake
     build-essential
     gfortran
-    cython3
-    # python3-nose python3-pytest python3-numpy python3-coverage python3-setuptools
-    # python3-pip
     libeigen3-dev
     libboost-all-dev
     libtinyxml2-dev
@@ -26,6 +23,12 @@ set(APT_DEPENDENCIES
     # python-is-python3
     libnotify-dev
     # python3-git
+    cython3
+    python3-numpy
+    python3-coverage
+    python3-setuptools
+    python3-pytest
+    pre-commit
 )
 if(BUILD_BENCHMARKS)
   list(APPEND APT_DEPENDENCIES libbenchmark-dev)
