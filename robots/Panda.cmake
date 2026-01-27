@@ -51,16 +51,6 @@ else()
   AptInstall(ros-${ROS_DISTRO}-libfranka ros-${ROS_DISTRO}-franka-description)
 endif()
 
-if(WITH_MC_FRANKA)
-  AptInstall(libcap2-bin) # for setcap
-  AddProject(
-    mc_franka
-    GITHUB jrl-umi3218/mc_franka
-    GIT_TAG origin/master
-    DEPENDS mc_rtc mc_panda
-  )
-endif()
-
 AddProject(
   mc_panda
   GITHUB jrl-umi3218/mc_panda
@@ -74,5 +64,15 @@ if(WITH_PandaLIRMM)
     GITHUB jrl-umi3218/mc_panda_lirmm
     GIT_TAG origin/main
     DEPENDS mc_panda
+  )
+endif()
+
+if(WITH_MC_FRANKA)
+  AptInstall(libcap2-bin) # for setcap
+  AddProject(
+    mc_franka
+    GITHUB jrl-umi3218/mc_franka
+    GIT_TAG origin/master
+    DEPENDS mc_rtc mc_panda
   )
 endif()
