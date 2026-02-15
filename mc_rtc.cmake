@@ -40,8 +40,10 @@ AddProject(
 if(PYTHON_BINDING)
   AddProject(
     Eigen3ToPython
-    GITHUB jrl-umi3218/Eigen3ToPython
-    GIT_TAG origin/master
+    # GITHUB jrl-umi3218/Eigen3ToPython
+    # GIT_TAG origin/master
+    GITHUB arntanguy/Eigen3ToPython
+    GIT_TAG origin/topic/noble
     CMAKE_ARGS -DPIP_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
     APT_PACKAGES python-eigen python3-eigen
   )
@@ -223,8 +225,10 @@ else()
 endif()
 AddProject(
   mc_rtc
-  GITHUB jrl-umi3218/mc_rtc
-  GIT_TAG origin/master
+  # GITHUB jrl-umi3218/mc_rtc
+  # GIT_TAG origin/master
+  GITHUB mathieu-celerier/mc_rtc
+  GIT_TAG origin/topic/fixing-fmt
   CMAKE_ARGS -DMC_LOG_UI_PYTHON_EXECUTABLE=${MC_LOG_UI_PYTHON_EXECUTABLE}
              ${MC_RTC_ROS_OPTION} ${MC_RTC_EXTRA_OPTIONS}
   DEPENDS ${mc_rtc_DEPENDS}
