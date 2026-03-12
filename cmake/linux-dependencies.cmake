@@ -68,7 +68,7 @@ if(WITH_ROS_SUPPORT AND ROS_DISTRO)
     if(ROS_IS_ROS2)
       list(APPEND ROS_APT_DEPENDENCIES ros-${ROS_DISTRO}-rviz2
            ros-${ROS_DISTRO}-geometry-msgs ros-${ROS_DISTRO}-rosidl-default-generators
-           ros-${ROS_DISTRO}-rosidl-default-runtime
+           ros-${ROS_DISTRO}-rosidl-default-runtime ros-${ROS_DISTRO}-rosidl-adapter
       )
     else()
       list(APPEND ROS_APT_DEPENDENCIES ros-${ROS_DISTRO}-common-msgs
