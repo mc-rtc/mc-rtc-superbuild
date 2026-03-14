@@ -78,7 +78,6 @@ plugins=(
     pip
     pre-commit
     ssh
-    zsh-interactive-cd
     zsh-autosuggestions
 )
 
