@@ -1,0 +1,94 @@
+{
+    "version": 10,
+    "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
+    "configurePresets": [
+        {
+            "name": "G1-notests",
+            "displayName": "G1 RelWithDebInfo (no tests)",
+            "inherits": [
+                "relwithdebinfo-notests"
+            ],
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "SOURCE_DESTINATION": "${sourceDir}/../src",
+                "BUILD_DESTINATION": "${sourceDir}/../build",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/../install",
+                "BUILD_TESTING": "OFF",
+                "WITH_G1": "ON",
+                "WITH_ROS_SUPPORT": "ON",
+                "PYTHON_BINDING": "ON"
+            }
+        },
+        {
+            "name": "G1-notests-minimal",
+            "displayName": "G1 RelWithDebInfo (no tests, no ros, no python)",
+            "inherits": [
+                "G1-notests"
+            ],
+            "cacheVariables": {
+                "BUILD_TESTING": "OFF",
+                "WITH_ROS_SUPPORT": "OFF",
+                "PYTHON_BINDING": "OFF"
+            }
+        },
+        {
+            "name": "G1-tests",
+            "displayName": "G1 RelWithDebInfo (with tests)",
+            "inherits": [
+                "G1-notests"
+            ],
+            "cacheVariables": {
+                "BUILD_TESTING": "ON"
+            }
+        },
+        {
+            "name": "G1-tests-minimal",
+            "displayName": "G1 RelWithDebInfo (with tests, no ros, no python)",
+            "inherits": [
+                "G1-tests"
+            ],
+            "cacheVariables": {
+                "WITH_ROS_SUPPORT": "ON",
+                "PYTHON_BINDING": "OFF"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "G1-notests",
+            "displayName": "G1 RelWithDebInfo (no tests)",
+            "configurePreset": "G1-notests",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "G1-notests-minimal",
+            "displayName": "G1 RelWithDebInfo (no tests, no ros, no python)",
+            "configurePreset": "G1-notests-minimal",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "G1-tests",
+            "displayName": "G1 RelWithDebInfo (with tests)",
+            "configurePreset": "G1-tests",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "G1-tests-minimal",
+            "displayName": "G1 RelWithDebInfo (with tests, no ros, no python)",
+            "configurePreset": "G1-tests-minimal",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        }
+    ]
+}    
