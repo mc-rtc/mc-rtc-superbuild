@@ -3,3 +3,5 @@ devel/
 install/
 **/.devpod-internal
 .ccache/
+CMakeCache.txt
+CMakeFiles/
