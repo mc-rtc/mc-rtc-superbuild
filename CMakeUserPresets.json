@@ -15,6 +15,7 @@
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/../install",
                 "BUILD_TESTING": "OFF",
                 "WITH_G1": "ON",
+                "WITH_Revo2": "ON",
                 "WITH_ROS_SUPPORT": "ON",
                 "PYTHON_BINDING": "ON"
             }
