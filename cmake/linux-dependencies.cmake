@@ -139,7 +139,7 @@ if(WITH_ROS_SUPPORT AND ROS_DISTRO)
         OUTPUT_VARIABLE PYTHON_VERSION
         OUTPUT_STRIP_TRAILING_WHITESPACE
       )
-      set(ENV{ROS_PYTHON_VERSION} ${PYTHON_VERSION})
+      set(ENV{ROS_PYTHON_VERSION} ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON})
       AppendROSWorkspace(/opt/ros/${ROS_DISTRO} /opt/ros/${ROS_DISTRO}/share/)
     endif()
     if(NOT EXISTS /etc/ros/rosdep/sources.list.d/20-default.list)
