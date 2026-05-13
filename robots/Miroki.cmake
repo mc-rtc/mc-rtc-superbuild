@@ -5,7 +5,7 @@ if(NOT WITH_MIROKI)
 endif()
 
 if(NOT WITH_ROS_SUPPORT)
-  message(FATAL_ERROR "ROS support is required to use the Staubli robot")
+  message(FATAL_ERROR "ROS support is required to use the Miroki robot")
 endif()
 
 if(ROS_IS_ROS2)
