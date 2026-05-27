@@ -41,7 +41,7 @@ fi
 
 if [[ ! -f $HOME/.local/bin/pre-commit ]]
 then
-  if [[ `lsb_release -cs` == "noble" ]]
+  if [[ `lsb_release -cs` == "noble" || `lsb_release -cs` == "resolute" ]]
   then
     pipx install pre-commit
   else
