@@ -19,11 +19,7 @@ then
 fi
 
 ${SUDO} apt-get update
-${SUDO} apt-get install -y --no-install-recommends wget apt-transport-https software-properties-common gnupg lsb-release build-essential gfortran curl git sudo cmake cmake-curses-gui python3-pip ccache
-if [[ `lsb_release -cs` == "noble" ]]
-then
-  ${SUDO} apt-get install -y --no-install-recommends pipx
-fi
+${SUDO} apt-get install -y --no-install-recommends wget apt-transport-https software-properties-common gnupg lsb-release build-essential gfortran curl git sudo cmake cmake-curses-gui python3-pip pipx ccache
 
 if [[ `lsb_release -si` == "Ubuntu" ]]
 then
@@ -44,7 +40,18 @@ then
   if [[ `lsb_release -cs` == "noble" ]]
   then
     pipx install pre-commit
+    pipx ensurepath
   else
     /usr/bin/python3 -m pip install --user pre-commit
   fi
+fi
+
+if [[ "$VIRTUAL_ENV" == "" ]]
+then
+  echo "You are not in a python virtual environment, creating a default one in ~/.mc-rtc-venv"
+  python3 -m venv --system-site-packages ~/.mc-rtc-venv
+  source ~/.mc-rtc-venv/bin/activate
+  echo "You must activate a python virtual environment before building
+  source ~/.mc-rtc-venv/bin/activate
+  "
 fi

@@ -1,9 +1,9 @@
-name: CI Ubuntu Jammy
+name: CI Ubuntu
 
 on:
   repository_dispatch:
     types:
-    - build-jammy
+    - build
   push:
     branches:
       - 'main'
@@ -26,10 +26,11 @@ jobs:
       matrix:
         use-mc-rtc-apt-mirror: [ON, OFF]
         use-mc-rtc-apt-mirror-stable: [ON, OFF]
+        os: [ubuntu-22.04, ubuntu-24.04]
         exclude:
           - use-mc-rtc-apt-mirror: OFF
             use-mc-rtc-apt-mirror-stable: ON
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
     steps:
     - name: Maximize build space
       shell: bash

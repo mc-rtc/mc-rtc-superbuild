@@ -6,6 +6,7 @@ if [ "$BUILD_SUPERBUILD" != "true" ]; then
   echo "SUPERBUILD: Skipping build because BUILD_SUPERBUILD=$BUILD_SUPERBUILD"
 else
   ./utils/bootstrap-linux.sh
+  source ~/.mc-rtc-venv/bin/activate
   git config --global user.email "$EMAIL" && git config --global user.name "$NAME"
 
   # CMake configure will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)
