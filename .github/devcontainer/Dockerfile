@@ -255,7 +255,8 @@ RUN cp $SUPERBUILD_DIR/.devcontainer/docker-entrypoint.sh ~/.docker-entrypoint.s
 # CMake configure will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)
 RUN --mount=type=cache,target=/var/cache/apt \
      --mount=type=ssh,uid=1000 \
-     .github/devcontainer/build_superbuild.sh
+      mkdir -p $CCACHE_IMAGE_DIR \
+     && .github/devcontainer/build_superbuild.sh
 
 # mc_rtc configuration copy if MC_RTC_CONTROLLER_CONFIG is set and file exists
 RUN mkdir -p ~/.config/mc_rtc && \
