@@ -28,7 +28,7 @@ jobs:
       runner: ubuntu-24.04
       free-disk-space: true
       os: ${{ matrix.os }}
-      preset: relwithdebinfo${{ matrix.os == 'noble' && '-noble' || '' }}
+      preset: relwithdebinfo
       include-preset-in-name: false
       build-standalone-release: true
       build-standalone-devel: true
