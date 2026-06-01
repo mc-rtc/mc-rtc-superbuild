@@ -27,6 +27,7 @@ jobs:
       matrix:
         use-mc-rtc-apt-mirror: [ON, OFF]
         use-mc-rtc-apt-mirror-stable: [ON, OFF]
+        # TODO: add ubuntu-26.04 once the github runner is available
         os: [ ubuntu-22.04, ubuntu-24.04 ]
         exclude:
           - use-mc-rtc-apt-mirror: OFF
