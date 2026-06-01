@@ -31,6 +31,9 @@ jobs:
         exclude:
           - use-mc-rtc-apt-mirror: OFF
             use-mc-rtc-apt-mirror-stable: ON
+          # TODO: generate packages for 24.04
+          - os: ubuntu-24.04
+            use-mc-rtc-apt-mirror: ON
     runs-on: ${{ matrix.os }}
     steps:
     - name: Maximize build space
