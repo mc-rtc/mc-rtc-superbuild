@@ -23,22 +23,6 @@
             "cacheVariables": {
                 "BUILD_TESTING": "OFF"
             }
-        },
-        {
-            "name": "relwithdebinfo-noble",
-            "displayName": "RelWithDebInfo (noble, ROS, no Python)",
-            "inherits": [
-                "relwithdebinfo"
-            ],
-            "cacheVariables": {
-                "PYTHON_BINDING": "OFF",
-                "WITH_ROS_SUPPORT": "ON"
-            },
-            "condition": {
-                "type": "equals",
-                "lhs": "$env{UBUNTU_VERSION}",
-                "rhs": "noble"
-            }
         }
     ],
     "buildPresets": [
@@ -55,15 +39,6 @@
             "name": "relwithdebinfo-notests",
             "displayName": "RelWithDebInfo (no tests)",
             "configurePreset": "relwithdebinfo-notests",
-            "configuration": "RelWithDebInfo",
-            "targets": [
-                "install"
-            ]
-        },
-        {
-            "name": "relwithdebinfo-noble",
-            "displayName": "RelWithDebInfo (ubuntu noble)",
-            "configurePreset": "relwithdebinfo-noble",
             "configuration": "RelWithDebInfo",
             "targets": [
                 "install"

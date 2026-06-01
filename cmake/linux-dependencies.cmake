@@ -36,6 +36,9 @@ if(DPKG)
   endif()
 endif()
 
+message(STATUS "Installing pip dependencies ${PIP_DEPENDENCIES}")
+execute_process(COMMAND pip install ${PIP_DEPENDENCIES})
+
 if(WITH_ROS_SUPPORT AND ROS_DISTRO)
   if(DPKG)
     if(${DISTRO} STREQUAL "buster")

@@ -23,13 +23,9 @@ set(APT_DEPENDENCIES
     # python-is-python3
     libnotify-dev
     # python3-git
-    cython3
-    python3-numpy
-    python3-coverage
-    python3-setuptools
-    python3-pytest
     pre-commit
 )
+set(PIP_DEPENDENCIES cython numpy coverage setuptools pytest)
 if(BUILD_BENCHMARKS)
   list(APPEND APT_DEPENDENCIES libbenchmark-dev)
 endif()

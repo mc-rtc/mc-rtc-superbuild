@@ -39,7 +39,6 @@ set(BUILD_PARALLEL_JOBS
 # ######################################################################################
 set(PYTHON_BINDING_DEFAULT ON)
 set(PYTHON_BINDING_FORCE_PYTHON3_DEFAULT ON)
-set(PYTHON_BINDING_FORCE_PYTHON2_DEFAULT OFF)
 option(CYTHON_USE_CCACHE "Use CCache for Cython compilation" ON)
 
 find_program(MC_RTC_SUPERBUILD_DEFAULT_PYTHON python3)
@@ -47,12 +46,7 @@ if(NOT MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
   set(PYTHON_BINDING_FORCE_PYTHON3_DEFAULT OFF)
   find_program(MC_RTC_SUPERBUILD_DEFAULT_PYTHON python)
   if(NOT MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
-    find_program(MC_RTC_SUPERBUILD_DEFAULT_PYTHON python2)
-    if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
-      set(PYTHON_BINDING_FORCE_PYTHON2_DEFAULT ON)
-    else()
-      set(PYTHON_BINDING_DEFAULT OFF)
-    endif()
+    set(PYTHON_BINDING_DEFAULT OFF)
   endif()
 endif()
 
@@ -67,7 +61,10 @@ if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
     OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET
   )
   if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON_USER_BASE STREQUAL "")
-    message(FATAL_ERROR "Failed to find Python user base directory")
+    message(
+      FATAL_ERROR
+        "Failed to find Python user base directory: ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON}"
+    )
   endif()
   if(WIN32)
     execute_process(
@@ -88,12 +85,30 @@ if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
   if(DISTRO STREQUAL "noble")
     # on ubuntu noble onwards, pip requires a virtualenv
     # detect if we are already in one and if not create one for mc-rtc
-    # we should add options to options.cmake to specify a custom name for the venv
-    set(MC_RTC_SUPERBUILD_VENV_NAME
-        "mc-rtc-venv"
-        CACHE STRING "Name of the Python virtualenv to create/use"
+
+    # Check if we are already in a virtualenv
+    execute_process(
+      COMMAND
+        python3 -c
+        "import sys; exit(0) if (hasattr(sys, 'real_prefix') or (getattr(sys, 'base_prefix', sys.prefix) != sys.prefix)) else exit(1)"
+      RESULT_VARIABLE IN_VENV # 0 if in venv, 1 otherwise
     )
-    #handle_noble_virtualenv(${MC_RTC_SUPERBUILD_DEFAULT_PYTHON} ${DISTRO})
+    if(IN_VENV EQUAL 0)
+      message(STATUS "Already in the expected Python virtualenv: $ENV{VIRTUAL_ENV}")
+    else()
+      message(
+        FATAL_ERROR
+          "You must create or activate a python virtualenv first:
+
+$ python3 -m venv --system-site-packages ~/.mc-rtc-venv
+
+Note that --system-site-packages is required in order to access ros python packages
+
+Then activate it with
+$ source ~/.mc-rtc-venv/biin/activate
+"
+      )
+    endif()
   endif()
   find_program(
     MC_RTC_SUPERBUILD_PRE_COMMIT
