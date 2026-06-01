@@ -1,5 +1,5 @@
 {
-  "name": "mc-rtc-superbuild-noble-build",
+  "name": "mc-rtc-superbuild-resolute-build",
 
   "build": {
     "dockerfile": "../Dockerfile",
@@ -9,11 +9,12 @@
       "CMAKE_PRESET": "${localEnv:CMAKE_PRESET:relwithdebinfo}",
       "BUILD_VERSION": "${localEnv:BUILD_VERSION:devcontainer}",
       "IMAGE_SOURCE_REPO": "",
-      "UBUNTU_VERSION": "noble"
+      "UBUNTU_VERSION": "resolute"
     },
     "options":
     [
       "${localEnv:SSH_OPT:''}"
+      // "${localEnv:SSH_OPT:--ssh=default}"
     ]
   },
 
@@ -22,14 +23,14 @@
   },
 
   "mounts": [
-    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached"
-    // "source=${localEnv:HOME}${localEnv:USERPROFILE}/docker-ws/mc-rtc-superbuild-noble,target=/home/vscode/workspace,type=bind,consistency=cached"
+    "type=bind,source=/tmp/.X11-unix,target=/tmp/.X11-unix,consistency=cached",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/devcontainers/volumes/mc-rtc-superbuild-resolute,target=/home/vscode/workspace,type=bind,consistency=cached"
   ],
 
   "features":
   {
     "ghcr.io/devcontainers/features/node:1": {},
-    "ghcr.io/arntanguy/nvim-devcontainer-feature/nvim:latest": {},
+    // "ghcr.io/arntanguy/nvim-devcontainer-feature/nvim:latest": {},
     "ghcr.io/devcontainers/features/github-cli": { "version": "latest" },
     "ghcr.io/georgofenbeck/features/lazygit-linuxbinary:1": { "version": "latest" }
   },
