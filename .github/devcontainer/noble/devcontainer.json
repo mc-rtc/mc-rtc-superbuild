@@ -48,13 +48,13 @@
             "GitHub.vscode-github-actions"
           ]
       }
-  }
+  },
 
   "runArgs": [
     "--network=host",
     "--cap-add=sys_nice", // Grants the container the CAP_SYS_NICE capability, which allows the container to raise process nice values, set real-time scheduling policies, set CPU affinity, and other operations.
     "--security-opt", // allow core dumps
-    "seccomp=unconfined", // allow core dumps
+    "seccomp=unconfined" // allow core dumps
     // Uncomment for containers requiring use of nvidia GPUs
     // You will need to install NVIDIA Container Toolkit first
     // "--runtime=nvidia",
