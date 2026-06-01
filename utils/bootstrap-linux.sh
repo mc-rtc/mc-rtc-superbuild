@@ -35,15 +35,13 @@ else
   ${SUDO} /tmp/cmake-${CMAKE_VERSION_FULL} --skip-license --prefix=/usr --exclude-subdir
 fi
 
-if [[ ! -f $HOME/.local/bin/pre-commit ]]
+if ! command -v pre-commit &> /dev/null
 then
-  if [[ `lsb_release -cs` == "noble" ]]
-  then
+    echo "pre-commit not found. Installing via pipx..."
     pipx install pre-commit
     pipx ensurepath
-  else
-    /usr/bin/python3 -m pip install --user pre-commit
-  fi
+else
+    echo "pre-commit is already installed."
 fi
 
 if [[ "$VIRTUAL_ENV" == "" ]]

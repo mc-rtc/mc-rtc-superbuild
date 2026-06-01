@@ -5,6 +5,7 @@ on:
     types:
       - build-jammy
       - build-noble
+      - build-resolute
   push:
     branches:
       - 'main'
@@ -22,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [jammy, noble]
+        os: [jammy, noble, resolute]
     uses: jrl-umi3218/github-actions/.github/workflows/superbuild-devcontainer.yml@master
     with:
       runner: ubuntu-24.04
