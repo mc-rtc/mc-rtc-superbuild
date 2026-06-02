@@ -34,7 +34,9 @@ jobs:
       build-standalone-release: true
       build-standalone-devel: true
       build-devcontainer: true
-      container-repository: ghcr.io/mc-rtc/mc-rtc-superbuild
-      push: ${{ github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild' }}
+      # container-repository: ghcr.io/mc-rtc/mc-rtc-superbuild
+      # push: ${{ github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild' }}
+      container-repository: ghcr.io/arntanguy/mc-rtc-superbuild
+      push: ${{ github.ref == 'refs/heads/topic/noble' }}
     secrets:
       SSH_KEY: ${{ secrets.SSH_KEY }}
