@@ -271,15 +271,10 @@ AddProject(
   APT_PACKAGES ${mc_rtc_APT_PACKAGES}
 )
 
-set(MC_RTC_ROS_REMOTE "jrl-umi3218/mc_rtc_ros")
-# TODO: remove after merging github.com/jrl-umi3218/mc_rtc_ros/pull/65
-if(DISTRO STREQUAL "resolute")
-  set(MC_RTC_ROS_REMOTE "Kooolkimooov/mc_rtc_ros")
-endif()
 if(WITH_ROS_SUPPORT)
   AddCatkinProject(
     mc_rtc_ros
-    GITHUB ${MC_RTC_ROS_REMOTE}
+    GITHUB jrl-umi3218/mc_rtc_ros
     GIT_TAG origin/master
     WORKSPACE mc_rtc_ws
     DEPENDS mc_rtc
