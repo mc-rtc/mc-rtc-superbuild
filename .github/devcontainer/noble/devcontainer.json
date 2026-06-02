@@ -3,6 +3,7 @@
 
   "build": {
     "dockerfile": "../Dockerfile",
+    "target": "devcontainer",
     "context": "../../..",
     "args":
     {
