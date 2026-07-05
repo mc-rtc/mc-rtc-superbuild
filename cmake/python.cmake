@@ -9,3 +9,5 @@ execute_process(
 set(ENV{PYTHONPATH}
     "${CMAKE_INSTALL_PREFIX}/lib/${PYTHON_VERSION}/site-packages:$ENV{PYTHONPATH}"
 )
+set(ENV{PATH} "$ENV{VIRTUAL_ENV}/bin:$ENV{PATH}")
+message(WARNING "python: PATH is $ENV{PATH}")

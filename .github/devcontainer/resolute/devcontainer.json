@@ -10,12 +10,14 @@
       "CMAKE_PRESET": "${localEnv:CMAKE_PRESET:relwithdebinfo}",
       "BUILD_VERSION": "${localEnv:BUILD_VERSION:devcontainer}",
       "IMAGE_SOURCE_REPO": "",
-      "UBUNTU_VERSION": "resolute"
+      "UBUNTU_VERSION": "resolute",
+      // FIXME
+      "BUILD_SUPERBUILD": "false"
     },
     "options":
     [
-      "${localEnv:SSH_OPT:''}"
-      // "${localEnv:SSH_OPT:--ssh=default}"
+      // "${localEnv:SSH_OPT:''}"
+      "${localEnv:SSH_OPT:--ssh=default}"
     ]
   },
 
