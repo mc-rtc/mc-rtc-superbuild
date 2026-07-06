@@ -64,12 +64,18 @@ AddProject(
   APT_PACKAGES libsch-core-dev
 )
 
+if(DISTRO STREQUAL "jammy" OR DISTRO STREQUAL "noble")
+  set(MESH_SAMPLING_ARGS "-DUSE_LEGACY_QHULL_STREAM=ON")
+else()
+  set(MESH_SAMPLING_ARGS "-DUSE_LEGACY_QHULL_STREAM=OFF")
+endif()
 AddProject(
   mesh-sampling
   GITHUB jrl-umi3218/mesh_sampling
   GIT_TAG origin/master
   APT_PACKAGES libmesh-sampling-dev
   APT_DEPENDENCIES libgtest-dev libqhull-dev libassimp-dev
+  CMAKE_ARGS ${MESH_SAMPLING_ARGS}
 )
 
 if(PYTHON_BINDING)

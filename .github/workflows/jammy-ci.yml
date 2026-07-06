@@ -6,13 +6,18 @@ on:
     - build-jammy
   push:
     branches:
-      - '**'
+      - 'main'
   pull_request:
     branches:
       - '**'
   schedule:
     # Run on Sunday, Tuesday and Thursday nights
     - cron: '0 22 * * 0,1,4'
+
+# cancel running workflows when pushing to the same branch/pr
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   run:
