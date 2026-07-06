@@ -72,8 +72,7 @@ endif()
 AddProject(
   mesh-sampling
   GITHUB jrl-umi3218/mesh_sampling
-  # GIT_TAG origin/master
-  GIT_TAG origin/revert-11-revert-10-fix-convex-generation
+  GIT_TAG origin/master
   APT_PACKAGES libmesh-sampling-dev
   APT_DEPENDENCIES libgtest-dev libqhull-dev libassimp-dev
   CMAKE_ARGS ${MESH_SAMPLING_ARGS}
@@ -230,10 +229,8 @@ else()
 endif()
 AddProject(
   mc_rtc
-  #GITHUB jrl-umi3218/mc_rtc
-  #GIT_TAG origin/master
-  GITHUB arntanguy/mc_rtc
-  GIT_TAG origin/external-qhull-flake
+  GITHUB jrl-umi3218/mc_rtc
+  GIT_TAG origin/master
   CMAKE_ARGS -DMC_LOG_UI_PYTHON_EXECUTABLE=${MC_LOG_UI_PYTHON_EXECUTABLE}
              ${MC_RTC_ROS_OPTION} ${MC_RTC_EXTRA_OPTIONS}
   DEPENDS ${mc_rtc_DEPENDS}
