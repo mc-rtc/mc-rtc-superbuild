@@ -182,7 +182,7 @@ if(WITH_ROS_SUPPORT)
   set(MC_RTC_ROS_COMPAT_APT_DEPENDENCIES ros-${ROS_DISTRO}-ament-cmake
                                          ros-${ROS_DISTRO}-rclcpp
   )
-  set(MC_RTC_ROS_COMPAT_APT_PACKAGES "ros-${ROS_DIRO}-mc-rtc-ros-compat")
+  set(MC_RTC_ROS_COMPAT_APT_PACKAGES "ros-${ROS_DISTRO}-mc-rtc-ros-compat")
   set(MC_RTC_ROS_COMPAT_ARGS "")
 else()
   set(MC_RTC_ROS_COMPAT_DEPENDS "")
