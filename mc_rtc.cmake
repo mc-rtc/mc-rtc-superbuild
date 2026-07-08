@@ -178,6 +178,26 @@ AddProject(
   APT_PACKAGES libtvm-dev
 )
 
+if(WITH_ROS_SUPPORT)
+  set(MC_RTC_ROS_COMPAT_APT_DEPENDENCIES ros-${ROS_DISTRO}-ament-cmake
+                                         ros-${ROS_DISTRO}-rclcpp
+  )
+  set(MC_RTC_ROS_COMPAT_APT_PACKAGES "ros-${ROS_DIRO}-mc-rtc-ros-compat")
+  set(MC_RTC_ROS_COMPAT_ARGS "")
+else()
+  set(MC_RTC_ROS_COMPAT_DEPENDS "")
+  set(MC_RTC_ROS_COMPAT_ARGS "-DDISABLE_ROS=ON")
+  set(MC_RTC_ROS_COMPAT_APT_PACKAGES "libmc-rtc-ros-compat-dev")
+endif()
+AddProject(
+  mc_rtc_ros_compat
+  GITHUB jrl-umi3218/mc_rtc_ros_compat
+  GIT_TAG origin/main
+  CMAKE_ARGS ${MC_RTC_ROS_COMPAT_ARGS}
+  APT_PACKAGES ${MC_RTC_ROS_COMPAT_APT_PACKAGES}
+  APT_DEPENDENCIES ${MC_RTC_ROS_COMPAT_APT_DEPENDENCIES}
+)
+
 if(NOT WITH_ROS_SUPPORT)
   set(MC_RTC_ROS_BRANCH origin/ROSFree)
 else()
@@ -192,7 +212,16 @@ AddCatkinProject(
   CMAKE_ARGS ${MC_RTC_ROS_OPTION}
 )
 
-set(mc_rtc_DEPENDS tvm Tasks mc_rtc_data ndcurves state-observation mesh-sampling)
+set(mc_rtc_DEPENDS
+    tvm
+    Tasks
+    mc_rtc_data
+    ndcurves
+    state-observation
+    mesh-sampling
+    mc_rtc_ros_compat
+)
+set(mc_rtc_APT_PACKAGES libmc-rtc-dev mc-rtc-utils python-mc-rtc python3-mc-rtc)
 if(WITH_ROS_SUPPORT)
   AddCatkinProject(
     mc_rtc_msgs
@@ -202,6 +231,7 @@ if(WITH_ROS_SUPPORT)
     APT_PACKAGES ros-${ROS_DISTRO}-mc-rtc-msgs
   )
   list(APPEND mc_rtc_DEPENDS mc_rtc_msgs)
+  list(APPEND mc_rtc_APT_PACKAGES ros-${ROS_DISTRO}-mc-rtc-plugin)
 endif()
 
 if(TARGET spdlog)
@@ -234,8 +264,7 @@ AddProject(
   CMAKE_ARGS -DMC_LOG_UI_PYTHON_EXECUTABLE=${MC_LOG_UI_PYTHON_EXECUTABLE}
              ${MC_RTC_ROS_OPTION} ${MC_RTC_EXTRA_OPTIONS}
   DEPENDS ${mc_rtc_DEPENDS}
-  APT_PACKAGES libmc-rtc-dev mc-rtc-utils python-mc-rtc python3-mc-rtc
-               ros-${ROS_DISTRO}-mc-rtc-plugin
+  APT_PACKAGES ${mc_rtc_APT_PACKAGES}
 )
 
 if(WITH_ROS_SUPPORT)
