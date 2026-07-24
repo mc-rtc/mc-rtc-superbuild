@@ -47,7 +47,8 @@ fi
 if [[ "$VIRTUAL_ENV" == "" ]]
 then
   echo "You are not in a python virtual environment, creating a default one in ~/.mc-rtc-venv"
-  python3 -m venv ~/.mc-rtc-venv
+  # enable system-site-packages so that we can use ROS python packages
+  python3 -m venv --system-site-packages ~/.mc-rtc-venv
   source ~/.mc-rtc-venv/bin/activate
   echo "You must activate a python virtual environment before building
   source ~/.mc-rtc-venv/bin/activate
