@@ -19,11 +19,7 @@ then
 fi
 
 ${SUDO} apt-get update
-${SUDO} apt-get install -y --no-install-recommends wget apt-transport-https software-properties-common gnupg lsb-release build-essential gfortran curl git sudo cmake cmake-curses-gui python3-pip ccache
-if [[ `lsb_release -cs` == "noble" ]]
-then
-  ${SUDO} apt-get install -y --no-install-recommends pipx
-fi
+${SUDO} apt-get install -y --no-install-recommends wget apt-transport-https software-properties-common gnupg lsb-release build-essential gfortran curl git sudo cmake cmake-curses-gui python3-pip pipx ccache
 
 if [[ `lsb_release -si` == "Ubuntu" ]]
 then
@@ -39,12 +35,22 @@ else
   ${SUDO} /tmp/cmake-${CMAKE_VERSION_FULL} --skip-license --prefix=/usr --exclude-subdir
 fi
 
-if [[ ! -f $HOME/.local/bin/pre-commit ]]
+if ! command -v pre-commit &> /dev/null
 then
-  if [[ `lsb_release -cs` == "noble" ]]
-  then
+    echo "pre-commit not found. Installing via pipx..."
     pipx install pre-commit
-  else
-    /usr/bin/python3 -m pip install --user pre-commit
-  fi
+    pipx ensurepath
+else
+    echo "pre-commit is already installed."
+fi
+
+if [[ "$VIRTUAL_ENV" == "" ]]
+then
+  echo "You are not in a python virtual environment, creating a default one in ~/.mc-rtc-venv"
+  # enable system-site-packages so that we can use ROS python packages
+  python3 -m venv --system-site-packages ~/.mc-rtc-venv
+  source ~/.mc-rtc-venv/bin/activate
+  echo "You must activate a python virtual environment before building
+  source ~/.mc-rtc-venv/bin/activate
+  "
 fi

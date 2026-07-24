@@ -65,8 +65,7 @@ if(INSTALL_SYSTEM_DEPENDENCIES)
       )
     endif()
     execute_process(
-      COMMAND sudo ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON} -m pip install
-              ${PIP_DEPENDENCIES}
+      COMMAND ${MC_RTC_SUPERBUILD_DEFAULT_PYTHON} -m pip install ${PIP_DEPENDENCIES}
     )
   endif()
 endif()

@@ -1,9 +1,9 @@
-name: CI Ubuntu Jammy
+name: CI Ubuntu
 
 on:
   repository_dispatch:
     types:
-    - build-jammy
+    - build
   push:
     branches:
       - 'main'
@@ -21,15 +21,21 @@ concurrency:
 
 jobs:
   run:
+    name: "${{ matrix.os }}, use apt: ${{ matrix.use-mc-rtc-apt-mirror }} (stable: ${{ matrix.use-mc-rtc-apt-mirror-stable }})"
     strategy:
       fail-fast: false
       matrix:
         use-mc-rtc-apt-mirror: [ON, OFF]
         use-mc-rtc-apt-mirror-stable: [ON, OFF]
+        # TODO: add ubuntu-26.04 once the github runner is available
+        os: [ ubuntu-22.04, ubuntu-24.04 ]
         exclude:
           - use-mc-rtc-apt-mirror: OFF
             use-mc-rtc-apt-mirror-stable: ON
-    runs-on: ubuntu-22.04
+          # TODO: generate packages for 24.04
+          - os: ubuntu-24.04
+            use-mc-rtc-apt-mirror: ON
+    runs-on: ${{ matrix.os }}
     steps:
     - name: Maximize build space
       shell: bash
@@ -54,14 +60,16 @@ jobs:
       shell: bash
       run: |
         ./utils/bootstrap-linux.sh
-    - name: Install system dependencies
+    - name: Configure superbuild
       shell: bash
       run: |
+        source ~/.mc-rtc-venv/bin/activate
         mkdir -p ${TMPDIR-/tmp}/build-mc-rtc
         cmake -S ${GITHUB_WORKSPACE} -B ${TMPDIR-/tmp}/build-mc-rtc -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVERBOSE_TEST_OUTPUT=ON -DUSE_MC_RTC_APT_MIRROR=${{ matrix.use-mc-rtc-apt-mirror }} -DUSE_MC_RTC_APT_MIRROR_STABLE=${{ matrix.use-mc-rtc-apt-mirror-stable }}
     - name: Install mc_rtc and related projects
       shell: bash
       run: |
+        source ~/.mc-rtc-venv/bin/activate
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@example.com"
         cmake --build ${TMPDIR-/tmp}/build-mc-rtc --config RelWithDebInfo

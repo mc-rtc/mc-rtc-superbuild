@@ -11,7 +11,8 @@
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo",
                 "SOURCE_DESTINATION": "${sourceDir}/../workspace/devel",
                 "BUILD_DESTINATION": "${sourceDir}/../workspace/build/projects",
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/../workspace/install"
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/../workspace/install",
+		"MC_RTC_SUPERBUILD_VERBOSE": "ON"
             }
         },
         {
@@ -22,22 +23,6 @@
             ],
             "cacheVariables": {
                 "BUILD_TESTING": "OFF"
-            }
-        },
-        {
-            "name": "relwithdebinfo-noble",
-            "displayName": "RelWithDebInfo (noble, ROS, no Python)",
-            "inherits": [
-                "relwithdebinfo"
-            ],
-            "cacheVariables": {
-                "PYTHON_BINDING": "OFF",
-                "WITH_ROS_SUPPORT": "ON"
-            },
-            "condition": {
-                "type": "equals",
-                "lhs": "$env{UBUNTU_VERSION}",
-                "rhs": "noble"
             }
         }
     ],
@@ -55,15 +40,6 @@
             "name": "relwithdebinfo-notests",
             "displayName": "RelWithDebInfo (no tests)",
             "configurePreset": "relwithdebinfo-notests",
-            "configuration": "RelWithDebInfo",
-            "targets": [
-                "install"
-            ]
-        },
-        {
-            "name": "relwithdebinfo-noble",
-            "displayName": "RelWithDebInfo (ubuntu noble)",
-            "configurePreset": "relwithdebinfo-noble",
             "configuration": "RelWithDebInfo",
             "targets": [
                 "install"

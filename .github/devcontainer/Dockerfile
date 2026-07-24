@@ -193,7 +193,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 # Workaround screen refresh issues with neovim/ncurses
 ENV TERM="xterm-256color"
 RUN \
-   if [ "$UBUNTU_VERSION" = "noble" ]; then \
+   if [ "$UBUNTU_VERSION" = "noble" ] || [ "$UBUNTU_VERSION" = "resolute" ]; then \
      apt install --no-install-recommends -y libtinfo6 ncurses-term; \
    else \
      apt install --no-install-recommends -y libtinfo5 ncurses-term; \
@@ -203,7 +203,7 @@ RUN \
 # Rename ubuntu user to vscode (noble)
 # Create a new vscode user (jammy)
 RUN \
-  if [ "$UBUNTU_VERSION" = "noble" ]; then \
+   if [ "$UBUNTU_VERSION" = "noble" ] || [ "$UBUNTU_VERSION" = "resolute" ]; then \
     usermod -l vscode ubuntu \
     && usermod -d /home/vscode -m vscode \
     && groupmod -n vscode ubuntu; \
@@ -255,7 +255,8 @@ RUN cp $SUPERBUILD_DIR/.devcontainer/docker-entrypoint.sh ~/.docker-entrypoint.s
 # CMake configure will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)
 RUN --mount=type=cache,target=/var/cache/apt \
      --mount=type=ssh,uid=1000 \
-     .github/devcontainer/build_superbuild.sh
+      mkdir -p $CCACHE_IMAGE_DIR \
+     && .github/devcontainer/build_superbuild.sh
 
 # mc_rtc configuration copy if MC_RTC_CONTROLLER_CONFIG is set and file exists
 RUN mkdir -p ~/.config/mc_rtc && \

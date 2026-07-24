@@ -5,6 +5,7 @@ on:
     types:
       - build-jammy
       - build-noble
+      - build-resolute
   push:
     branches:
       - 'main'
@@ -22,18 +23,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [jammy, noble]
+        os: [jammy, noble, resolute]
     uses: jrl-umi3218/github-actions/.github/workflows/superbuild-devcontainer.yml@master
     with:
       runner: ubuntu-24.04
       free-disk-space: true
       os: ${{ matrix.os }}
-      preset: relwithdebinfo${{ matrix.os == 'noble' && '-noble' || '' }}
+      preset: relwithdebinfo
       include-preset-in-name: false
       build-standalone-release: true
       build-standalone-devel: true
       build-devcontainer: true
-      container-repository: ghcr.io/mc-rtc/mc-rtc-superbuild
-      push: ${{ github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild' }}
+      # container-repository: ghcr.io/mc-rtc/mc-rtc-superbuild
+      # push: ${{ github.ref == 'refs/heads/main' && github.repository == 'mc-rtc/mc-rtc-superbuild' }}
+      container-repository: ghcr.io/arntanguy/mc-rtc-superbuild
+      push: ${{ github.ref == 'refs/heads/topic/noble' }}
     secrets:
       SSH_KEY: ${{ secrets.SSH_KEY }}

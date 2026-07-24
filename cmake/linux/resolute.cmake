@@ -1,14 +1,15 @@
 set(MC_LOG_UI_PYTHON_EXECUTABLE python3)
 set(APT_HAS_PYTHON2_PACKAGES OFF)
 set(ROS_IS_ROS2 ON)
-set(ROS_DISTRO jazzy)
-set(ROS_WORKSPACE_INSTALL_PYTHON_DESTINATION "lib/python3.12/site-packages")
+set(ROS_DISTRO lyrical)
+set(ROS_WORKSPACE_INSTALL_PYTHON_DESTINATION "lib/python3.14/site-packages")
 set(APT_DEPENDENCIES
     curl
     wget
     cmake
     build-essential
     gfortran
+    rapidjson-dev
     libeigen3-dev
     libboost-all-dev
     libtinyxml2-dev
@@ -37,7 +38,7 @@ function(mc_rtc_extra_steps)
   if(PYTHON_BINDING_BUILD_PYTHON2_AND_PYTHON3 OR PYTHON_BINDING_FORCE_PYTHON2)
     message(
       FATAL_ERROR
-        "Python 2 is not supported on Focal, disable PYTHON_BINDING or enable Python 3 binding only"
+        "Python 2 is not supported on Resolute, disable PYTHON_BINDING or enable Python 3 binding only"
     )
   endif()
 endfunction()
