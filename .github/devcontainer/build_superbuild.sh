@@ -7,6 +7,9 @@ if [ "$BUILD_SUPERBUILD" != "true" ]; then
 else
   ./utils/bootstrap-linux.sh
   source ~/.mc-rtc-venv/bin/activate
+  # pytest finds ROS dependencies and tries to load launch_testing plugin from ROS packages,
+  # which seems to be incompatible with pytest version in the venv
+  export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
   git config --global user.email "$EMAIL" && git config --global user.name "$NAME"
 
   # CMake configure will install all APT/PIP dependencies (keep downloaded packages in mounted APT cache)
