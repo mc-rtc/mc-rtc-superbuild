@@ -105,7 +105,7 @@ $ python3 -m venv --system-site-packages ~/.mc-rtc-venv
 Note that --system-site-packages is required in order to access ros python packages
 
 Then activate it with
-$ source ~/.mc-rtc-venv/biin/activate
+$ source ~/.mc-rtc-venv/bin/activate
 "
       )
     endif()
