@@ -60,6 +60,9 @@ jobs:
       shell: bash
       run: |
         ./utils/bootstrap-linux.sh
+        # pytest finds ROS dependencies and tries to load launch_testing plugin from ROS packages,
+        # which seems to be incompatible with pytest version in the venv
+        echo "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1" >> $GITHUB_ENV
     - name: Configure superbuild
       shell: bash
       run: |
