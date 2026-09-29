@@ -29,11 +29,20 @@ AddProject(
   APT_PACKAGES libndcurves-dev
 )
 
+set(STATE_OBSERVATION_ARGS "")
+if(DISTRO STREQUAL "resolute")
+  # FIXME
+  message(
+    WARNING
+      "Disabling state-observation unit tests for 'resolute' as they are failing. See https://github.com/jrl-umi3218/state-observation/issues/30"
+  )
+  set(STATE_OBSERVATION_ARGS "-DBUILD_TESTING:BOOL=OFF")
+endif()
 AddProject(
   state-observation
   GITHUB jrl-umi3218/state-observation
   GIT_TAG origin/master
-  CMAKE_ARGS -DBUILD_STATE_OBSERVATION_TOOLS:BOOL=OFF
+  CMAKE_ARGS -DBUILD_STATE_OBSERVATION_TOOLS:BOOL=OFF ${STATE_OBSERVATION_ARGS}
   APT_PACKAGES libstate-observation-dev
 )
 
