@@ -51,7 +51,6 @@ then
   python3 -m venv --system-site-packages ~/.mc-rtc-venv
   source ~/.mc-rtc-venv/bin/activate
   pip install pytest
-  pip install --upgrade launch_testing
   echo "You must activate a python virtual environment before building
   source ~/.mc-rtc-venv/bin/activate
   "
