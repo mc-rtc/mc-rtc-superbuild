@@ -47,11 +47,17 @@ fi
 if [[ "$VIRTUAL_ENV" == "" ]]
 then
   echo "You are not in a python virtual environment, creating a default one in ~/.mc-rtc-venv"
-  # enable system-site-packages so that we can use ROS python packages
+  echo "$ python3 -m venv --system-site-packages ~/.mc-rtc-venv"
+  # XXX: enable system-site-packages so that we can use ROS python packages
+  # This breaks isolation as the environment now has access to the system's site-packages
+  # but this is the only way to mix mc_rtc python packages with ROS
   python3 -m venv --system-site-packages ~/.mc-rtc-venv
+  # Note that except for python packages (mc_rtc_msgs), the following works
+  # python3 -m venv ~/.mc-rtc-venv
   source ~/.mc-rtc-venv/bin/activate
   pip install pytest
   echo "You must activate a python virtual environment before building
-  source ~/.mc-rtc-venv/bin/activate
+  $ source ~/.mc-rtc-venv/bin/activate
+  $ export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
   "
 fi
