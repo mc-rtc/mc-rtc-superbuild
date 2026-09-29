@@ -42,14 +42,4 @@ function(mc_rtc_extra_steps)
   endif()
 endfunction()
 
-AddProject(
-  geos-cpp-inline
-  GITHUB isri-aist/geos-cpp-inline-deb
-  GIT_TAG origin/main
-  INSTALL_PREFIX /usr
-  SKIP_TEST NO_SOURCE_MONITOR
-  APT_PACKAGES libgeos++-inline-dev
-)
-list(APPEND GLOBAL_DEPENDS geos-cpp-inline)
-
 include(${CMAKE_CURRENT_LIST_DIR}/mc-rtc-mirror.cmake)
