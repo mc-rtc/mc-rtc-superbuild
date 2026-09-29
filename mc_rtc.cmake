@@ -41,8 +41,7 @@ if(PYTHON_BINDING)
   AddProject(
     Eigen3ToPython
     GITHUB jrl-umi3218/Eigen3ToPython
-    # GIT_TAG origin/master
-    GIT_TAG origin/python-venv
+    GIT_TAG origin/master
     CMAKE_ARGS -DPIP_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
     APT_PACKAGES python-eigen python3-eigen
   )
@@ -52,8 +51,7 @@ endif()
 AddProject(
   SpaceVecAlg
   GITHUB jrl-umi3218/SpaceVecAlg
-  # GIT_TAG origin/master
-  GIT_TAG origin/python-venv
+  GIT_TAG origin/master
   CMAKE_ARGS -DPython3_EXECUTABLE=${MC_RTC_SUPERBUILD_DEFAULT_PYTHON}
   DEPENDS ${SpaceVecAlg_DEPENDS}
   APT_PACKAGES libspacevecalg-dev python-spacevecalg python3-spacevecalg
@@ -67,7 +65,10 @@ AddProject(
   APT_PACKAGES libsch-core-dev
 )
 
-if(DISTRO STREQUAL "jammy" OR DISTRO STREQUAL "noble" OR DISTRO STREQUAL "resolute")
+if(DISTRO STREQUAL "jammy"
+   OR DISTRO STREQUAL "noble"
+   OR DISTRO STREQUAL "resolute"
+)
   set(MESH_SAMPLING_ARGS "-DUSE_LEGACY_QHULL_STREAM=ON")
 else()
   set(MESH_SAMPLING_ARGS "-DUSE_LEGACY_QHULL_STREAM=OFF")
@@ -85,8 +86,7 @@ if(PYTHON_BINDING)
   AddProject(
     sch-core-python
     GITHUB jrl-umi3218/sch-core-python
-    #GIT_TAG origin/master
-    GIT_TAG origin/python-venv
+    GIT_TAG origin/master
     CMAKE_ARGS -DPIP_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
     DEPENDS sch-core SpaceVecAlg
     APT_PACKAGES python-sch-core python3-sch-core
@@ -96,8 +96,7 @@ endif()
 AddProject(
   RBDyn
   GITHUB jrl-umi3218/RBDyn
-  # GIT_TAG origin/master
-  GIT_TAG origin/python-venv
+  GIT_TAG origin/master
   DEPENDS SpaceVecAlg
   APT_PACKAGES librbdyn-dev python-rbdyn python3-rbdyn
 )
@@ -114,8 +113,7 @@ endif()
 AddProject(
   eigen-qld
   GITHUB jrl-umi3218/eigen-qld
-  #GIT_TAG origin/master
-  GIT_TAG origin/python-venv
+  GIT_TAG origin/master
   NO_NINJA NO_COLOR
   CMAKE_ARGS ${USE_F2C_ARGS}
   APT_PACKAGES libeigen-qld-dev python-eigen-qld python3-eigen-qld
@@ -153,8 +151,7 @@ endif()
 AddProject(
   Tasks
   GITHUB jrl-umi3218/Tasks
-  # GIT_TAG origin/master
-  GIT_TAG origin/python-venv
+  GIT_TAG origin/master
   DEPENDS ${Tasks_DEPENDS}
   APT_PACKAGES libtasks-qld-dev python-tasks python3-tasks
 )
@@ -267,10 +264,8 @@ else()
 endif()
 AddProject(
   mc_rtc
-  # GITHUB jrl-umi3218/mc_rtc
-  GITHUB arntanguy/mc_rtc
-  #GIT_TAG origin/master
-  GIT_TAG origin/python-venv
+  GITHUB jrl-umi3218/mc_rtc
+  GIT_TAG origin/master
   CMAKE_ARGS -DMC_LOG_UI_PYTHON_EXECUTABLE=${MC_LOG_UI_PYTHON_EXECUTABLE}
              ${MC_RTC_ROS_OPTION} ${MC_RTC_EXTRA_OPTIONS}
   DEPENDS ${mc_rtc_DEPENDS}
