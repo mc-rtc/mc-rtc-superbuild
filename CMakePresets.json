@@ -4,7 +4,7 @@
     "configurePresets": [
         {
             "name": "relwithdebinfo",
-            "displayName": "RelWithDebInfo",
+            "displayName": "RelWithDebInfo (default: with ROS, Python, Tests)",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/../workspace/build/superbuild",
             "cacheVariables": {
@@ -16,8 +16,39 @@
             }
         },
         {
+            "name": "relwithdebinfo-noros",
+            "displayName": "RelWithDebInfo (no ROS)",
+            "inherits": [
+                "relwithdebinfo"
+            ],
+            "cacheVariables": {
+                "WITH_ROS_SUPPORT": "OFF"
+            }
+        },
+        {
+            "name": "relwithdebinfo-nopython",
+            "displayName": "RelWithDebInfo (no Python)",
+            "inherits": [
+                "relwithdebinfo"
+            ],
+            "cacheVariables": {
+                "PYTHON_BINDING": "OFF"
+            }
+        },
+        {
+            "name": "relwithdebinfo-noros-nopython",
+            "displayName": "RelWithDebInfo (no Python, no ROS)",
+            "inherits": [
+                "relwithdebinfo"
+            ],
+            "cacheVariables": {
+                "PYTHON_BINDING": "OFF",
+                "WITH_ROS_SUPPORT": "OFF"
+            }
+        },
+        {
             "name": "relwithdebinfo-notests",
-            "displayName": "RelWithDebInfo (no tests)",
+            "displayName": "RelWithDebInfo (no Tests)",
             "inherits": [
                 "relwithdebinfo"
             ],
@@ -31,6 +62,33 @@
             "name": "relwithdebinfo",
             "displayName": "RelWithDebInfo",
             "configurePreset": "relwithdebinfo",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "relwithdebinfo-noros",
+            "displayName": "RelWithDebInfo",
+            "configurePreset": "relwithdebinfo-noros",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "relwithdebinfo-nopython",
+            "displayName": "RelWithDebInfo",
+            "configurePreset": "relwithdebinfo-nopython",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "relwithdebinfo-noros-nopython",
+            "displayName": "RelWithDebInfo",
+            "configurePreset": "relwithdebinfo-noros-nopython",
             "configuration": "RelWithDebInfo",
             "targets": [
                 "install"
