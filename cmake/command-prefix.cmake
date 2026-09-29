@@ -15,7 +15,6 @@ function(GetCommandPrefix VAR WRITE_TO)
       APPEND
       CMAKE_COMMAND_PREFIX
       ROS_DISTRO=$ENV{ROS_DISTRO}
-      PYTHONPATH=$ENV{PYTHONPATH}
       ROS_ROOT=$ENV{ROS_ROOT}
       ROS_ETC_DIR=$ENV{ROS_ETC_DIR}
       ROS_PARALLEL_JOBS="$ENV{ROS_PARALLEL_JOBS}"
@@ -48,6 +47,10 @@ function(GetCommandPrefix VAR WRITE_TO)
       "LDFLAGS=-s USE_PTHREADS=1 -s DISABLE_EXCEPTION_CATCHING=0"
     )
   endif()
+  # python
+  list(APPEND CMAKE_COMMAND_PREFIX PATH=$ENV{VIRTUAL_ENV}/bin:$ENV{PATH}
+       VIRTUAL_ENV=$ENV{VIRTUAL_ENV} PYTHONPATH=$ENV{PYTHONPATH}
+  )
   list(TRANSFORM CMAKE_COMMAND_PREFIX REPLACE " " "\\\\ " OUTPUT_VARIABLE
                                                           CMAKE_COMMAND_PREFIX
   ) # restore backslash before spaces in env variables
@@ -58,4 +61,6 @@ function(GetCommandPrefix VAR WRITE_TO)
       ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/cmake-with-prefix.cmake --
       PARENT_SCOPE
   )
+  # FIXME
+  message(STATUS "CMAKE_COMMAND_PREFIX IS ${CMAKE_COMMAND_PREFIX}")
 endfunction()

@@ -104,6 +104,8 @@ if(EMSCRIPTEN)
   )
 endif()
 
+include(cmake/detect-system.cmake)
+include(cmake/python.cmake)
 include(cmake/project.cmake)
 
 if(APPLE)

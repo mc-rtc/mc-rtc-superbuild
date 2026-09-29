@@ -4,40 +4,56 @@
     "configurePresets": [
         {
             "name": "relwithdebinfo",
-            "displayName": "RelWithDebInfo",
+            "displayName": "RelWithDebInfo (default: with ROS, Python, Tests)",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/../workspace/build/superbuild",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo",
                 "SOURCE_DESTINATION": "${sourceDir}/../workspace/devel",
                 "BUILD_DESTINATION": "${sourceDir}/../workspace/build/projects",
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/../workspace/install"
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/../workspace/install",
+		"MC_RTC_SUPERBUILD_VERBOSE": "ON"
             }
         },
         {
-            "name": "relwithdebinfo-notests",
-            "displayName": "RelWithDebInfo (no tests)",
+            "name": "relwithdebinfo-noros",
+            "displayName": "RelWithDebInfo (no ROS)",
             "inherits": [
                 "relwithdebinfo"
             ],
             "cacheVariables": {
-                "BUILD_TESTING": "OFF"
+                "WITH_ROS_SUPPORT": "OFF"
             }
         },
         {
-            "name": "relwithdebinfo-noble",
-            "displayName": "RelWithDebInfo (noble, ROS, no Python)",
+            "name": "relwithdebinfo-nopython",
+            "displayName": "RelWithDebInfo (no Python)",
+            "inherits": [
+                "relwithdebinfo"
+            ],
+            "cacheVariables": {
+                "PYTHON_BINDING": "OFF"
+            }
+        },
+        {
+            "name": "relwithdebinfo-noros-nopython",
+            "displayName": "RelWithDebInfo (no Python, no ROS)",
             "inherits": [
                 "relwithdebinfo"
             ],
             "cacheVariables": {
                 "PYTHON_BINDING": "OFF",
-                "WITH_ROS_SUPPORT": "ON"
-            },
-            "condition": {
-                "type": "equals",
-                "lhs": "$env{UBUNTU_VERSION}",
-                "rhs": "noble"
+                "WITH_ROS_SUPPORT": "OFF"
+            }
+        },
+        {
+            "name": "relwithdebinfo-notests",
+            "displayName": "RelWithDebInfo (no Tests)",
+            "inherits": [
+                "relwithdebinfo"
+            ],
+            "cacheVariables": {
+                "BUILD_TESTING": "OFF"
             }
         }
     ],
@@ -52,18 +68,36 @@
             ]
         },
         {
-            "name": "relwithdebinfo-notests",
-            "displayName": "RelWithDebInfo (no tests)",
-            "configurePreset": "relwithdebinfo-notests",
+            "name": "relwithdebinfo-noros",
+            "displayName": "RelWithDebInfo",
+            "configurePreset": "relwithdebinfo-noros",
             "configuration": "RelWithDebInfo",
             "targets": [
                 "install"
             ]
         },
         {
-            "name": "relwithdebinfo-noble",
-            "displayName": "RelWithDebInfo (ubuntu noble)",
-            "configurePreset": "relwithdebinfo-noble",
+            "name": "relwithdebinfo-nopython",
+            "displayName": "RelWithDebInfo",
+            "configurePreset": "relwithdebinfo-nopython",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "relwithdebinfo-noros-nopython",
+            "displayName": "RelWithDebInfo",
+            "configurePreset": "relwithdebinfo-noros-nopython",
+            "configuration": "RelWithDebInfo",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "relwithdebinfo-notests",
+            "displayName": "RelWithDebInfo (no tests)",
+            "configurePreset": "relwithdebinfo-notests",
             "configuration": "RelWithDebInfo",
             "targets": [
                 "install"

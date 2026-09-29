@@ -29,11 +29,20 @@ AddProject(
   APT_PACKAGES libndcurves-dev
 )
 
+set(STATE_OBSERVATION_ARGS "")
+if(DISTRO STREQUAL "resolute")
+  # FIXME
+  message(
+    WARNING
+      "Disabling state-observation unit tests for 'resolute' as they are failing. See https://github.com/jrl-umi3218/state-observation/issues/30"
+  )
+  set(STATE_OBSERVATION_ARGS "-DBUILD_TESTING:BOOL=OFF")
+endif()
 AddProject(
   state-observation
   GITHUB jrl-umi3218/state-observation
   GIT_TAG origin/master
-  CMAKE_ARGS -DBUILD_STATE_OBSERVATION_TOOLS:BOOL=OFF
+  CMAKE_ARGS -DBUILD_STATE_OBSERVATION_TOOLS:BOOL=OFF ${STATE_OBSERVATION_ARGS}
   APT_PACKAGES libstate-observation-dev
 )
 
@@ -52,6 +61,7 @@ AddProject(
   SpaceVecAlg
   GITHUB jrl-umi3218/SpaceVecAlg
   GIT_TAG origin/master
+  CMAKE_ARGS -DPython3_EXECUTABLE=${MC_RTC_SUPERBUILD_DEFAULT_PYTHON}
   DEPENDS ${SpaceVecAlg_DEPENDS}
   APT_PACKAGES libspacevecalg-dev python-spacevecalg python3-spacevecalg
 )
@@ -64,7 +74,10 @@ AddProject(
   APT_PACKAGES libsch-core-dev
 )
 
-if(DISTRO STREQUAL "jammy" OR DISTRO STREQUAL "noble")
+if(DISTRO STREQUAL "jammy"
+   OR DISTRO STREQUAL "noble"
+   OR DISTRO STREQUAL "resolute"
+)
   set(MESH_SAMPLING_ARGS "-DUSE_LEGACY_QHULL_STREAM=ON")
 else()
   set(MESH_SAMPLING_ARGS "-DUSE_LEGACY_QHULL_STREAM=OFF")
@@ -228,7 +241,8 @@ if(WITH_ROS_SUPPORT)
     GITHUB jrl-umi3218/mc_rtc_msgs
     GIT_TAG origin/master
     WORKSPACE data_ws
-    APT_PACKAGES ros-${ROS_DISTRO}-mc-rtc-msgs
+    APT_PACKAGES ros-${ROS_DISTRO}-mc-rtc-msgs ros-${ROS_DISTRO}-rosidl-adapter
+                 python3-empy
   )
   list(APPEND mc_rtc_DEPENDS mc_rtc_msgs)
   list(APPEND mc_rtc_APT_PACKAGES ros-${ROS_DISTRO}-mc-rtc-plugin)

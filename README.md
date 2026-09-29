@@ -5,9 +5,22 @@ This project is a superbuild project for mc_rtc and related projects.
 
 It will clone, update, build, install all of mc_rtc dependencies, mc_rtc itself and downstream projects. You can also extend the project locally or clone extensions to build your own projects.
 
-There are two ways to use the superbuild:
-- **Recommended:** Within isolated devcontainers (docker images). This will leave your host system intact, and come with a convenient environment pre-configured to efficiently work with the framework. For building within devcontainers, please refer to [doc/devcontainer.md](doc/devcontainer.md)
-- Or locally on your host machine. Note that system dependencies (apt, pip, ROS, etc.) will be installed globally on your machine. For building with this method, keep reading this page.
+There are two main ways to use the superbuild:
+- **Recommended:** Within one of the provided isolated devcontainers (docker images). For building within devcontainers, please refer to [doc/devcontainer.md](doc/devcontainer.md).
+  - **Advantage:** This will leave your host system intact, and come with a convenient environment pre-configured to efficiently work with the framework.
+  - **Drawbacks:**
+    - You need to mount a local folder within the devcontainer.
+    - It will inherently take up much more space as all the dependencies need to be installed within the devcontainer
+    - If you need access to external devices (usb serial, etc) they will need to be configured when creating the devcontainer.
+    - You do not have full access to all the tools on your machine, only those within the devcontainer (by default a pre-configured vscode and convenience CLI tools such as github cli, lazygit, etc).
+- **Locally on your host machine**. For building with this method, keep reading this page.
+  - **Advantage**:
+    - Less space required. If a dependency / tool already exists it needs not be reinstalled
+    - Access to your full system, including all available tools, packages and devices
+  - **Drawbacks:**
+    - While `mc-rtc-superbuild` defined packages can be installed into their own local `CMAKE_INSTALL_PREFIX` (recommended), system dependencies (apt, pip, ROS, etc.) will be installed globally on your machine. This may lead to conflicts with other projects, and is highly suceptible to system-wide changes (e.g uninstalling an apt package might make an existing mc-rtc-superbuild environment fail).
+
+If reproducibility is your main concern, you might want to use [Nix](https://nix.dev) instead. Please refer to [mc-rtc's nixpkg repository](https://mc-rtc.github.io/nixpkgs/) for documentation.
 
 
 Requirements
@@ -29,6 +42,10 @@ git clone https://github.com/mc-rtc/mc-rtc-superbuild
 - on Debian like distributions: `./mc-rtc-superbuild/utils/bootstrap-linux.sh`
 - on macOS: `./mc-rtc-superbuild/utils/bootstrap-macos.sh`
 
+A note on python virtualenvs:
+- If a venv is currently enabled the boostrap script and subsequent uses of mc-rtc-superbuild will use the python interpreter from the venv. This is not recommended as it may lead to issues with dependencies and system packages. Please deactivate any venv before running the bootstrap script or using mc-rtc-superbuild.
+- **Recommended:** If no venv are enabled, the boostrap script will create one in ~/.mc-rtc-venv using `python3 -m venv --system-site-packages ~/.mc-rtc-venv`. Note that `--system-site-packages` is required in order for ROS dependencies to work. If you know of a better solution, please raise an issue.
+
 Usage
 --
 
@@ -38,23 +55,17 @@ git config --global user.name "Full Name"
 git config --global user.email "your.email@provider.com"
 ```
 
-#### Build with cmake presets
+#### Build with CMake Presets (recommended)
 
 Then configure and run the superbuild from the terminal, or use VSCode's "CMake Tools" extension to select your desired build preset.
   Note that default presets will:
-  - clone all projects in `./devel`
-  - build all projects in `./build/projects`
-  - install all projects in `./install`
+  - clone all projects in `../workspace/devel`
+  - build all projects in `../workspace/build/projects`
+  - mc-rtc-superbuild build folder in `../workspace/build/superbuild`
+  - install all projects in `./workspace/install`
 
-  ```bash
-  # Setup cmake and install all dependencies if necessary
-  cmake --preset relwithdebinfo
-  ```
+If these defaults do not suit you, you can create your own presets in `CMakeUserPresets.json` as detailed below.
 
-  ```bash
-  # Build all projects
-  cmake --build --preset relwithdebinfo
-  ```
 > <details>
 >  <summary>ℹ️ Create custom presets</summary>
 >   If you need to customize the build process, you can create your own presets. Here is an example of how to define custom CMake presets:
@@ -105,7 +116,21 @@ Then configure and run the superbuild from the terminal, or use VSCode's "CMake 
 >   - `"targets"`: Specifies the build targets (e.g., `install`).
 > </details>
 
+To build the `mc-rtc-superbuild` environment, which will clone, build, and install all projects and their dependencies, use:
+
+  ```bash
+  # Setup cmake and install all dependencies if necessary
+  cmake --preset relwithdebinfo
+  ```
+
+  ```bash
+  # Build all projects
+  cmake --build --preset relwithdebinfo
+  ```
+
 #### Build with standard cmake commands
+
+You do not have to use the presets, if you prefer to build manually refer to the details below. This is not recommended as it makes it hard to remember what options were used to build the environment in the first place in case you need to clear the build folder.
 
 <details>
   <summary>Build with standard cmake commands</summary>

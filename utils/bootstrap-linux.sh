@@ -19,11 +19,7 @@ then
 fi
 
 ${SUDO} apt-get update
-${SUDO} apt-get install -y --no-install-recommends wget apt-transport-https software-properties-common gnupg lsb-release build-essential gfortran curl git sudo cmake cmake-curses-gui python3-pip ccache
-if [[ `lsb_release -cs` == "noble" ]]
-then
-  ${SUDO} apt-get install -y --no-install-recommends pipx
-fi
+${SUDO} apt-get install -y --no-install-recommends wget apt-transport-https software-properties-common gnupg lsb-release build-essential gfortran curl git sudo cmake cmake-curses-gui python3-pip pipx ccache
 
 if [[ `lsb_release -si` == "Ubuntu" ]]
 then
@@ -39,12 +35,29 @@ else
   ${SUDO} /tmp/cmake-${CMAKE_VERSION_FULL} --skip-license --prefix=/usr --exclude-subdir
 fi
 
-if [[ ! -f $HOME/.local/bin/pre-commit ]]
+if ! command -v pre-commit &> /dev/null
 then
-  if [[ `lsb_release -cs` == "noble" ]]
-  then
+    echo "pre-commit not found. Installing via pipx..."
     pipx install pre-commit
-  else
-    /usr/bin/python3 -m pip install --user pre-commit
-  fi
+    pipx ensurepath
+else
+    echo "pre-commit is already installed."
+fi
+
+if [[ "$VIRTUAL_ENV" == "" ]]
+then
+  echo "You are not in a python virtual environment, creating a default one in ~/.mc-rtc-venv"
+  echo "$ python3 -m venv --system-site-packages ~/.mc-rtc-venv"
+  # XXX: enable system-site-packages so that we can use ROS python packages
+  # This breaks isolation as the environment now has access to the system's site-packages
+  # but this is the only way to mix mc_rtc python packages with ROS
+  python3 -m venv --system-site-packages ~/.mc-rtc-venv
+  # Note that except for python packages (mc_rtc_msgs), the following works
+  # python3 -m venv ~/.mc-rtc-venv
+  source ~/.mc-rtc-venv/bin/activate
+  pip install pytest
+  echo "You must activate a python virtual environment before building
+  $ source ~/.mc-rtc-venv/bin/activate
+  $ export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
+  "
 fi
