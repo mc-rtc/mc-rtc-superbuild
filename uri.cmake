@@ -51,7 +51,7 @@ AddProject(
 
 AddProject(
   uri
-  GITHUB_PRIVATE isri-aist/unified_robot_interface
+  GITHUB isri-aist/unified_robot_interface
   GIT_TAG origin/main
   CMAKE_ARGS -DBUILD_TESTING=OFF -DWITH_PROTOBUF=OFF
   DEPENDS mc_rtc flatbuffers zenoh-cpp
