@@ -17,14 +17,20 @@ set(APT_DEPENDENCIES
     libyaml-cpp-dev
     libltdl-dev
     libqwt-qt5-dev
-    # python3-matplotlib python3-pyqt5
     libspdlog-dev
     ninja-build
-    # python-is-python3
     libnotify-dev
-    # python3-git
 )
-set(PIP_DEPENDENCIES cython numpy coverage setuptools pytest)
+set(PIP_DEPENDENCIES
+    cython
+    numpy
+    coverage
+    setuptools
+    pytest
+    pyqt5
+    matplotlib
+    gitpython
+)
 
 if(BUILD_BENCHMARKS)
   list(APPEND APT_DEPENDENCIES libbenchmark-dev)
