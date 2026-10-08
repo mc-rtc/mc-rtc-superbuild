@@ -136,6 +136,7 @@ if(UNIX
 endif()
 
 include(mc_rtc.cmake)
+include(uri.cmake)
 
 add_subdirectory(robots)
 
