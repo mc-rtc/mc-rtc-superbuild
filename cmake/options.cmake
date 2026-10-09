@@ -82,7 +82,7 @@ if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
         "${MC_RTC_SUPERBUILD_DEFAULT_PYTHON_USER_BASE}/bin"
     )
   endif()
-  if(DISTRO STREQUAL "noble")
+  if(DISTRO STREQUAL "noble" OR DISTRO STREQUAL "resolute")
     # on ubuntu noble onwards, pip requires a virtualenv
     # detect if we are already in one and if not create one for mc-rtc
 
@@ -95,6 +95,10 @@ if(MC_RTC_SUPERBUILD_DEFAULT_PYTHON)
     )
     if(IN_VENV EQUAL 0)
       message(STATUS "Already in the expected Python virtualenv: $ENV{VIRTUAL_ENV}")
+      set(MC_RTC_SUPERBUILD_DEFAULT_PYTHON
+          "$ENV{VIRTUAL_ENV}/bin/python3"
+          CACHE FILEPATH "Python interpreter used by the superbuild" FORCE
+      )
     else()
       message(
         FATAL_ERROR

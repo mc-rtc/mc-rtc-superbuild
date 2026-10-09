@@ -203,9 +203,10 @@ RUN \
 # Rename ubuntu user to vscode (noble)
 # Create a new vscode user (jammy)
 RUN \
-   if [ "$UBUNTU_VERSION" = "noble" ] || [ "$UBUNTU_VERSION" = "resolute" ]; then \
+  if [ "$UBUNTU_VERSION" = "noble" ] || [ "$UBUNTU_VERSION" = "resolute" ]; then \
     usermod -l vscode ubuntu \
     && usermod -d /home/vscode -m vscode \
+    && usermod -s /bin/zsh vscode \
     && groupmod -n vscode ubuntu; \
   else \
     useradd -u 1000 -ms /bin/zsh vscode; \
