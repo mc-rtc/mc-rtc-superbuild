@@ -22,6 +22,6 @@ endif()
 AddProject(
   mc_openarm
   GITHUB isri-aist/mc_openarm
-  GIT_TAG origin/master
+  GIT_TAG origin/main
   DEPENDS openarm_description mc_rtc
 )
