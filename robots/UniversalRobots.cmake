@@ -5,6 +5,8 @@ option(WITH_UR3E "Build UR3E support" OFF)
 option(WITH_UR5E "Build UR5E support" OFF)
 option(WITH_UR10 "Build UR10 support" OFF)
 
+option(WITH_RTDE_DRIVER "Build rtde_driver control interface for UR manipulators" OFF)
+
 function(AddAptRepository PPA)
   execute_process(
     COMMAND bash -c
@@ -38,6 +40,21 @@ if(WITH_MC_RTDE)
     GITHUB isri-aist/mc_rtde
     GIT_TAG origin/main
     DEPENDS mc_rtc ur_modern_driver
+  )
+endif()
+
+if(WITH_RTDE_DRIVER)
+  AddProject(
+    Universal_Robots_Client_Library
+    GITHUB UniversalRobots/Universal_Robots_Client_Library
+    GIT_TAG origin/master
+  )
+
+  AddProject(
+    rtde_driver
+    GITHUB isri-aist/rtde_driver
+    GIT_TAG origin/main
+    DEPENDS Universal_Robots_Client_Library uri
   )
 endif()
 
