@@ -769,8 +769,7 @@ function(AddCatkinProject NAME)
       ExternalProject_Add_Step(
         ${NAME} install_dependencies
         COMMAND rosdep update
-        COMMAND ${SUDO_CMD} rosdep install --from-paths ${ROSDEP_PATHS} --ignore-src -y
-                -r
+        COMMAND rosdep install --from-paths ${ROSDEP_PATHS} --ignore-src -y -r
         WORKING_DIRECTORY "${WORKSPACE_DIR}"
         DEPENDEES download
         DEPENDERS configure
