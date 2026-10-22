@@ -16,7 +16,7 @@ if(WITH_Kinova)
     ros_kortex
     GITHUB Kinovarobotics/ros2_kortex
     GIT_TAG origin/${ROS_DISTRO}
-    WORKSPACE data_ws INSTALL_DEPENDENCIES
+    WORKSPACE data_ws INSTALL_DEPENDENCIES PACKAGES_SELECT kortex_description
   )
 
   AddProject(
