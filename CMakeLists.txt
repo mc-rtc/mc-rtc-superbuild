@@ -45,8 +45,7 @@ find_program(CCACHE_PROGRAM ccache)
 # For ccache < 4.8
 if(CCACHE_PROGRAM)
   message(NOTICE "Selected CCache: ${CCACHE_PROGRAM}")
-  # path is $HOME/workspace/devel, rewrite relative to $HOME
-  get_filename_component(CCACHE_BASE_DIR "${SOURCE_DESTINATION}/../.." REALPATH)
+  get_filename_component(CCACHE_BASE_DIR "${SOURCE_DESTINATION}" REALPATH)
   set(ccacheEnv
       # Rewrite all absolute paths that contain the CCACHE_BASEDIR into relative paths
       # This is done to ensure that the cache will be used even if the project is pulled
@@ -55,9 +54,14 @@ if(CCACHE_PROGRAM)
       # user's machine, etc)
       # See https://ccache.dev/manual/4.10.2.html#_compiling_in_different_directories
       CCACHE_BASEDIR=${CCACHE_BASE_DIR}
-      # locale and umask are important for docker containers: if either differs, the
-      # cache won't be used. no_hash_dir useful?
-      CCACHE_SLOPPINESS="umask,locale,no_hash_dir,pch_defines,file_macro,include_file_ctime"
+      # umask: Ignore differences in file creation permissions across builds
+      # locale: Ignore differences in compiler message localizations
+      # pch_defines: Relax strict macro validation when using precompiled headers
+      # file_macro: Ensure __FILE__ macros expand to relative paths (works with CCACHE_BASEDIR)
+      # include_file_ctime: Ignore changes to header file change times (ctime), which shift during Git checkouts
+      # include_file_mtime: Ignore changes to header file modification times (mtime)
+      # time_macros: Ignore __DATE__ and __TIME__ expansions to prevent invalidations based on build timestamp
+      CCACHE_SLOPPINESS="umask,locale,pch_defines,file_macro,include_file_ctime,include_file_mtime,time_macros"
       CCACHE_NOHASHDIR=true
   )
   set(CMAKE_C_COMPILER_LAUNCHER ${CMAKE_COMMAND} -E env ${ccacheEnv} ${CCACHE_PROGRAM})
