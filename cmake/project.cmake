@@ -717,7 +717,7 @@ endfunction()
 function(AddCatkinProject NAME)
   set(options INSTALL_DEPENDENCIES)
   set(oneValueArgs WORKSPACE)
-  set(multiValueArgs)
+  set(multiValueArgs PACKAGES_SELECT)
   cmake_parse_arguments(
     ADD_CATKIN_PROJECT_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}
   )
@@ -730,11 +730,26 @@ function(AddCatkinProject NAME)
     ensurevalidcatkinworkspace(${WORKSPACE})
     get_property(WORKSPACE_DIR GLOBAL PROPERTY CATKIN_WORKSPACE_${WORKSPACE}_DIR)
     get_property(WORKSPACE_STAMP GLOBAL PROPERTY CATKIN_WORKSPACE_${WORKSPACE}_STAMP)
+
+    set(PROJECT_SOURCE_DIR "${WORKSPACE_DIR}/src/${NAME}")
+
+    set(CONFIGURE_COMMAND ${CMAKE_COMMAND} -E rm -f "${WORKSPACE_STAMP}")
+
+    if(ADD_CATKIN_PROJECT_ARGS_PACKAGES_SELECT)
+      string(JOIN "," SELECTED_PACKAGES_CSV ${ADD_CATKIN_PROJECT_ARGS_PACKAGES_SELECT})
+
+      set(CONFIGURE_COMMAND
+          ${CMAKE_COMMAND} "-DSOURCE_DIR=${PROJECT_SOURCE_DIR}"
+          "-DSELECTED_PACKAGES=${SELECTED_PACKAGES_CSV}" -P
+          "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/scripts/select-colcon-packages.cmake"
+          COMMAND ${CMAKE_COMMAND} -E rm -f "${WORKSPACE_STAMP}"
+      )
+    endif()
+
     AddProject(
       ${NAME}
-      SOURCE_DIR "${WORKSPACE_DIR}/src/${NAME}" BINARY_DIR
-      "${WORKSPACE_DIR}/src/${NAME}"
-      CONFIGURE_COMMAND ${CMAKE_COMMAND} -E rm -f "${WORKSPACE_STAMP}"
+      SOURCE_DIR "${PROJECT_SOURCE_DIR}" BINARY_DIR "${PROJECT_SOURCE_DIR}"
+      CONFIGURE_COMMAND ${CONFIGURE_COMMAND}
       BUILD_COMMAND ""
       INSTALL_COMMAND "" WORKSPACE ${WORKSPACE}
       SKIP_TEST SKIP_SYMBOLIC_LINKS ${ADD_CATKIN_PROJECT_ARGS_UNPARSED_ARGUMENTS}
@@ -743,11 +758,19 @@ function(AddCatkinProject NAME)
     set_property(GLOBAL APPEND PROPERTY CATKIN_WORKSPACE_${WORKSPACE} "${NAME}")
 
     if(ADD_CATKIN_PROJECT_ARGS_INSTALL_DEPENDENCIES)
+      set(ROSDEP_PATHS "${PROJECT_SOURCE_DIR}")
+      if(ADD_CATKIN_PROJECT_ARGS_PACKAGES_SELECT)
+        set(ROSDEP_PATHS "")
+        foreach(PACKAGE IN LISTS ADD_CATKIN_PROJECT_ARGS_PACKAGES_SELECT)
+          list(APPEND ROSDEP_PATHS "${PROJECT_SOURCE_DIR}/${PACKAGE}")
+        endforeach()
+      endif()
+
       ExternalProject_Add_Step(
         ${NAME} install_dependencies
-        COMMAND ${SUDO_CMD} rosdep update && rosdep install --from-path src --ignore-src
-                -y -r
-        WORKING_DIRECTORY ${WORKSPACE_DIR}
+        COMMAND rosdep update
+        COMMAND rosdep install --from-paths ${ROSDEP_PATHS} --ignore-src -y -r
+        WORKING_DIRECTORY "${WORKSPACE_DIR}"
         DEPENDEES download
         DEPENDERS configure
       )
