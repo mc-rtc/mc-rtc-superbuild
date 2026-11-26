@@ -11,11 +11,21 @@ if(WITH_ROS_SUPPORT)
     CATKIN_BUILD_ARGS -DCATKIN_ENABLE_TESTING:BOOL=OFF
                       -DCMAKE_POLICY_VERSION_MINIMUM=3.5
   )
+
+  if(NOT WITH_MC_RTC_RVIZ_PANEL)
+    # Explicitely skip building the mc_rtc_ros package when WITH_MC_RTC_RVIZ_PANEL=OFF
+    # e.g colcon build --packages-skip mc_rtc_rviz_panel mc_rtc_ticker
+    # This prevents colcon from building the package if mc_rtc_ros was previously cloned (from a previous run with WITH_MC_RTC_RVIZ_PANEL=ON)
+    set(COLCON_SKIP_PACKAGES "")
+    list(APPEND COLCON_SKIP_PACKAGES "mc_rtc_rviz_panel")
+    list(APPEND COLCON_SKIP_PACKAGES "mc_rtc_ticker")
+  endif()
   CreateCatkinWorkspace(
     ID mc_rtc_ws
     DIR "catkin_ws"
     CATKIN_BUILD
-    CATKIN_BUILD_ARGS -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+    CATKIN_BUILD_ARGS -DCMAKE_POLICY_VERSION_MINIMUM=3.5 COLCON_SKIP_PACKAGES
+                      ${COLCON_SKIP_PACKAGES}
     PARALLEL_JOBS 8
   )
 endif()
@@ -282,14 +292,20 @@ AddProject(
 )
 
 if(WITH_ROS_SUPPORT)
-  AddCatkinProject(
-    mc_rtc_ros
-    GITHUB jrl-umi3218/mc_rtc_ros
-    GIT_TAG origin/master
-    WORKSPACE mc_rtc_ws
-    DEPENDS mc_rtc
-    APT_PACKAGES ros-${ROS_DISTRO}-mc-rtc-plugin ros-${ROS_DISTRO}-mc-rtc-tools
-  )
+  if(NOT WITH_MC_RTC_RVIZ_PANEL)
+    # Retrieve the value of COLCON_SKIP_PACKAGES after the function call
+    get_property(SKIP_PACKAGES GLOBAL PROPERTY COLCON_SKIP_PACKAGES)
+    message(STATUS "after ColconSkipPackage, COLCON_SKIP_PACKAGES: ${SKIP_PACKAGES}")
+  else()
+    AddCatkinProject(
+      mc_rtc_ros
+      GITHUB jrl-umi3218/mc_rtc_ros
+      GIT_TAG origin/master
+      WORKSPACE mc_rtc_ws
+      DEPENDS mc_rtc
+      APT_PACKAGES ros-${ROS_DISTRO}-mc-rtc-plugin ros-${ROS_DISTRO}-mc-rtc-tools
+    )
+  endif()
 endif()
 
 set(MC_STATE_OBSERVATION_DEPENDS mc_rtc)

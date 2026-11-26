@@ -1,17 +1,26 @@
 # Common options for all package
 
+include(CMakeDependentOption)
+
 # ######################################################################################
 # -- General options -- #
 # ######################################################################################
 option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 option(INSTALL_SYSTEM_DEPENDENCIES "Install system dependencies" ON)
 option(WITH_LSSOL "Enable LSSOL support" OFF)
+# Default to ON on non-Apple Unix systems (such as Linux), and OFF elsewhere
 if(UNIX AND NOT APPLE)
   set(WITH_ROS_SUPPORT_DEFAULT ON)
 else()
   set(WITH_ROS_SUPPORT_DEFAULT OFF)
 endif()
 option(WITH_ROS_SUPPORT "Enable ROS support" ${WITH_ROS_SUPPORT_DEFAULT})
+
+# Dependent option: enabled by default when WITH_ROS_SUPPORT is ON, and forced OFF when WITH_ROS_SUPPORT is OFF
+cmake_dependent_option(
+  WITH_MC_RTC_RVIZ_PANEL "Enable mc_rtc's rviz panel" ${WITH_ROS_SUPPORT_DEFAULT}
+  "WITH_ROS_SUPPORT" OFF
+)
 option(INSTALL_DOCUMENTATION "Install documentation of the projects" OFF)
 option(MC_RTC_SUPERBUILD_VERBOSE "Output more information at configuration time" OFF)
 option(VERBOSE_TEST_OUTPUT "Output more information while running unit tests" OFF)
