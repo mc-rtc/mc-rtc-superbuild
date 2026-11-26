@@ -64,6 +64,7 @@ endfunction()
 # * CATKIN_MAKE Init/Build the workspace for/with catkin_make
 # * CATKIN_BUILD Init/Build the workspace for/with catkin
 # * CATKIN_BUILD_ARGS <args...> Arguments for catkin build
+# * COLCON_SKIP_PACKAGES <pkg1;pkg2...> List of packages to skip when building the workspace with colcon
 # * PARALLEL_JOBS <num> number of parallel jobs to use when building this (0 lets Ninja decice, make will build on a single core)
 #
 # CATKIN_MAKE/CATKIN_BUILD are mutually exclusive and only apply for ROS1. For ROS2, colcon is always used
@@ -72,6 +73,7 @@ function(CreateCatkinWorkspace)
   set(options CATKIN_MAKE CATKIN_BUILD)
   set(oneValueArgs ID DIR PARALLEL_JOBS)
   set(multiValueArgs CATKIN_BUILD_ARGS)
+  set(multiValueArgs COLCON_SKIP_PACKAGES)
   cmake_parse_arguments(
     CC_WORKSPACE_ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN}
   )
@@ -181,10 +183,10 @@ function(CreateCatkinWorkspace)
     add_dependencies(catkin-config-skiplist-${ID} catkin-init-${ID})
     set(BUILD_COMMAND_DEPENDS DEPENDS ${SKIPLIST_STAMP_FILE})
   else()
-    # FIXME Add support for skiplist
     set(BUILD_COMMAND
         ${CMAKE_COMMAND} -E chdir ${DIR} ${COMMAND_PREFIX} colcon build --merge-install
-        --executor sequential --cmake-args -DCMAKE_BUILD_TYPE=$<CONFIG>
+        --executor sequential --packages-skip ${CC_WORKSPACE_ARGS_COLCON_SKIP_PACKAGES}
+        --cmake-args -DCMAKE_BUILD_TYPE=$<CONFIG>
         -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON ${CC_WORKSPACE_ARGS_CATKIN_BUILD_ARGS}
     )
   endif()
